@@ -40,12 +40,12 @@
 ### Decisões que ainda precisam ser fechadas
 
 1. Ramificações e serviços finais das três jornadas prioritárias.
-2. URLs, exemplos e evidências reproduzíveis da prova de viabilidade.
+2. URLs, exemplos e evidências reproduzíveis da prova de viabilidade. Em andamento: [matriz de evidências](dados/evidencias/README.md) das 3 jornadas (10/10/2026); amostras brutas coletadas em [amostras](dados/amostras/README.md). As fontes estaduais de perda de documentos ficaram fora do recorte do protótipo.
 3. Critérios e frequência de atualização e resolução de divergências.
 4. Modelo físico de dados e persistência das sessões.
 5. ~~Stack de backend e acesso a dados~~ — resolvido: Django 6.1.2 + PostgreSQL 18 ([ADR 0001](arquitetura/decisoes/0001-stack.md)). Frontend e hospedagem continuam pendentes.
 6. Estratégia de interpretação de texto livre.
-7. Critério de seleção de perguntas, desempate e encerramento.
+7. Critério de seleção de perguntas, desempate e encerramento. Direção decidida (critério determinístico sobre as regras, sem ML) no [ADR 0002](arquitetura/decisoes/0002-motor-baseado-em-regras.md); pesos, desempate e parada seguem pendentes.
 8. Representação concreta das regras e das dependências.
 9. Forma de manutenção do conteúdo e necessidade de interface administrativa.
 10. Procedimentos e nível pretendido de verificação de acessibilidade.

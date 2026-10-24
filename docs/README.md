@@ -35,6 +35,7 @@ Documentação de concepção e modelagem do sistema. Originada da consolidaçã
 | [arquitetura/motor-de-orientacao.md](arquitetura/motor-de-orientacao.md) | Aplicabilidade ternária, próxima pergunta, ordenação topológica e explicabilidade. |
 | [arquitetura/decisoes/](arquitetura/decisoes/) | Registros de decisões de arquitetura (ADR). |
 | [dados/fontes-oficiais.md](dados/fontes-oficiais.md) | Prova de viabilidade, serviços analisados, formatos e autenticação. |
+| [dados/evidencias/](dados/evidencias/README.md) | Matriz de evidências das jornadas: fontes, API Gov.br e classificação. |
 | [dados/ingestao-e-proveniencia.md](dados/ingestao-e-proveniencia.md) | Pipeline de coleta, normalização, proveniência e divergências. |
 | [academico/tcc.md](academico/tcc.md) | Título, questão de pesquisa, objetivos, metodologia, avaliação e monografia. |
 | [academico/referencial-teorico.md](academico/referencial-teorico.md) | Eixos teóricos, ressalvas e inventário de referências. |
