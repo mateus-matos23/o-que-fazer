@@ -1,0 +1,10 @@
+{% extends "guidance/base.html" %}
+{% block title %}Seu plano - O que Fazer?{% endblock %}
+{% block content %}
+<h1>Seu plano</h1>
+<ol>
+  {% for step in plan.steps %}
+  <li data-slug="{{ step.procedure.slug }}">{{ step.procedure.slug }}</li>
+  {% endfor %}
+</ol>
+{% endblock %}

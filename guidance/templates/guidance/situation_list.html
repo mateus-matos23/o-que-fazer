@@ -1,0 +1,12 @@
+{% extends "guidance/base.html" %}
+{% block title %}O que aconteceu? - O que Fazer?{% endblock %}
+{% block content %}
+<h1>O que aconteceu?</h1>
+<ul>
+  {% for situation in situations %}
+  <li><a href="{% url 'guidance:question' situation.slug %}">{{ situation.title }}</a></li>
+  {% empty %}
+  <li>Nenhuma situação disponível.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
