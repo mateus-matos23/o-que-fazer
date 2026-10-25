@@ -47,27 +47,29 @@ candidates = [
 
 [[questions]]
 slug = "forma-de-termino"
-text = "Como terminou o seu vínculo de trabalho?"
+text = "Como você saiu do emprego?"
+help = "Escolha a opção mais parecida com o que aconteceu. Se não tiver certeza, escolha \"Não sei\"."
 kind = "SINGLE"
 allows_unknown = true
 situations = ["desligamento-do-trabalho"]
 options = [
-  {slug = "sem-justa-causa", label = "Fui dispensado sem justa causa"},
-  {slug = "pedido-de-demissao", label = "Pedi demissão"},
-  {slug = "justa-causa", label = "Fui dispensado por justa causa"},
-  {slug = "acordo", label = "Rescisão por acordo", out_of_coverage = true},
+  {slug = "sem-justa-causa", label = "A empresa me mandou embora sem justa causa"},
+  {slug = "pedido-de-demissao", label = "Eu pedi para sair (pedido de demissão)"},
+  {slug = "justa-causa", label = "A empresa me mandou embora por justa causa"},
+  {slug = "acordo", label = "Combinei a saída com a empresa (rescisão por acordo)", out_of_coverage = true},
   {slug = "culpa-reciproca", label = "Culpa recíproca", out_of_coverage = true},
-  {slug = "fim-de-contrato", label = "Fim de contrato (por exemplo, prazo determinado)", out_of_coverage = true},
+  {slug = "fim-de-contrato", label = "O contrato chegou ao fim do prazo combinado (fim de contrato)", out_of_coverage = true},
 ]
 
 [[questions]]
 slug = "tipo-de-vinculo"
-text = "Qual era o seu tipo de vínculo de trabalho?"
+text = "Que tipo de trabalho era?"
+help = "Essa resposta muda qual seguro-desemprego entra no seu plano."
 kind = "SINGLE"
 allows_unknown = true
 situations = ["desligamento-do-trabalho"]
 options = [
-  {slug = "empregado", label = "Empregado com carteira assinada (não doméstico)"},
+  {slug = "empregado", label = "Com carteira assinada, sem ser empregado doméstico"},
   {slug = "domestico", label = "Empregado doméstico"},
 ]
 

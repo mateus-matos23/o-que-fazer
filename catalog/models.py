@@ -34,6 +34,7 @@ class Question(models.Model):
 
     slug = models.SlugField(unique=True)
     text = models.TextField()
+    help_text = models.TextField(blank=True)
     kind = models.CharField(max_length=10, choices=Kind)
     allows_unknown = models.BooleanField(default=False)
     order = models.PositiveSmallIntegerField(default=0)

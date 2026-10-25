@@ -29,6 +29,7 @@ def question(
     return QuestionDef(
         slug,
         slug,
+        "",
         kind,
         allows_unknown,
         order,

@@ -43,6 +43,7 @@ class OptionDef:
 class QuestionDef:
     slug: str
     text: str
+    help_text: str
     kind: Literal["SINGLE", "MULTIPLE"]
     allows_unknown: bool
     order: int

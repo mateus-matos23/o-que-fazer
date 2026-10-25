@@ -177,6 +177,15 @@ def test_out_of_coverage_true_false_and_absent(content: Path) -> None:
     assert _option_flags() == {"sim": True, "nao": False}
 
 
+def test_help_text_is_stored_and_defaults_to_empty(content: Path) -> None:
+    (content / "journey.toml").write_text(
+        _bump('text = "Pergunta?"', 'text = "Pergunta?"\nhelp = "Dica."')
+    )
+    load_content(content)
+    assert Question.objects.get(slug="q1").help_text == "Dica."
+    assert Question.objects.get(slug="q2").help_text == ""
+
+
 def test_idempotent(content: Path) -> None:
     load_content(content)
     assert load_content(content) == EXPECTED
@@ -385,6 +394,10 @@ ERRORS = {
     "out_of_coverage not bool": (
         _bump('{slug = "x", label = "X"}', '{slug = "x", label = "X", out_of_coverage = "sim"}'),
         "q2: options[0].out_of_coverage: esperado bool",
+    ),
+    "help not string": (
+        _bump('text = "Pergunta?"', 'text = "Pergunta?"\nhelp = 1'),
+        "q1: help: esperado str",
     ),
     "unknown nested key": (
         _bump('{slug = "x", label = "X"}', '{slug = "x", label = "X", z = 1}'),

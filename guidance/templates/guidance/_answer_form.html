@@ -8,8 +8,11 @@
     {{ form.answer.errors }}
   </div>
   {% endif %}
-  <fieldset{% if form.errors %} aria-describedby="form-errors"{% endif %}>
+  <fieldset{% if question.help_text or form.errors %} aria-describedby="{% if question.help_text %}question-help{% endif %}{% if question.help_text and form.errors %} {% endif %}{% if form.errors %}form-errors{% endif %}"{% endif %}>
     <legend><h1>{{ form.answer.label }}</h1></legend>
+    {% if question.help_text %}
+    <p id="question-help" class="question-help">{{ question.help_text }}</p>
+    {% endif %}
     <div class="choices{% if question.kind == 'SINGLE' and question.allows_unknown %} has-unknown{% endif %}">
       {{ form.answer }}
     </div>

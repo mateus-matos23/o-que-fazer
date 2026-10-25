@@ -321,7 +321,7 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
 
 ## Fase 7 — Conversa guiada
 
-Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; nenhuma fatia foi iniciada, exceto a documentação base.
+Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; a fatia 1 está consolidada, as demais seguem pendentes.
 
 **Motivação.** Hoje o cidadão escolhe a situação numa lista e responde uma ou duas perguntas antes do plano. O autor quer uma experiência de "conversa guiada", inspirada no Akinator, para um público com idade, escolaridade e familiaridade com tecnologia variadas. A conversa leva à situação por um funil de triagem, mostra o efeito de cada resposta no plano e termina num plano com ponto de partida. Requisitos RF21 a RF26 e regras RN02, RN14 e RN16 em [requisitos](../produto/requisitos.md).
 
@@ -338,7 +338,7 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; nenhuma fatia foi 
 | Fatia | Escopo | Estado |
 | --- | --- | --- |
 | 0 | Documentação base (produto, glossário, pendências e este registro) | Consolidado |
-| 1 | Linguagem simples e dica por pergunta | Pendente |
+| 1 | Linguagem simples e dica por pergunta | Consolidado |
 | 2 | Funil de triagem, com limite de cobertura nos ramos sem jornada | Pendente |
 | 3 | Efeito da resposta no plano | Pendente |
 | 4 | Preferência de atendimento e ordenação dos canais | Pendente |
@@ -347,6 +347,15 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; nenhuma fatia foi 
 | 7 | Perguntas novas com fonte: primeira solicitação do seguro-desemprego; declaração de IR nos últimos dois anos para o canal "sem gov.br" do CPF | Pendente |
 | 8 | "Não sei" com como descobrir (pesquisa) | Pendente |
 | 9 | Pesquisa perda × furto/roubo | Pendente |
+
+**Fatia 1 — linguagem simples e dica.**
+
+- `Question.help_text` (migration 0003) e chave TOML opcional `help` por pergunta. A dica é ligada ao `fieldset` por `aria-describedby`, junto de `form-errors` quando há erro.
+- Perguntas reescritas: "Qual é a situação do seu CPF na consulta da Receita Federal?", "Como você saiu do emprego?" e "Que tipo de trabalho era?"; a pergunta de documentos perdidos manteve o texto e ganhou dica. Os rótulos do desligamento passaram a frases simples, com o termo oficial entre parênteses.
+- Motivo: público variado (RF24). As dicas não afirmam nada sem fonte (RN16). "Culpa recíproca" foi mantida porque não há fonte para explicar o termo.
+- Gates: ruff, mypy e pytest verdes (281 passed).
+- Verificação no Chromium headless via CDP em 25/10/2026, após migrate e load_content no `oqf_dev` (autorizados pelo autor para a Fase 7): textos, dicas e `aria-describedby` conferidos; contraste da dica 6,69:1; sem rolagem horizontal em 320 px; sem erros de console.
+- Limite observado: o envio vazio é barrado pela validação nativa do navegador (`required` nos radios, anterior à fatia), então o bloco `#form-errors` só aparece quando o navegador não valida. O caminho do servidor segue coberto por testes.
 
 ## Limitações conhecidas
 

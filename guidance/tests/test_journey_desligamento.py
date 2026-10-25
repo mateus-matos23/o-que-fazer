@@ -104,9 +104,9 @@ def _post(client: Client, question: str, value: str) -> None:
 
 def test_http_flow_to_plan(loaded: dict[str, int], client: Client) -> None:
     html = client.get(f"/s/{SLUG}/").content.decode()
-    assert "Como terminou o seu vínculo de trabalho?" in html
+    assert "Como você saiu do emprego?" in html
     _post(client, FORMA, "sem-justa-causa")
-    assert "Qual era o seu tipo de vínculo" in client.get(f"/s/{SLUG}/").content.decode()
+    assert "Que tipo de trabalho era?" in client.get(f"/s/{SLUG}/").content.decode()
     _post(client, VINCULO, "domestico")
     response = client.get(f"/s/{SLUG}/", follow=True)
     assert response.redirect_chain[-1] == (f"/s/{SLUG}/plano/", 302)

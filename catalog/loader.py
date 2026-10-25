@@ -66,7 +66,7 @@ _TABLES = {
                 )
             ],
         },
-        {"allows_unknown": bool, "order": int_range_of(Question, "order")},
+        {"help": str, "allows_unknown": bool, "order": int_range_of(Question, "order")},
     ),
     "procedures": Schema(
         {
@@ -191,6 +191,7 @@ class QuestionDef:
     file: str
     slug: str
     text: str
+    help_text: str
     kind: str
     allows_unknown: bool
     order: int
@@ -231,6 +232,7 @@ def _parse(file: str, doc: dict[str, Any], content: Content) -> None:
                 file,
                 r["slug"],
                 r["text"],
+                r.get("help", ""),
                 r["kind"],
                 r.get("allows_unknown", False),
                 r.get("order", 0),
@@ -493,7 +495,12 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
     option_by_key: dict[tuple[str, str], AnswerOption] = {}
     for q in content.questions:
         question = Question.objects.create(
-            slug=q.slug, text=q.text, kind=q.kind, allows_unknown=q.allows_unknown, order=q.order
+            slug=q.slug,
+            text=q.text,
+            help_text=q.help_text,
+            kind=q.kind,
+            allows_unknown=q.allows_unknown,
+            order=q.order,
         )
         question_by_slug[q.slug] = question
         for slug, label in q.options:

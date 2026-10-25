@@ -231,6 +231,7 @@ def load_catalog(situation_slug: str) -> Catalog:
             q.slug: QuestionDef(
                 slug=q.slug,
                 text=q.text,
+                help_text=q.help_text,
                 kind=_choice(q.kind, QUESTION_KINDS),
                 allows_unknown=q.allows_unknown,
                 order=q.order,

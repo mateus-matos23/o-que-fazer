@@ -102,7 +102,7 @@ def test_csrf_enforced(loaded: dict[str, int]) -> None:
 
 def _question(kind: Literal["SINGLE", "MULTIPLE"], unknown: bool) -> QuestionDef:
     options = (OptionDef("a", "A"), OptionDef("b", "B"))
-    return QuestionDef("q", "Pergunta?", kind, unknown, 1, options)
+    return QuestionDef("q", "Pergunta?", "", kind, unknown, 1, options)
 
 
 def test_form_single() -> None:

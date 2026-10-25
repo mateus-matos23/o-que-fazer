@@ -150,6 +150,7 @@ button.secondary, .button.secondary { background: transparent; color: var(--acti
 fieldset { border: 0; margin: 1rem 0; padding: 0; min-width: 0; }
 legend { padding: 0; font-size: 1.33rem; font-weight: 700; line-height: 1.25; margin-bottom: 1rem; }
 legend h1 { font-size: 1.66rem; margin: 0; }
+.question-help { color: var(--muted); margin: 0 0 1rem; }
 .choices > div > div { margin: 0; }
 .choices label, .choice {
   display: flex;

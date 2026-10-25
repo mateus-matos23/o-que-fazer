@@ -36,13 +36,14 @@ candidates = ["segunda-via-cpf", "registrar-ocorrencia-extravio", "segunda-via-c
 [[questions]]
 slug = "documentos-perdidos"
 text = "Quais documentos você perdeu?"
+help = "Marque todos os documentos que você perdeu."
 kind = "MULTIPLE"
 allows_unknown = false
 situations = ["perda-de-documentos"]
 options = [
   {slug = "cpf", label = "CPF"},
   {slug = "cin", label = "Carteira de Identidade (RG / CIN)"},
-  {slug = "cnh", label = "Carteira Nacional de Habilitação (CNH)"},
+  {slug = "cnh", label = "Carteira de motorista (CNH)"},
   {slug = "titulo-de-eleitor", label = "Título de eleitor", out_of_coverage = true},
 ]
 

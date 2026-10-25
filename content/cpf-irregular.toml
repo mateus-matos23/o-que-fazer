@@ -15,7 +15,8 @@ candidates = [
 
 [[questions]]
 slug = "cpf-situacao-cadastral"
-text = "Qual é a situação cadastral do seu CPF na consulta oficial?"
+text = "Qual é a situação do seu CPF na consulta da Receita Federal?"
+help = "Escolha o nome que aparece na consulta oficial do CPF. Se você ainda não consultou, escolha \"Não sei\": o plano mostra como consultar."
 kind = "SINGLE"
 allows_unknown = true
 situations = ["cpf-irregular"]
