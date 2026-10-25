@@ -27,7 +27,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 1 | Fontes e proveniência (app `sources`) | Consolidado (commits `bc4a2c0`, `8c21ca0`, `8f3c093`) |
 | 2 | Domínio normalizado, conhecimento e carregador de conteúdo (app `catalog`, comandos `load_sources`/`load_content`, jornada CPF irregular, ADR 0003) | Consolidado |
 | 3 | Motor de orientação (`guidance/engine`, Python puro: avaliação ternária, próxima pergunta, plano em camadas com Kahn; `guidance/repository.py`) | Consolidado (commits `3b957cb`, `90969f6`, `a12eaa1`) |
-| 4 | Fluxo mínimo HTTP com templates Django sem estilo e sessão Django | Pendente |
+| 4 | Fluxo mínimo HTTP com templates Django sem estilo e sessão Django | Consolidado (commits `ad23d39`, `c14f994`) |
 | 5 | Jornadas desligamento do trabalho e perda de documentos | Pendente |
 | 6 | UI/UX, acessibilidade, frontend, RF18 e RF02 | Pendente |
 
@@ -178,6 +178,51 @@ O motor fica em `guidance/engine/`, em Python puro, sem Django. Ele recebe um `C
 - O teste de ponta a ponta cobre a jornada CPF irregular com cada resposta possível, com "não sei" e sem fatos.
 - No `oqf_dev`, com as fontes reais, "suspenso" gera a etapa `regularizar-cpf-suspenso` e "não sei" gera `consultar-situacao-cpf`.
 
+## Fase 4 — Fluxo mínimo HTTP
+
+Templates Django sem CSS nem JavaScript, com HTML semântico (`fieldset` e `legend`, resumo em `ol`). O visual fica para a Fase 6.
+
+| Fatia | Escopo | Estado |
+| --- | --- | --- |
+| 4a | Lista de situações, pergunta e sessão | Consolidado (`ad23d39`) |
+| 4b | Plano, revisão e edição de respostas, recomeçar e erro de ciclo | Consolidado (`c14f994`) |
+
+**Rotas**
+
+| Rota | Função |
+| --- | --- |
+| `/` | Situações (RF01). |
+| `/s/<slug>/` | Próxima pergunta; o POST segue o padrão POST/redirect/GET com 303. |
+| `/s/<slug>/plano/` | Plano, exibido só quando não resta pergunta relevante. |
+| `/s/<slug>/respostas/` | Revisão das respostas (RF16). |
+| `/s/<slug>/respostas/<pergunta>/` | Edição de uma resposta; o plano é recalculado (invariante 8). |
+| `/s/<slug>/recomecar/` | Recomeçar; aceita só POST. |
+
+**Sessão** (`guidance/session.py`)
+- Formato: `{"facts": {situação: {pergunta: [opções] | "unknown"}}}`, guardado na sessão do Django, sem conta e sem tabela.
+- Uma resposta que não cabe mais no catálogo carregado (pergunta ou opção removida) é descartada com `warning` no log, e a pergunta volta a ser feita.
+- Motivo: `load_content` substitui o catálogo, e as sessões antigas guardam slugs.
+
+**Formulário** (`guidance/forms.py`)
+- Pergunta de escolha única vira botões de opção; de escolha múltipla, caixas de seleção, e a escolha múltipla aceita "nenhuma destas".
+- "Não sei" só aparece quando a pergunta aceita. Na escolha única, usa o valor reservado `__unknown__`; na múltipla, um campo próprio, que não pode vir junto com outras opções.
+- Toda validação é feita no servidor.
+
+**Plano**
+- Começa por um aviso de que o sistema é orientativo, seguido de um resumo e depois dos detalhes de cada etapa.
+- Cada etapa mostra:
+  - motivo (RF19);
+  - "necessária antes de" e "faça depois de", com "(sugestão)" nas dependências recomendadas (RN08);
+  - órgão, requisitos e canais;
+  - custo e prazo, ou "Não informado" (RN11);
+  - fonte, com a data de coleta e a data declarada pelo órgão (RN12), no fuso America/Fortaleza.
+- Um ciclo registra os slugs no log e mostra uma página de erro genérica (500), nunca um plano parcial.
+
+**Verificação**
+- Testes com o client do Django cobrem a jornada inteira, "não sei", edição, recomeçar, CSRF, 404, 400 e 405, fuso e ciclo.
+- Em 24/10/2026, a jornada foi percorrida por HTTP com `runserver` sobre o `oqf_dev`: lista, pergunta com 6 opções ("Não sei" incluída), POST 303 e plano com fonte e data de coleta.
+- Não houve verificação no navegador com o `verificador-ui`. Motivo: as telas não têm estilo e serão refeitas na Fase 6, onde a verificação visual e de acessibilidade acontece.
+
 ## Limitações conhecidas
 
 - O banco não garante que o snapshot de uma importação pertence à mesma fonte da importação. Essa garantia hoje é só do código de coleta (`sources/services.py`).
@@ -185,5 +230,7 @@ O motor fica em `guidance/engine/`, em Python puro, sem Django. Ele recebe um `C
 - `load_sources` recusa a troca de URL entre duas fontes já cadastradas (marcado como `shortcut:` no código). Isso será tratado se surgir um caso real.
 - A validação de `load_content` roda fora da transação de escrita. Uma coleta concorrente entre as duas etapas pode invalidar a verificação. É um risco baixo para um comando executado manualmente.
 - Uma dependência condicional cuja etapa dependente é um pré-requisito puxado (não candidato) não torna a sua pergunta elegível como próxima pergunta. Sem dependências no conteúdo atual, isso ainda não tem efeito.
-- `fetched_at` é guardado em UTC; a interface (Fase 4) precisa exibi-lo no fuso `America/Fortaleza`.
+- **Fonte mostrada por slug.** O plano mostra a fonte pelo slug, e o link de fontes `GOVBR_API` abre o JSON da API, o que não serve ao cidadão. Na Fase 6, exibir um nome legível e preferir a página HTML do serviço.
+- **Etapa sem data de atualização.** As etapas citadas pela ficha da API, como "regularizar CPF suspenso", aparecem com data de atualização "Não informado", porque a API não declara essa data. Revisar o conteúdo para citar a página HTML, que traz "Última Modificação" (RN12).
+- **Esquema de URL não validado.** O loader não valida o esquema das URLs de canais e fontes; aceita qualquer texto. O conteúdo é curado e versionado, mas convém restringir a `https://`.
 - O conteúdo bruto completo da página HTML é guardado em `TEXT` no banco. As páginas têm até cerca de 150 KB. Não há armazenamento de arquivos brutos fora do banco.
