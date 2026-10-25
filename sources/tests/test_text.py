@@ -8,6 +8,12 @@ def test_normalize_whitespace() -> None:
     assert normalize_whitespace("  a \n\t b  ") == "a b"
 
 
+def test_normalize_glues_punctuation_split_by_tags() -> None:
+    snapshot = SourceSnapshot(raw_text="<p>é <b>gratuita</b>, exceto (<span> R$ 7,00</span>).</p>")
+    assert snapshot_text(snapshot) == "é gratuita, exceto (R$ 7,00)."
+    assert contains_excerpt(snapshot_text(snapshot), "gratuita, exceto (R$ 7,00).")
+
+
 def test_html_text_drops_tags_and_decodes_entities() -> None:
     snapshot = SourceSnapshot(raw_text="<p>Taxa:  <b>R$&nbsp;10</b>\n e   &amp; mais</p>")
     assert snapshot_text(snapshot) == "Taxa: R$ 10 e & mais"

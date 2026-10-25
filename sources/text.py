@@ -1,5 +1,6 @@
 """Texto pesquisável de uma versão de fonte, usado para verificar trechos literais."""
 
+import re
 from html.parser import HTMLParser
 
 from .models import SourceSnapshot
@@ -14,8 +15,14 @@ class TextExtractor(HTMLParser):
         self.chunks.append(data)
 
 
+_SPACE_BEFORE_CLOSING = re.compile(r" ([,.;:!?)])")
+_SPACE_AFTER_OPENING = re.compile(r"\( ")
+
+
 def normalize_whitespace(text: str) -> str:
-    return " ".join(text.split())
+    # Fronteiras de tag viram espaço ("<b>gratuita</b>," → "gratuita ,"); a pontuação volta a colar.
+    collapsed = " ".join(text.split())
+    return _SPACE_AFTER_OPENING.sub("(", _SPACE_BEFORE_CLOSING.sub(r"\1", collapsed))
 
 
 def _json_strings(value: object) -> list[str]:
