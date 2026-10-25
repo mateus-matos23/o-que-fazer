@@ -16,6 +16,17 @@
 - Explicar o motivo de cada providência em linguagem simples.
 - Manter fonte e encaminhamento oficial acessíveis.
 
+### Linguagem simples
+
+Proposto (Fase 7, 25/10/2026): regras de redação para perguntas e opções, pensadas para públicos com idade, escolaridade e familiaridade com tecnologia variadas.
+
+- Frases curtas.
+- Opções na primeira pessoa, descrevendo o que aconteceu com o cidadão: "A empresa me mandou embora".
+- Termo oficial entre parênteses, quando existir: "(dispensa sem justa causa)".
+- A dica da pergunta é opcional e fica ligada ao fieldset por `aria-describedby`.
+- O efeito de cada resposta aparece em texto, sem animação.
+- "Saiu do seu plano" nunca é redigido como "você não tem direito". Não aplicável é avaliação orientativa sobre os fatos informados, não decisão oficial.
+
 ### Telas previstas no documento inicial
 
 | Tela ou estado | Conteúdo principal |
@@ -34,6 +45,8 @@
 ### Estrutura do plano
 
 Cada etapa deve apresentar título, explicação curta, motivo de aplicabilidade, órgão, canais, requisitos, dependências e fonte. Custos e prazos aparecem quando disponíveis. A ordem deve tornar visíveis os pré-requisitos e as etapas independentes.
+
+Proposto (Fase 7, 25/10/2026): o plano começa por "Comece por aqui", que indica por onde começar. Em seguida vem "O que separar antes", agrupado por etapa e sem mesclar requisitos parecidos de procedimentos diferentes. O plano também tem versão para impressão.
 
 ### Direção visual discutida
 

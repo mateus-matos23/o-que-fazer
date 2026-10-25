@@ -30,6 +30,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 4 | Fluxo mínimo HTTP com templates Django sem estilo e sessão Django | Consolidado (commits `ad23d39`, `c14f994`) |
 | 5 | Jornadas desligamento do trabalho e perda de documentos | Consolidado |
 | 6 | UI/UX, acessibilidade, frontend e RF18 (RF02 segue pendente) | Consolidado |
+| 7 | Conversa guiada: funil de triagem, efeito da resposta, preferência de atendimento e plano com ponto de partida (RF21 a RF26) | Proposto (25/10/2026) |
 
 ## Decisões tomadas em 24/10/2026 (aprovadas pelo autor)
 
@@ -317,6 +318,35 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
   - a página de detalhe pré-busca as regras sem usá-las (cerca de 4 consultas a mais), porque reaproveita a conversão do `load_catalog`;
   - o bloco de erro repetido entre busca e pergunta (dois usos);
   - o contexto repetido entre `question` e `edit_answer`, que é anterior à fase.
+
+## Fase 7 — Conversa guiada
+
+Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; nenhuma fatia foi iniciada, exceto a documentação base.
+
+**Motivação.** Hoje o cidadão escolhe a situação numa lista e responde uma ou duas perguntas antes do plano. O autor quer uma experiência de "conversa guiada", inspirada no Akinator, para um público com idade, escolaridade e familiaridade com tecnologia variadas. A conversa leva à situação por um funil de triagem, mostra o efeito de cada resposta no plano e termina num plano com ponto de partida. Requisitos RF21 a RF26 e regras RN02, RN14 e RN16 em [requisitos](../produto/requisitos.md).
+
+**Decisões de 25/10/2026 (aprovadas pelo autor)**
+
+1. **RN02 mantida.** Cada pergunta continua existindo só se a resposta puder alterar aplicabilidade, ordem ou encaminhamento. O funil de triagem entra como encaminhamento.
+2. **RF02 (texto livre) segue fora.** A direção registrada, para quando entrar, são palavras-chave determinísticas com confirmação do cidadão, sem LLM ([pendências](../pendencias.md), item 6).
+3. **Preferência de atendimento só ordena canais.** Ela nunca esconde canal nem altera aplicabilidade (RN14).
+4. **Efeito da resposta por parâmetro de URL**, sem mudar a sessão. A sessão continua guardando só as respostas.
+5. **Lista de situações mantida** como link secundário, ao lado do funil.
+
+**Fatias.** Cada fatia depende da anterior estar funcional e validada.
+
+| Fatia | Escopo | Estado |
+| --- | --- | --- |
+| 0 | Documentação base (produto, glossário, pendências e este registro) | Consolidado |
+| 1 | Linguagem simples e dica por pergunta | Pendente |
+| 2 | Funil de triagem, com limite de cobertura nos ramos sem jornada | Pendente |
+| 3 | Efeito da resposta no plano | Pendente |
+| 4 | Preferência de atendimento e ordenação dos canais | Pendente |
+| 5 | Plano com "Comece por aqui", "O que separar antes" e versão para impressão | Pendente |
+| 6 | Requisitos e canais condicionais no motor | Pendente |
+| 7 | Perguntas novas com fonte: primeira solicitação do seguro-desemprego; declaração de IR nos últimos dois anos para o canal "sem gov.br" do CPF | Pendente |
+| 8 | "Não sei" com como descobrir (pesquisa) | Pendente |
+| 9 | Pesquisa perda × furto/roubo | Pendente |
 
 ## Limitações conhecidas
 

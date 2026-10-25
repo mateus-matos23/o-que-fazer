@@ -54,6 +54,8 @@ Fluxo previsto:
 6. Consultar o plano e os detalhes de cada etapa.
 7. Acessar o canal oficial correspondente.
 
+**Conversa guiada (Proposto, Fase 7, 25/10/2026).** A situação pode ser encontrada por um funil de triagem, com perguntas amplas e inspiração no Akinator, que leva a uma situação da lista. Quando um ramo do funil não tem jornada, o sistema informa o limite de cobertura. Cada resposta mostra o seu efeito no plano ("por causa dessa resposta, X entrou no seu plano" ou "Y saiu do seu plano"). As perguntas usam linguagem simples e podem ter uma dica. A conversa termina num plano que indica por onde começar ("Comece por aqui").
+
 ### Onde resolvo?
 
 Entrada por serviço já conhecido. O usuário busca, por exemplo, regularização do CPF ou emissão de identidade, fornece apenas o contexto necessário e consulta órgão, requisitos e canais.
@@ -65,6 +67,8 @@ Esse modo integra a visão do produto. Sua profundidade no protótipo deve ser c
 Foi discutida uma entrada como “descreva sua situação”. O mecanismo que transforma esse texto em uma situação conhecida ainda não foi definido. Não se deve assumir que o histórico estabeleceu obrigatoriamente o uso de um modelo de linguagem.
 
 A seleção de situações frequentes permite demonstrar o núcleo decisório enquanto a interpretação do texto livre permanece uma escolha de implementação.
+
+Direção registrada para quando a entrada por texto livre for implementada (Pendente; fora da Fase 7): palavras-chave determinísticas, com confirmação do cidadão antes de qualquer situação ser aberta, sem modelo de linguagem.
 
 ## Funcionalidades futuras discutidas
 

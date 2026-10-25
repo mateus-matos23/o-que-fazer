@@ -34,13 +34,19 @@ Os requisitos abaixo organizam o conteúdo discutido. Eles precisam ser detalhad
 | RF18 | Permitir busca direta por serviço no modo “Onde resolvo?”. | Visão do produto. |
 | RF19 | Explicar por que uma etapa aparece e por que depende de outra. | Núcleo explicável. |
 | RF20 | Tratar informação divergente, desatualizada ou não disponível. | Qualidade da orientação. |
+| RF21 | Conduzir o cidadão até a situação por um funil de perguntas amplas (triagem), informando o limite de cobertura nos ramos sem jornada. | Proposto (Fase 7). |
+| RF22 | Mostrar, após cada resposta, o efeito dela no plano (providências que entraram, que saíram e quantas seguem em análise). | Proposto (Fase 7). |
+| RF23 | Perguntar a preferência de atendimento (internet/aplicativo, telefone, pessoalmente, tanto faz) e ordenar os canais por ela, sem esconder nenhum. | Proposto (Fase 7). |
+| RF24 | Redigir perguntas e opções em linguagem simples, com dica opcional por pergunta. | Proposto (Fase 7). |
+| RF25 | Exibir requisitos e canais conforme os fatos informados, mantendo os de aplicabilidade indeterminada com marcação. | Proposto (Fase 7). |
+| RF26 | Destacar no plano por onde começar, listar o que separar antes (agrupado por etapa) e oferecer versão para impressão. | Proposto (Fase 7). |
 
 ## Regras de negócio e de orientação
 
 | ID | Regra |
 | --- | --- |
 | RN01 | Toda orientação publicada deve ter fundamento rastreável em fonte oficial pertinente ao serviço e ao território. |
-| RN02 | Cada pergunta deve existir porque sua resposta pode alterar a aplicabilidade, a ordem ou o encaminhamento. |
+| RN02 | Cada pergunta deve existir porque sua resposta pode alterar a aplicabilidade, a ordem ou o encaminhamento. Encaminhamento inclui levar à situação (funil de triagem), escolher os requisitos e canais exibidos e ordenar os canais pela preferência de atendimento. |
 | RN03 | Fatos desconhecidos não devem ser convertidos automaticamente em respostas negativas. |
 | RN04 | Um procedimento pode ser aplicável, não aplicável ou indeterminado. |
 | RN05 | Uma situação pode gerar vários procedimentos, inclusive de órgãos diferentes. |
@@ -52,5 +58,6 @@ Os requisitos abaixo organizam o conteúdo discutido. Eles precisam ser detalhad
 | RN11 | Custo, prazo e canal desconhecidos devem permanecer identificados como não informados; não cabe inventar valores. |
 | RN12 | A data da consulta da fonte deve ser diferenciada da data de atualização declarada pelo órgão. |
 | RN13 | Divergências relevantes precisam ser sinalizadas para revisão e registradas. |
-| RN14 | A preferência por atendimento presencial deve ser considerada quando houver alternativa documentada. |
+| RN14 | A preferência de atendimento (internet, telefone ou presencial) deve ser considerada na ordem dos canais quando houver alternativa documentada; ela nunca esconde canais nem altera aplicabilidade. |
 | RN15 | No uso básico, não será exigido cadastro e devem ser evitados dados pessoais desnecessários. |
+| RN16 | Dicas e textos de ajuda das perguntas não afirmam regra, prazo ou definição sem trecho de fonte oficial; limitam-se a explicar por que se pergunta e como responder. |

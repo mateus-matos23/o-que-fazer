@@ -23,6 +23,13 @@ Conhecimento declarado durante a sessão a partir das respostas. Um fato pode es
 Interação de um cidadão com o sistema: situação escolhida, fatos coletados e plano resultante. Não exige conta; persistência e retenção estão pendentes.
 _Distinguir de:_ conteúdo publicado — respostas da sessão nunca alteram regras ou procedimentos.
 
+**Funil de triagem** · `TriageNode` / `TriageChoice`
+Perguntas amplas que levam à situação. É encaminhamento: não afirma nada em nome de órgão e por isso não exige fonte. Ramos sem jornada informam o limite de cobertura.
+_Distinguir de:_ Pergunta (`Question`), que pertence a uma situação e alimenta regras.
+
+**Preferência de atendimento** · `channel preference`
+Como o cidadão prefere ser atendido (internet/aplicativo, telefone, pessoalmente ou tanto faz). Só ordena canais; nunca é Fato nem altera aplicabilidade (RN14).
+
 ## Conhecimento e decisão
 
 **Regra** · `Rule`
@@ -88,6 +95,9 @@ Apresentação da jornada ao cidadão ("Seu plano"): resumo antes dos detalhes.
 **Etapa** · `PlanStep`
 Item do plano: título, explicação, motivo da inclusão, órgão, canais, requisitos, dependências, fonte e, quando documentados, custo e prazo.
 
+**Efeito da resposta** · `answer effect`
+Procedimentos que entraram ou saíram do plano por causa da última resposta, e quantos seguem em análise.
+
 ## Modos de uso
 
 **"O que faço agora?"** · `situation mode`
@@ -105,3 +115,4 @@ Entrada por serviço já conhecido; profundidade compatível com as jornadas sel
 - **Prioridade de exibição ≠ requisito administrativo** (RN08).
 - **Não informado ≠ inexistente**: custo, prazo ou canal desconhecido aparece como "não informado" (RN11).
 - **Consultar a descrição de um serviço ≠ executar o serviço**: o sistema orienta e encaminha; não executa, não autentica nos portais oficiais e não confirma direitos.
+- **Saiu do plano ≠ não tem direito**: não aplicável é avaliação orientativa sobre os fatos informados, não decisão oficial.
