@@ -1,0 +1,19 @@
+{% extends "guidance/base.html" %}
+{% block title %}Suas respostas - O que Fazer?{% endblock %}
+{% block content %}
+<h1>Suas respostas</h1>
+{% if lines %}
+<ul>
+  {% for line in lines %}
+  <li>
+    <p>{{ line.text }}</p>
+    <p>{% if line.unknown %}Não sei{% elif line.labels %}{{ line.labels|join:", " }}{% else %}Nenhuma destas{% endif %}</p>
+    <a href="{% url 'guidance:edit_answer' catalog.situation_slug line.question_slug %}">Alterar</a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Nenhuma pergunta respondida ainda.</p>
+{% endif %}
+<p><a href="{% url 'guidance:question' catalog.situation_slug %}">Continuar</a></p>
+{% endblock %}

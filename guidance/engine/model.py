@@ -26,6 +26,7 @@ Facts = Mapping[str, Answer]  # chave = slug da pergunta; ausente = não respond
 @dataclass(frozen=True, slots=True)
 class Citation:
     source_slug: str
+    source_url: str
     excerpt: str
     fetched_at: datetime
     declared_updated_at: date | None

@@ -1,0 +1,14 @@
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="question" value="{{ question.slug }}">
+  {{ form.non_field_errors }}
+  <fieldset>
+    <legend>{{ form.answer.label }}</legend>
+    {{ form.answer.errors }}
+    {{ form.answer }}
+  </fieldset>
+  {% if form.unknown %}
+  <p>{{ form.unknown }} <label for="{{ form.unknown.id_for_label }}">{{ form.unknown.label }}</label></p>
+  {% endif %}
+  <button type="submit">Continuar</button>
+</form>

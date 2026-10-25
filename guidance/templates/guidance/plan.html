@@ -2,9 +2,94 @@
 {% block title %}Seu plano - O que Fazer?{% endblock %}
 {% block content %}
 <h1>Seu plano</h1>
-<ol>
-  {% for step in plan.steps %}
-  <li data-slug="{{ step.procedure.slug }}">{{ step.procedure.slug }}</li>
-  {% endfor %}
-</ol>
+<p><strong>Atenção:</strong> este sistema é apenas orientativo. Ele não executa serviços nem confirma direitos; confira sempre na fonte oficial.</p>
+
+{% if steps %}
+<nav aria-label="Resumo do plano">
+  <h2>Resumo</h2>
+  <ol>
+    {% for item in steps %}
+    <li><a href="#etapa-{{ item.step.procedure.slug }}">{{ item.step.procedure.title }}</a></li>
+    {% endfor %}
+  </ol>
+</nav>
+
+{% for item in steps %}
+{% with step=item.step procedure=item.step.procedure %}
+<section id="etapa-{{ procedure.slug }}" data-slug="{{ procedure.slug }}">
+  <h2>{{ procedure.title }}</h2>
+  <p>Passo {{ step.layer }} (etapas do mesmo passo podem ser feitas em qualquer ordem)</p>
+  <p>{{ procedure.description }}</p>
+
+  {% if step.reasons %}
+  <h3>Por que esta etapa</h3>
+  <ul>
+    {% for rule in step.reasons %}<li>{{ rule.explanation }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  {% if step.clarifies %}
+  <p>Você respondeu "Não sei" para: {{ step.clarifies.text }} Descubra a resposta e volte para continuar.
+    <a href="{% url 'guidance:edit_answer' catalog.situation_slug step.clarifies.slug %}">Alterar essa resposta</a></p>
+  {% endif %}
+  {% if item.required_for %}
+  <p>Necessária antes de: {{ item.required_for|join:", " }}</p>
+  {% endif %}
+  {% if item.after %}
+  <p>Faça depois de:</p>
+  <ul>
+    {% for line in item.after %}<li>{{ line.title }}{% if line.suggestion %} (sugestão){% endif %}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <h3>Órgão</h3>
+  <p>{{ procedure.agency_name }}</p>
+
+  <h3>Requisitos</h3>
+  {% if procedure.requirements %}
+  <ul>
+    {% for requirement in procedure.requirements %}<li>{{ requirement.description }}</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p>Não informado</p>
+  {% endif %}
+
+  <h3>Canais</h3>
+  {% if item.channels %}
+  <ul>
+    {% for line in item.channels %}
+    <li>{{ line.kind_label }}: {{ line.channel.description }}
+      {% if line.channel.url %}<a href="{{ line.channel.url }}" rel="noopener">Acessar</a>{% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Não informado</p>
+  {% endif %}
+
+  <p>Custo: {% if item.costs %}{{ item.costs|join:"; " }}{% else %}Não informado{% endif %}</p>
+  <p>Prazo: {% if item.deadlines %}{{ item.deadlines|join:"; " }}{% else %}Não informado{% endif %}</p>
+
+  <p>Fonte: <a href="{{ procedure.citation.source_url }}" rel="noopener">{{ procedure.citation.source_slug }}</a>.
+    Coletado em {{ procedure.citation.fetched_at|date:"d/m/Y H:i" }}.
+    Atualizado pelo órgão em {% if procedure.citation.declared_updated_at %}{{ procedure.citation.declared_updated_at|date:"d/m/Y" }}{% else %}Não informado{% endif %}.</p>
+</section>
+{% endwith %}
+{% endfor %}
+{% elif not undetermined %}
+<p>Nenhuma providência encontrada para as respostas dadas.</p>
+{% endif %}
+
+{% if undetermined %}
+<section>
+  <h2>Pode se aplicar, mas faltam informações</h2>
+  <ul>
+    {% for title in undetermined %}<li>{{ title }}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<p><a href="{% url 'guidance:review' catalog.situation_slug %}">Revisar respostas</a></p>
+<form method="post" action="{% url 'guidance:restart' catalog.situation_slug %}">
+  {% csrf_token %}
+  <button type="submit">Recomeçar</button>
+</form>
 {% endblock %}

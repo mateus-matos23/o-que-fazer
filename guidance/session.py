@@ -61,3 +61,9 @@ def write_answer(
     all_facts[situation_slug] = current
     session[KEY] = all_facts
     session.modified = True
+
+
+def clear_situation(session: SessionBase, situation_slug: str) -> None:
+    all_facts = session.get(KEY, {})
+    if all_facts.pop(situation_slug, None) is not None:
+        session[KEY] = all_facts

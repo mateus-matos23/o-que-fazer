@@ -103,6 +103,7 @@ class CitationFactory:
             raise ValueError(f"snapshot {snapshot} sem importação OK")
         return Citation(
             source_slug=snapshot.source.slug,
+            source_url=snapshot.source.url,
             excerpt=cited.excerpt,
             fetched_at=fetched_at,
             declared_updated_at=snapshot.declared_updated_at,

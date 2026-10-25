@@ -12,7 +12,9 @@ from guidance.engine.model import (
     RuleDef,
 )
 
-CITATION = Citation("fonte", "trecho", datetime(2026, 1, 1, tzinfo=UTC), None)
+CITATION = Citation(
+    "fonte", "https://exemplo.gov.br/fonte", "trecho", datetime(2026, 1, 1, tzinfo=UTC), None
+)
 
 
 def question(
