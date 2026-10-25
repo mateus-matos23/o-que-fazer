@@ -22,6 +22,7 @@ from catalog.models import (
     TriageChoice,
     TriageNode,
 )
+from guidance.engine.channels import ChannelPreference, lacks_preferred, order_channels
 from guidance.engine.effect import answer_effect
 from guidance.engine.evaluation import evaluate
 from guidance.engine.model import (
@@ -36,7 +37,7 @@ from guidance.engine.model import (
 from guidance.engine.ordering import DependencyCycleError
 from guidance.engine.plan import PlanStep, build_plan
 from guidance.engine.questions import next_question
-from guidance.forms import AnswerForm, SearchForm
+from guidance.forms import AnswerForm, ChannelPreferenceForm, SearchForm
 from guidance.repository import (
     ProcedureNotFound,
     SituationNotFound,
@@ -46,8 +47,10 @@ from guidance.repository import (
 from guidance.session import (
     clear_situation,
     pop_effect,
+    read_channel_preference,
     read_facts,
     write_answer,
+    write_channel_preference,
     write_effect,
 )
 
@@ -144,6 +147,8 @@ def question(request: HttpRequest, slug: str) -> HttpResponse:
     else:
         current = next_question(catalog, facts, evaluate(catalog, facts))
         if current is None:
+            if read_channel_preference(request.session) is None:
+                return redirect("guidance:channel_preference", slug=slug)
             return redirect("guidance:plan", slug=slug)  # o plano consome o aviso
         form = AnswerForm(current, initial_answer=facts.get(current.slug))
     context = {
@@ -154,6 +159,20 @@ def question(request: HttpRequest, slug: str) -> HttpResponse:
         "effect": _effect_view(request, catalog) if request.method == "GET" else None,
     }
     return render(request, "guidance/question.html", context)
+
+
+@require_http_methods(["GET", "POST"])
+def channel_preference(request: HttpRequest, slug: str) -> HttpResponse:
+    catalog = _load(slug)  # não toca no aviso de efeito: quem consome é o plano
+    current = read_channel_preference(request.session)
+    if request.method == "POST":
+        form = ChannelPreferenceForm(request.POST)
+        if form.is_valid():
+            write_channel_preference(request.session, form.cleaned_data["preference"])
+            return _see_other(reverse("guidance:plan", args=[slug]))
+    else:
+        form = ChannelPreferenceForm(initial={"preference": current.slug if current else None})
+    return render(request, "guidance/channel_preference.html", {"catalog": catalog, "form": form})
 
 
 @dataclass(frozen=True, slots=True)
@@ -176,9 +195,12 @@ class StepView:
     channels: tuple[ChannelLine, ...]
     costs: tuple[str, ...]
     deadlines: tuple[str, ...]
+    channel_notice: str = ""
 
 
-def _step_view(catalog: Catalog, step: PlanStep) -> StepView:
+def _step_view(
+    catalog: Catalog, step: PlanStep, preference: ChannelPreference | None = None
+) -> StepView:
     def title(slug: str) -> str:
         return catalog.procedures[slug].title
 
@@ -190,14 +212,20 @@ def _step_view(catalog: Catalog, step: PlanStep) -> StepView:
         step=step,
         required_for=tuple(title(slug) for slug in step.required_for),
         after=tuple(line(d) for d in step.after),
-        channels=_channel_lines(procedure),
+        channels=_channel_lines(procedure, preference),
         costs=_detail_texts(procedure, "COST"),
         deadlines=_detail_texts(procedure, "DEADLINE"),
+        channel_notice=preference.missing_notice
+        if preference and lacks_preferred(procedure.channels, preference)
+        else "",
     )
 
 
-def _channel_lines(procedure: ProcedureDef) -> tuple[ChannelLine, ...]:
-    return tuple(ChannelLine(ServiceChannel.Kind(c.kind).label, c) for c in procedure.channels)
+def _channel_lines(
+    procedure: ProcedureDef, preference: ChannelPreference | None = None
+) -> tuple[ChannelLine, ...]:
+    ordered = order_channels(procedure.channels, preference)
+    return tuple(ChannelLine(ServiceChannel.Kind(c.kind).label, c) for c in ordered)
 
 
 def _detail_texts(procedure: ProcedureDef, kind: Literal["COST", "DEADLINE"]) -> tuple[str, ...]:
@@ -234,10 +262,12 @@ def plan(request: HttpRequest, slug: str) -> HttpResponse:
             {"message": "Não foi possível montar o plano agora. Tente novamente mais tarde."},
             status=500,
         )
+    preference = read_channel_preference(request.session)
     context = {
         "catalog": catalog,
         "plan": result,
-        "steps": [_step_view(catalog, step) for step in result.steps],
+        "preference": preference,
+        "steps": [_step_view(catalog, step, preference) for step in result.steps],
         "uncovered": _uncovered_lines(catalog, result.uncovered),
         "undetermined": [catalog.procedures[s].title for s in result.undetermined],
         "effect": _effect_view(request, catalog),

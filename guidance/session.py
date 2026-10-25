@@ -5,6 +5,7 @@ from typing import Any
 
 from django.contrib.sessions.backends.base import SessionBase
 
+from guidance.engine.channels import PREFERENCES, ChannelPreference
 from guidance.engine.effect import AnswerEffect
 from guidance.engine.evaluation import validate_facts
 from guidance.engine.model import Answer, Catalog, Facts, Unknown
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 KEY = "facts"
 EFFECT_KEY = "answer_effect"
 UNKNOWN = "unknown"
+PREFERENCE_KEY = "channel_preference"
 
 
 def _parse(raw: Any) -> Answer:
@@ -111,3 +113,13 @@ def pop_effect(session: SessionBase, catalog: Catalog) -> AnswerEffect | None:
     if entered is None or left is None or type(in_play) is not int or in_play < 0:
         return None
     return AnswerEffect(entered, left, in_play)
+
+
+def read_channel_preference(session: SessionBase) -> ChannelPreference | None:
+    """Global (vale para todas as situações). Valor desconhecido ou corrompido vira None."""
+    raw = session.get(PREFERENCE_KEY)
+    return PREFERENCES.get(raw) if isinstance(raw, str) else None
+
+
+def write_channel_preference(session: SessionBase, value: str) -> None:
+    session[PREFERENCE_KEY] = value

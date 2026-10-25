@@ -6,6 +6,12 @@
 <h1>Seu plano</h1>
 <p class="disclaimer">Este sistema é apenas orientativo. Ele não executa serviços nem confirma direitos; confira sempre na fonte oficial.</p>
 
+<p class="channel-preference">
+  {% if preference and preference.kinds %}Canais ordenados pela sua preferência: {{ preference.label }}.
+  <a href="{% url 'guidance:channel_preference' catalog.situation_slug %}">Mudar</a>
+  {% else %}<a href="{% url 'guidance:channel_preference' catalog.situation_slug %}">Escolher como prefere ser atendido</a>{% endif %}
+</p>
+
 {% if uncovered %}
 <section id="limite-de-cobertura" class="notice">
   <h2>Limite de cobertura</h2>
@@ -62,7 +68,7 @@
   </ul>
   {% endif %}
 
-  {% include "guidance/_procedure_facts.html" with channels=item.channels costs=item.costs deadlines=item.deadlines %}
+  {% include "guidance/_procedure_facts.html" with channels=item.channels costs=item.costs deadlines=item.deadlines channel_notice=item.channel_notice %}
 </article>
 {% endwith %}
 {% endfor %}

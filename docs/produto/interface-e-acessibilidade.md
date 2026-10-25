@@ -33,7 +33,7 @@ Proposto (Fase 7, 25/10/2026): regras de redação para perguntas e opções, pe
 | --- | --- |
 | Home | “O que aconteceu?”, situações frequentes e acesso aos dois modos. |
 | Seleção de situação | Categorias e acontecimentos compreensíveis. |
-| Perguntas | Uma pergunta principal, opções, retorno e progresso. |
+| Perguntas | Uma pergunta principal, opções, retorno e progresso. Depois da última, uma pergunta de preferência de atendimento (Fase 7) antes do primeiro plano. |
 | Orientação intermediária | Próximo passo para descobrir uma informação desconhecida. |
 | Seu plano | Providências ordenadas e resumo do contexto. |
 | Detalhe da etapa | Motivo, requisitos, órgão, canal, custo, prazo, dependências e fonte. |

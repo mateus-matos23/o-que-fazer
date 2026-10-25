@@ -1,0 +1,22 @@
+{% extends "guidance/base.html" %}
+{% block title %}{% if form.errors %}Erro: {% endif %}Como você prefere ser atendido? - {{ catalog.situation_title }} - O que Fazer?{% endblock %}
+{% block content %}
+<p class="context-link"><a href="{% url 'guidance:question' catalog.situation_slug %}">{{ catalog.situation_title }}</a></p>
+<form method="post" class="answer-form">
+  {% csrf_token %}
+  {% if form.errors %}
+  <div id="form-errors" class="errors" tabindex="-1" autofocus>
+    <p><strong>Erro:</strong> escolha uma opção antes de continuar.</p>
+    {{ form.preference.errors }}
+  </div>
+  {% endif %}
+  <fieldset aria-describedby="question-help{% if form.errors %} form-errors{% endif %}">
+    <legend><h1>{{ form.preference.label }}</h1></legend>
+    <p id="question-help" class="question-help">Isso só muda a ordem em que os canais aparecem. Nenhum canal some do plano.</p>
+    <div class="choices">
+      {{ form.preference }}
+    </div>
+  </fieldset>
+  <button type="submit">Continuar</button>
+</form>
+{% endblock %}

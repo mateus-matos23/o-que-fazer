@@ -16,6 +16,7 @@ pytestmark = pytest.mark.django_db
 
 URL = "/s/cpf-irregular/"
 PLAN = "/s/cpf-irregular/plano/"
+PREFERENCE = "/s/cpf-irregular/atendimento/"
 QUESTION = "cpf-situacao-cadastral"
 
 
@@ -28,10 +29,16 @@ def _post(client: Client, value: str | None, question: str = QUESTION) -> HttpRe
     return response
 
 
+def _choose_preference(client: Client, value: str = "tanto-faz") -> None:
+    response = client.post(PREFERENCE, {"preference": value})
+    assert (response.status_code, response["Location"]) == (303, PLAN)
+
+
 def _plan(client: Client) -> str:
     response = client.get(URL, follow=True)
-    assert response.redirect_chain[-1] == (PLAN, 302)
-    return response.content.decode()
+    assert response.redirect_chain[-1] == (PREFERENCE, 302)
+    _choose_preference(client)
+    return client.get(PLAN).content.decode()
 
 
 def test_lists_situations(loaded: dict[str, int], client: Client) -> None:
@@ -176,6 +183,7 @@ def test_effect_on_next_question_is_shown_once(loaded: dict[str, int], client: C
 
 def test_redirect_to_plan_keeps_effect_for_the_plan(loaded: dict[str, int], client: Client) -> None:
     _post(client, "suspenso")
+    _choose_preference(client)
     assert client.get(URL)["Location"] == PLAN
     block = _effect_block(client, PLAN)
     assert block is not None and "Regularizar o CPF suspenso" in block

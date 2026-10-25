@@ -2,6 +2,7 @@ from typing import Any
 
 from django import forms
 
+from guidance.engine.channels import PREFERENCES
 from guidance.engine.model import Answer, QuestionDef, Unknown
 
 UNKNOWN_VALUE = "__unknown__"
@@ -58,3 +59,11 @@ class AnswerForm(forms.Form):
 
 class SearchForm(forms.Form):
     q = forms.CharField(label="Qual serviço você procura?", min_length=2, max_length=100)
+
+
+class ChannelPreferenceForm(forms.Form):
+    preference = forms.ChoiceField(
+        label="Como você prefere ser atendido?",
+        choices=[(p.slug, p.label) for p in PREFERENCES.values()],
+        widget=forms.RadioSelect,
+    )

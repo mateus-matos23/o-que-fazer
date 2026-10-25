@@ -109,7 +109,9 @@ def test_http_flow_to_plan(loaded: dict[str, int], client: Client) -> None:
     assert "Que tipo de trabalho era?" in client.get(f"/s/{SLUG}/").content.decode()
     _post(client, VINCULO, "domestico")
     response = client.get(f"/s/{SLUG}/", follow=True)
-    assert response.redirect_chain[-1] == (f"/s/{SLUG}/plano/", 302)
+    assert response.redirect_chain[-1] == (f"/s/{SLUG}/atendimento/", 302)
+    response = client.post(f"/s/{SLUG}/atendimento/", {"preference": "tanto-faz"}, follow=True)
+    assert response.redirect_chain[-1] == (f"/s/{SLUG}/plano/", 303)
     plan = response.content.decode()
     for slug in (DOMESTICO, FGTS, CTPS, CAGED):
         assert f'data-slug="{slug}"' in plan

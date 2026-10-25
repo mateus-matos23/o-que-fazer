@@ -20,6 +20,7 @@
         {% endfor %}
       </ul>
       {% else %}<span class="not-informed">Não informado</span>{% endif %}
+      {% if channel_notice %}<p class="not-informed">{{ channel_notice }}</p>{% endif %}
     </dd>
 
     <dt>Custo</dt>

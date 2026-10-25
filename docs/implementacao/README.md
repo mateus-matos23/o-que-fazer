@@ -321,7 +321,7 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
 
 ## Fase 7 — Conversa guiada
 
-Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 3 estão consolidadas, as demais seguem pendentes.
+Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 4 estão consolidadas, as demais seguem pendentes.
 
 **Motivação.** Hoje o cidadão escolhe a situação numa lista e responde uma ou duas perguntas antes do plano. O autor quer uma experiência de "conversa guiada", inspirada no Akinator, para um público com idade, escolaridade e familiaridade com tecnologia variadas. A conversa leva à situação por um funil de triagem, mostra o efeito de cada resposta no plano e termina num plano com ponto de partida. Requisitos RF21 a RF26 e regras RN02, RN14 e RN16 em [requisitos](../produto/requisitos.md).
 
@@ -341,7 +341,7 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 3 es
 | 1 | Linguagem simples e dica por pergunta | Consolidado |
 | 2 | Funil de triagem, com limite de cobertura nos ramos sem jornada | Consolidado |
 | 3 | Efeito da resposta no plano | Consolidado |
-| 4 | Preferência de atendimento e ordenação dos canais | Pendente |
+| 4 | Preferência de atendimento e ordenação dos canais | Consolidado |
 | 5 | Plano com "Comece por aqui", "O que separar antes" e versão para impressão | Pendente |
 | 6 | Requisitos e canais condicionais no motor | Pendente |
 | 7 | Perguntas novas com fonte: primeira solicitação do seguro-desemprego; declaração de IR nos últimos dois anos para o canal "sem gov.br" do CPF | Pendente |
@@ -373,6 +373,14 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 3 es
 - Motivo: a primeira versão comparava a avaliação "com e sem a resposta" e media aplicabilidade, não o plano. Isso mostrava "saiu" para o que nunca esteve nas etapas (indeterminado que virou não aplicável), ignorava o esclarecimento de "não sei", divergia de `plan.undetermined` (por causa dos pré-requisitos puxados) e, ao editar, comparava com "sem resposta" em vez do plano que a pessoa via. Comparar planos corrige os quatro. O aviso na sessão em vez de parâmetro de URL evita um efeito que dependa de link ou recarga: ele só vale logo após a resposta.
 - Gates: ruff, mypy e pytest verdes (341 passed).
 - Verificação no navegador (25/10/2026, Chromium headless via CDP): desligamento sem justa causa → doméstico → edição para empregado → mesma resposta regravada, e CPF com "Não sei". Os itens de "entrou" estão nas etapas, os de "saiu" estavam no plano anterior e não estão no atual, e a resposta regravada não mostra bloco. O bloco some ao recarregar. Fica dentro de `main` antes do `h1`, com contraste de 14,7:1 e 7,19:1 e sem rolagem horizontal em 360 px.
+
+**Fatia 4 — preferência de atendimento.**
+
+- Depois da última pergunta e antes do primeiro plano, `s/<slug>/atendimento/` pergunta "Como você prefere ser atendido?" (internet ou aplicativo, telefone, pessoalmente, tanto faz). A resposta fica na sessão (`channel_preference`), vale para todas as situações e valor desconhecido ou corrompido vira "sem preferência". O plano aberto direto, sem preferência, aparece normalmente na ordem original.
+- `guidance/engine/channels.py` (motor puro) define as quatro opções fixas, com slugs em português como os demais valores de URL e sessão, e `order_channels`: canais dos tipos preferidos primeiro, ordem estável, nenhum removido. EMAIL não entra em nenhum grupo. A etapa sem canal do tipo preferido mostra "… não informado na fonte para esta etapa" (RN11). O topo do plano diz qual preferência ordenou os canais e oferece "Mudar".
+- Motivo: RN14 e RF23. A preferência não é Fato nem `Question`: não passa por regras, não altera aplicabilidade nem a ordem das etapas (RN08). A busca "Onde resolvo?" não muda. O aviso de efeito da fatia 3 continua sendo consumido só por `plan` ou pela pergunta, não pela página de preferência.
+- Gates: ruff, mypy e pytest verdes (364 passed).
+- Verificação no navegador (25/10/2026, Chromium headless via CDP): a última pergunta leva à página de preferência e depois ao plano, com o efeito da resposta preservado. Por telefone e pessoalmente põem os canais do tipo preferido primeiro e mostram o aviso nas etapas sem esse tipo. Tanto faz mantém a ordem de "Onde resolvo?". O número de canais por etapa é o mesmo em toda preferência (10 no total). A preferência vale para outra situação, e a CPF foi direto ao plano. Foco visível, contraste ≥ 5,95:1 e sem rolagem horizontal em 360 px. Etapa sem nenhum canal não apareceu no conteúdo real (coberta por teste).
 
 ## Limitações conhecidas
 
