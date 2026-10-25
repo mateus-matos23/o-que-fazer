@@ -3,13 +3,15 @@
 from collections import defaultdict, deque
 from dataclasses import dataclass
 
-from guidance.engine.evaluation import evaluate, evaluate_procedure, evaluate_rule
+from guidance.engine.evaluation import evaluate, evaluate_procedure, evaluate_rule, visible_items
 from guidance.engine.model import (
     Catalog,
+    ChannelDef,
     DependencyDef,
     Facts,
     ProcedureDef,
     QuestionDef,
+    RequirementDef,
     RuleDef,
     Tri,
     Unknown,
@@ -26,6 +28,9 @@ class PlanStep:
     required_for: tuple[str, ...]  # etapas que exigem esta (quando entrou como pré-requisito)
     clarifies: QuestionDef | None  # pergunta respondida com "não sei"
     after: tuple[DependencyDef, ...]  # dependências ativas "depois de X" com X no plano (RF19)
+    # Itens que valem para os fatos (RF25), na ordem original; UNDETERMINED = "pode valer".
+    requirements: tuple[tuple[RequirementDef, Tri], ...]
+    channels: tuple[tuple[ChannelDef, Tri], ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -105,6 +110,8 @@ def build_plan(catalog: Catalog, facts: Facts) -> Plan:
             required_for=tuple(sorted(required_for[slug])),
             clarifies=clarifies.get(slug),
             after=tuple(d for d in shown if d.after == slug),
+            requirements=visible_items(catalog.procedures[slug].requirements, facts),
+            channels=visible_items(catalog.procedures[slug].channels, facts),
         )
         for slug in ordered
     )

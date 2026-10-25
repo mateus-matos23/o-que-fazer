@@ -24,7 +24,7 @@ from catalog.models import (
 )
 from guidance.engine.channels import ChannelPreference, lacks_preferred, order_channels
 from guidance.engine.effect import answer_effect
-from guidance.engine.evaluation import evaluate
+from guidance.engine.evaluation import evaluate, visible_items
 from guidance.engine.model import (
     Answer,
     Catalog,
@@ -32,6 +32,8 @@ from guidance.engine.model import (
     DependencyDef,
     Facts,
     ProcedureDef,
+    RequirementDef,
+    Tri,
     Unknown,
 )
 from guidance.engine.ordering import DependencyCycleError
@@ -185,6 +187,13 @@ class DependencyLine:
 class ChannelLine:
     kind_label: str
     channel: ChannelDef
+    maybe: str = ""  # explicação da regra quando o canal "pode valer" (RF25)
+
+
+@dataclass(frozen=True, slots=True)
+class RequirementLine:
+    description: str
+    maybe: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -192,6 +201,7 @@ class StepView:
     step: PlanStep
     required_for: tuple[str, ...]
     after: tuple[DependencyLine, ...]
+    requirements: tuple[RequirementLine, ...]
     channels: tuple[ChannelLine, ...]
     costs: tuple[str, ...]
     deadlines: tuple[str, ...]
@@ -212,20 +222,32 @@ def _step_view(
         step=step,
         required_for=tuple(title(slug) for slug in step.required_for),
         after=tuple(line(d) for d in step.after),
-        channels=_channel_lines(procedure, preference),
+        requirements=_requirement_lines(step.requirements),
+        channels=_channel_lines(step.channels, preference),
         costs=_detail_texts(procedure, "COST"),
         deadlines=_detail_texts(procedure, "DEADLINE"),
         channel_notice=preference.missing_notice
-        if preference and lacks_preferred(procedure.channels, preference)
+        if preference and lacks_preferred([c for c, _ in step.channels], preference)
         else "",
     )
 
 
+def _maybe(item: RequirementDef | ChannelDef, tri: Tri) -> str:
+    return item.rule.explanation if item.rule and tri is Tri.UNDETERMINED else ""
+
+
+def _requirement_lines(
+    pairs: tuple[tuple[RequirementDef, Tri], ...],
+) -> tuple[RequirementLine, ...]:
+    return tuple(RequirementLine(r.description, _maybe(r, t)) for r, t in pairs)
+
+
 def _channel_lines(
-    procedure: ProcedureDef, preference: ChannelPreference | None = None
+    pairs: tuple[tuple[ChannelDef, Tri], ...], preference: ChannelPreference | None = None
 ) -> tuple[ChannelLine, ...]:
-    ordered = order_channels(procedure.channels, preference)
-    return tuple(ChannelLine(ServiceChannel.Kind(c.kind).label, c) for c in ordered)
+    maybe = {c: _maybe(c, t) for c, t in pairs}
+    ordered = order_channels([c for c, _ in pairs], preference)
+    return tuple(ChannelLine(ServiceChannel.Kind(c.kind).label, c, maybe[c]) for c in ordered)
 
 
 def _detail_texts(procedure: ProcedureDef, kind: Literal["COST", "DEADLINE"]) -> tuple[str, ...]:
@@ -280,7 +302,7 @@ def _plan_context(
     return {
         "steps": steps,
         "start_steps": [s for s in steps if s.step.layer == 1],
-        "requirement_steps": [s for s in steps if s.step.procedure.requirements],
+        "requirement_steps": [s for s in steps if s.requirements],
         "uncovered": _uncovered_lines(catalog, result.uncovered),
         "undetermined": [catalog.procedures[s].title for s in result.undetermined],
     }
@@ -361,7 +383,9 @@ def procedure_detail(request: HttpRequest, slug: str) -> HttpResponse:
         raise Http404("Serviço não encontrado") from None
     context = {
         "procedure": procedure,
-        "channels": _channel_lines(procedure),
+        # Sem fatos: itens com regra aparecem marcados como "pode valer".
+        "requirements": _requirement_lines(visible_items(procedure.requirements, {})),
+        "channels": _channel_lines(visible_items(procedure.channels, {})),
         "costs": _detail_texts(procedure, "COST"),
         "deadlines": _detail_texts(procedure, "DEADLINE"),
     }

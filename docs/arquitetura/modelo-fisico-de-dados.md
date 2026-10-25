@@ -24,8 +24,8 @@ Na carga, o trecho é procurado no texto da versão coletada (HTML sem tags ou v
 | `AnswerOption` | `question` FK, `slug`, `label`, `out_of_coverage` (padrão falso) | Único por (`question`, `slug`). "Não sei" **não** é opção: é `allows_unknown` e mantém o fato desconhecido (RN03). `out_of_coverage` marca resposta sem orientação oficial nesta versão: continua sendo oferecida e o plano exibe um aviso de limite de cobertura, sem alterar a avaliação das regras. |
 | `Procedure` | `slug`, `title`, `description`, `agency` FK, `jurisdiction`, `clarifies` FK → `Question` (nulo), citação | Com `clarifies` preenchido, é um **esclarecimento intermediário**: entra no plano quando aquela pergunta foi respondida com "não sei". |
 | `ProcedureDetail` | `procedure` FK, `kind` (`COST`/`DEADLINE`), `text`, citação | Único por (`procedure`, `kind`). Sem linha = "não informado" (RN11). |
-| `Requirement` | `procedure` FK, `description`, citação | Requisitos parecidos não são unificados. |
-| `ServiceChannel` | `procedure` FK, `kind` (`ONLINE`/`IN_PERSON`/`PHONE`/`APP`/`EMAIL`), `description`, `url`, citação | Alternativa presencial documentada (RN14). |
+| `Requirement` | `procedure` FK, `description`, `rule` FK (nulo, `PROTECT`), citação | Requisitos parecidos não são unificados. Sem `rule`, o requisito vale sempre (RF25). |
+| `ServiceChannel` | `procedure` FK, `kind` (`ONLINE`/`IN_PERSON`/`PHONE`/`APP`/`EMAIL`), `description`, `url`, `rule` FK (nulo, `PROTECT`), citação | Alternativa presencial documentada (RN14). Sem `rule`, o canal vale sempre (RF25). |
 | `Rule` | `slug`, `procedure` FK (nulo), `explanation`, citação | Conjunção (E) das suas condições. Com `procedure`, define a aplicabilidade. Sem `procedure`, é a condição de uma dependência condicional. |
 | `Condition` | `rule` FK, `question` FK, `operator` (`ANY_OF`/`NONE_OF`), `options` M2M → `AnswerOption` | As opções pertencem à pergunta (validado na carga). |
 | `Dependency` | `before` FK, `after` FK, `kind` (`MANDATORY`/`CONDITIONAL`/`RECOMMENDED`), `rule` FK (nulo), citação | Check: `rule` preenchida se e somente se `CONDITIONAL`. Único por (`before`, `after`), com `before ≠ after`. |

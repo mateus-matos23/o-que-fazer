@@ -38,7 +38,7 @@ Os requisitos abaixo organizam o conteúdo discutido. Eles precisam ser detalhad
 | RF22 | Mostrar, após cada resposta, o efeito dela no plano (providências que entraram, que saíram e quantas seguem em análise). | Proposto (Fase 7). |
 | RF23 | Perguntar a preferência de atendimento (internet/aplicativo, telefone, pessoalmente, tanto faz) e ordenar os canais por ela, sem esconder nenhum. | Proposto (Fase 7). |
 | RF24 | Redigir perguntas e opções em linguagem simples, com dica opcional por pergunta. | Proposto (Fase 7). |
-| RF25 | Exibir requisitos e canais conforme os fatos informados, mantendo os de aplicabilidade indeterminada com marcação. | Proposto (Fase 7). |
+| RF25 | Exibir requisitos e canais conforme os fatos informados, mantendo os de aplicabilidade indeterminada com marcação. | Consolidado (Fase 7, fatia 6). |
 | RF26 | Destacar no plano por onde começar, listar o que separar antes (agrupado por etapa) e oferecer versão para impressão. | Proposto (Fase 7). |
 
 ## Regras de negócio e de orientação

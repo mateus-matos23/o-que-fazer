@@ -4,10 +4,11 @@
 
     <dt>Requisitos</dt>
     <dd>
-      {% if procedure.requirements %}
+      {% if requirements %}
       <ul>
-        {% for requirement in procedure.requirements %}<li>{{ requirement.description }}</li>{% endfor %}
+        {% for requirement in requirements %}<li>{% include "guidance/_maybe.html" with maybe=requirement.maybe %}{{ requirement.description }}</li>{% endfor %}
       </ul>
+      {% elif procedure.requirements %}<span class="not-informed">Nenhum dos itens da fonte vale para o que você informou.</span>
       {% else %}<span class="not-informed">Não informado</span>{% endif %}
     </dd>
 
@@ -16,9 +17,10 @@
       {% if channels %}
       <ul>
         {% for line in channels %}
-        <li>{{ line.kind_label }}: {% if line.channel.url %}<a href="{{ line.channel.url }}" rel="noopener">{{ line.channel.description }} (site oficial)</a>{% else %}{{ line.channel.description }}{% endif %}</li>
+        <li>{% include "guidance/_maybe.html" with maybe=line.maybe %}{{ line.kind_label }}: {% if line.channel.url %}<a href="{{ line.channel.url }}" rel="noopener">{{ line.channel.description }} (site oficial)</a>{% else %}{{ line.channel.description }}{% endif %}</li>
         {% endfor %}
       </ul>
+      {% elif procedure.channels %}<span class="not-informed">Nenhum dos itens da fonte vale para o que você informou.</span>
       {% else %}<span class="not-informed">Não informado</span>{% endif %}
       {% if channel_notice %}<p class="not-informed">{{ channel_notice }}</p>{% endif %}
     </dd>

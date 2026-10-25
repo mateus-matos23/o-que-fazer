@@ -62,7 +62,7 @@
   {% for item in requirement_steps %}
   <h3>{{ item.step.procedure.title }}</h3>
   <ul>
-    {% for requirement in item.step.procedure.requirements %}<li>{{ requirement.description }}</li>{% endfor %}
+    {% for requirement in item.requirements %}<li>{% include "guidance/_maybe.html" with maybe=requirement.maybe %}{{ requirement.description }}</li>{% endfor %}
   </ul>
   {% endfor %}
 </section>
@@ -95,7 +95,7 @@
   </ul>
   {% endif %}
 
-  {% include "guidance/_procedure_facts.html" with channels=item.channels costs=item.costs deadlines=item.deadlines channel_notice=item.channel_notice %}
+  {% include "guidance/_procedure_facts.html" with requirements=item.requirements channels=item.channels costs=item.costs deadlines=item.deadlines channel_notice=item.channel_notice %}
 </article>
 {% endwith %}
 {% endfor %}

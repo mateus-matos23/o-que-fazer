@@ -115,6 +115,9 @@ class CitationFactory:
 
 
 CITED_SELECT = ("snapshot__source",)
+# Regra opcional de requisito e canal (RF25): condições e citação, sem consulta por item.
+ITEM_RULE_SELECT = (*CITED_SELECT, "rule__snapshot__source")
+ITEM_RULE_PREFETCH = ("rule__conditions__question", "rule__conditions__options")
 
 
 def _procedures() -> QuerySet[Procedure]:
@@ -122,10 +125,16 @@ def _procedures() -> QuerySet[Procedure]:
         Procedure.objects.select_related("agency", "clarifies", *CITED_SELECT)
         .prefetch_related(
             Prefetch(
-                "requirements", Requirement.objects.select_related(*CITED_SELECT).order_by("id")
+                "requirements",
+                Requirement.objects.select_related(*ITEM_RULE_SELECT)
+                .prefetch_related(*ITEM_RULE_PREFETCH)
+                .order_by("id"),
             ),
             Prefetch(
-                "channels", ServiceChannel.objects.select_related(*CITED_SELECT).order_by("id")
+                "channels",
+                ServiceChannel.objects.select_related(*ITEM_RULE_SELECT)
+                .prefetch_related(*ITEM_RULE_PREFETCH)
+                .order_by("id"),
             ),
             Prefetch("details", Detail.objects.select_related(*CITED_SELECT).order_by("id")),
             Prefetch(
@@ -144,6 +153,8 @@ def _procedure_snapshot_ids(procedures: list[Procedure]) -> set[int]:
         procedures,
         (r for p in procedures for r in p.requirements.all()),
         (c for p in procedures for c in p.channels.all()),
+        (i.rule for p in procedures for i in p.requirements.all() if i.rule),
+        (i.rule for p in procedures for i in p.channels.all() if i.rule),
         (d for p in procedures for d in p.details.all()),
         (r for p in procedures for r in p.rules.all()),
     )
@@ -157,6 +168,10 @@ def _fetched_at(snapshot_ids: set[int]) -> dict[int, datetime]:
     )
 
 
+def _item_rule(item: Requirement | ServiceChannel, cite: CitationFactory) -> RuleDef | None:
+    return _rule_def(item.rule, cite) if item.rule else None
+
+
 def _procedure_def(p: Procedure, cite: CitationFactory) -> ProcedureDef:
     return ProcedureDef(
         slug=p.slug,
@@ -166,9 +181,14 @@ def _procedure_def(p: Procedure, cite: CitationFactory) -> ProcedureDef:
         jurisdiction=p.jurisdiction,
         clarifies=p.clarifies.slug if p.clarifies else None,
         rules=tuple(_rule_def(r, cite) for r in p.rules.all()),
-        requirements=tuple(RequirementDef(r.description, cite(r)) for r in p.requirements.all()),
+        requirements=tuple(
+            RequirementDef(r.description, cite(r), _item_rule(r, cite))
+            for r in p.requirements.all()
+        ),
         channels=tuple(
-            ChannelDef(_choice(c.kind, CHANNEL_KINDS), c.description, c.url, cite(c))
+            ChannelDef(
+                _choice(c.kind, CHANNEL_KINDS), c.description, c.url, cite(c), _item_rule(c, cite)
+            )
             for c in p.channels.all()
         ),
         details=tuple(

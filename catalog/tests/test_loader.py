@@ -6,7 +6,16 @@ import pytest
 from django.core.management import CommandError, call_command
 
 from catalog.loader import load_content
-from catalog.models import AnswerOption, Dependency, Procedure, Question, Rule, TriageNode
+from catalog.models import (
+    AnswerOption,
+    Dependency,
+    Procedure,
+    Question,
+    Requirement,
+    Rule,
+    ServiceChannel,
+    TriageNode,
+)
 from sources.models import Agency, Jurisdiction, Source, SourceImport, SourceSnapshot
 from sources.toml_schema import ContentError
 
@@ -34,7 +43,7 @@ options = [{slug = "sim", label = "Sim"}, {slug = "nao", label = "Não"}]
 slug = "q2"
 text = "Outra?"
 kind = "MULTIPLE"
-situations = []
+situations = ["sit"]
 options = [{slug = "x", label = "X"}]
 
 [[procedures]]
@@ -188,6 +197,36 @@ def test_help_text_is_stored_and_defaults_to_empty(content: Path) -> None:
     assert Question.objects.get(slug="q2").help_text == ""
 
 
+def _item_rule_only() -> str:
+    """r-cond deixa de servir a dependência e passa a condicionar um requisito e um canal."""
+    text = _bump('kind = "CONDITIONAL"\nrule = "r-cond"', 'kind = "MANDATORY"')
+    text = text.replace('{description = "r", source', '{description = "r", rule = "r-cond", source')
+    return text.replace(
+        'url = "https://x.gov.br", source', 'url = "https://x.gov.br", rule = "r-cond", source'
+    )
+
+
+def test_item_rule_is_stored_and_keeps_rule_from_being_orphan(content: Path) -> None:
+    (content / "journey.toml").write_text(_item_rule_only())
+    load_content(content)
+    rule = Rule.objects.get(slug="r-cond")
+    assert Requirement.objects.get().rule == rule
+    assert ServiceChannel.objects.get().rule == rule
+
+
+def test_item_without_rule_has_none(content: Path) -> None:
+    load_content(content)
+    assert Requirement.objects.get().rule is None
+    assert ServiceChannel.objects.get().rule is None
+
+
+def test_reload_replaces_content_referenced_by_items(content: Path) -> None:
+    (content / "journey.toml").write_text(_item_rule_only())
+    load_content(content)
+    load_content(content)  # PROTECT: itens saem antes das regras
+    assert Requirement.objects.get().rule == Rule.objects.get(slug="r-cond")
+
+
 def test_idempotent(content: Path) -> None:
     load_content(content)
     assert load_content(content) == EXPECTED
@@ -211,7 +250,7 @@ def test_removed_procedure_disappears(content: Path) -> None:
 def test_sources_toml_is_ignored_and_files_merge(content: Path) -> None:
     (content / "sources.toml").write_text("lixo = 1")
     (content / "extra.toml").write_text(
-        '[[situations]]\nslug = "sit-2"\ntitle = "T"\ncandidates = ["proc-c"]\n'
+        '[[situations]]\nslug = "sit-2"\ntitle = "T"\ncandidates = []\n'
     )
     assert load_content(content)["Situation"] == 2
 
@@ -327,6 +366,35 @@ ERRORS = {
     "orphan rule": (
         _bump('kind = "CONDITIONAL"\nrule = "r-cond"', 'kind = "MANDATORY"'),
         "r-cond: regra órfã",
+    ),
+    "shared procedure, question linked to one situation": (
+        JOURNEY + '\n[[situations]]\nslug = "sit2"\ntitle = "Outra"\ncandidates = ["proc-b"]\n',
+        "r-cond: pergunta q2 não está ligada à situação sit2",
+    ),
+    "requirement rule question not linked": (
+        _bump('{description = "r", source', '{description = "r", rule = "r-cond", source').replace(
+            'situations = ["sit"]\noptions = [{slug = "x"',
+            'situations = []\noptions = [{slug = "x"',
+        ),
+        "r-cond: pergunta q2 não está ligada à situação sit",
+    ),
+    "requirement rule missing": (
+        _bump('{description = "r", source', '{description = "r", rule = "zzz", source'),
+        "proc-a: requisito[0]: regra inexistente: zzz",
+    ),
+    "requirement rule with procedure": (
+        _bump('{description = "r", source', '{description = "r", rule = "r-app", source'),
+        "proc-a: requisito[0]: regra r-app define aplicabilidade",
+    ),
+    "channel rule missing": (
+        _bump('url = "https://x.gov.br", source', 'url = "https://x.gov.br", rule = "zzz", source'),
+        "proc-a: canal[0]: regra inexistente: zzz",
+    ),
+    "channel rule with procedure": (
+        _bump(
+            'url = "https://x.gov.br", source', 'url = "https://x.gov.br", rule = "r-app", source'
+        ),
+        "proc-a: canal[0]: regra r-app define aplicabilidade",
     ),
     "dependency procedure": (
         _bump('after = "proc-c"', 'after = "zzz"'),

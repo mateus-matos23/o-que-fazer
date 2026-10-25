@@ -82,7 +82,7 @@ _TABLES = {
         },
         {
             "clarifies": str,
-            "requirements": [Schema({"description": str, **_CITATION})],
+            "requirements": [Schema({"description": str, **_CITATION}, {"rule": str})],
             "channels": [
                 Schema(
                     {
@@ -90,7 +90,7 @@ _TABLES = {
                         "description": str,
                         **_CITATION,
                     },
-                    {"url": text_of(ServiceChannel, "url")},
+                    {"url": text_of(ServiceChannel, "url"), "rule": str},
                 )
             ],
             "details": [
@@ -154,6 +154,7 @@ class Item:
     text: str
     url: str
     cite: Cite
+    rule: str | None = None  # só requisitos e canais; slug da regra que condiciona o item
 
 
 @dataclass(frozen=True)
@@ -286,9 +287,12 @@ def _parse(file: str, doc: dict[str, Any], content: Content) -> None:
                 r["jurisdiction"],
                 _cite(r),
                 r.get("clarifies"),
-                [Item("", i["description"], "", _cite(i)) for i in r.get("requirements", [])],
                 [
-                    Item(i["kind"], i["description"], i.get("url", ""), _cite(i))
+                    Item("", i["description"], "", _cite(i), i.get("rule"))
+                    for i in r.get("requirements", [])
+                ],
+                [
+                    Item(i["kind"], i["description"], i.get("url", ""), _cite(i), i.get("rule"))
                     for i in r.get("channels", [])
                 ],
                 [Item(i["kind"], i["text"], "", _cite(i)) for i in r.get("details", [])],
@@ -378,19 +382,38 @@ def _structure_problems(content: Content) -> list[str]:
                 problems.append(
                     f"{p.file}: {p.slug}: clarifies: {p.clarifies} não permite 'não sei'"
                 )
+        for name, items in (("requisito", p.requirements), ("canal", p.channels)):
+            for i, item in enumerate(items):
+                if item.rule is None:
+                    continue
+                used = rules.get(item.rule)
+                if used is None:
+                    problems.append(
+                        f"{p.file}: {p.slug}: {name}[{i}]: regra inexistente: {item.rule}"
+                    )
+                elif used.procedure is not None:
+                    problems.append(
+                        f"{p.file}: {p.slug}: {name}[{i}]: regra {item.rule} define aplicabilidade"
+                        " (tem procedure)"
+                    )
         kinds = Counter(d.kind for d in p.details)
         problems += [
             f"{p.file}: {p.slug}: detalhe duplicado: {kind}" for kind, n in kinds.items() if n > 1
         ]
 
     used_by_dependency = {d.rule for d in content.dependencies if d.rule is not None}
+    used_by_item = {
+        i.rule for p in content.procedures for i in (*p.requirements, *p.channels) if i.rule
+    }
     for r in content.rules:
         if r.procedure is not None and r.procedure not in procedures:
             problems.append(f"{r.file}: {r.slug}: procedimento inexistente: {r.procedure}")
         if not r.conditions:
             problems.append(f"{r.file}: {r.slug}: regra sem condições")
-        if r.procedure is None and r.slug not in used_by_dependency:
-            problems.append(f"{r.file}: {r.slug}: regra órfã (sem procedure e sem dependência)")
+        if r.procedure is None and r.slug not in used_by_dependency | used_by_item:
+            problems.append(
+                f"{r.file}: {r.slug}: regra órfã (sem procedure, dependência, requisito ou canal)"
+            )
         for c in r.conditions:
             if c.question not in questions:
                 problems.append(f"{r.file}: {r.slug}: pergunta inexistente: {c.question}")
@@ -427,7 +450,60 @@ def _structure_problems(content: Content) -> list[str]:
                 )
     if content.triage:
         problems += _triage_problems(content, situations)
+    problems += _situation_question_problems(content, rules, questions)
     return problems + _cycle_problems(content, procedures)
+
+
+def _situation_question_problems(
+    content: Content, rules: dict[str, RuleDef], questions: dict[str, QuestionDef]
+) -> list[str]:
+    """Toda pergunta citada por regra de um procedimento relevante precisa estar ligada à situação.
+
+    Relevantes = como em `guidance.repository.load_catalog`: candidatos, esclarecimentos de
+    perguntas da situação e o fecho para trás por qualquer dependência.
+    """
+    parents: dict[str, list[str]] = {}
+    for d in content.dependencies:
+        parents.setdefault(d.after, []).append(d.before)
+    problems: list[str] = []
+    for situation in content.situations:
+        relevant = set(situation.candidates) | {
+            p.slug
+            for p in content.procedures
+            if p.clarifies in questions and situation.slug in questions[p.clarifies].situations
+        }
+        pending = list(relevant)
+        while pending:
+            for before in parents.get(pending.pop(), ()):
+                if before not in relevant:
+                    relevant.add(before)
+                    pending.append(before)
+        used: list[str] = [r.slug for r in content.rules if r.procedure in relevant]
+        for p in content.procedures:
+            if p.slug in relevant:
+                used += [i.rule for i in (*p.requirements, *p.channels) if i.rule]
+        used += [
+            d.rule
+            for d in content.dependencies
+            if d.rule and d.kind == Dependency.Kind.CONDITIONAL and d.after in relevant
+        ]
+        reported: set[tuple[str, str]] = set()
+        for slug in used:
+            rule = rules.get(slug)
+            for c in rule.conditions if rule else ():
+                question = questions.get(c.question)
+                if (
+                    rule
+                    and question
+                    and situation.slug not in question.situations
+                    and (slug, c.question) not in reported
+                ):
+                    reported.add((slug, c.question))
+                    problems.append(
+                        f"{rule.file}: {slug}: pergunta {c.question} não está ligada à situação "
+                        f"{situation.slug}"
+                    )
+    return problems
 
 
 def _cycle_problems(content: Content, procedures: set[str]) -> list[str]:
@@ -590,7 +666,16 @@ def validate(directory: Path) -> tuple[Content, dict[str, SourceSnapshot]]:
 
 
 def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
-    for model in (TriageNode, Dependency, Rule, Situation, Procedure, Question):
+    for model in (
+        TriageNode,
+        Dependency,
+        Requirement,
+        ServiceChannel,
+        Rule,
+        Situation,
+        Procedure,
+        Question,
+    ):
         model.objects.all().delete()
 
     question_by_slug: dict[str, Question] = {}
@@ -627,22 +712,6 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
             excerpt=p.cite.excerpt,
         )
         procedure_by_slug[p.slug] = procedure
-        for item in p.requirements:
-            Requirement.objects.create(
-                procedure=procedure,
-                description=item.text,
-                snapshot=snapshots[item.cite.source],
-                excerpt=item.cite.excerpt,
-            )
-        for item in p.channels:
-            ServiceChannel.objects.create(
-                procedure=procedure,
-                kind=item.kind,
-                description=item.text,
-                url=item.url,
-                snapshot=snapshots[item.cite.source],
-                excerpt=item.cite.excerpt,
-            )
         for item in p.details:
             ProcedureDetail.objects.create(
                 procedure=procedure,
@@ -675,6 +744,28 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
                 rule=rule, question=question_by_slug[c.question], operator=c.operator
             )
             condition.options.set([option_by_key[(c.question, o)] for o in c.options])
+
+    # Requisitos e canais referenciam regras, então só nascem depois delas.
+    for p in content.procedures:
+        procedure = procedure_by_slug[p.slug]
+        for item in p.requirements:
+            Requirement.objects.create(
+                procedure=procedure,
+                description=item.text,
+                rule=rule_by_slug[item.rule] if item.rule else None,
+                snapshot=snapshots[item.cite.source],
+                excerpt=item.cite.excerpt,
+            )
+        for item in p.channels:
+            ServiceChannel.objects.create(
+                procedure=procedure,
+                kind=item.kind,
+                description=item.text,
+                url=item.url,
+                rule=rule_by_slug[item.rule] if item.rule else None,
+                snapshot=snapshots[item.cite.source],
+                excerpt=item.cite.excerpt,
+            )
 
     for d in content.dependencies:
         Dependency.objects.create(

@@ -248,6 +248,7 @@ dl { margin: 1rem 0 0; }
 dt { font-weight: 700; margin-top: 1rem; }
 dd { margin: 0; }
 .not-informed { color: var(--muted); }
+.maybe { font-weight: 700; color: var(--notice-ink); }
 
 /* Comece por aqui (primeira camada do plano) */
 .start-here {

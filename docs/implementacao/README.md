@@ -391,6 +391,15 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 5 es
 - Gates: ruff format, ruff check, mypy e pytest verdes (376 passed; eram 364 na fatia 4). `git diff --check` limpo.
 - Verificação no navegador (25/10/2026, Chromium headless via CDP): "Comece por aqui" com três etapas em perda de documentos (CPF, CIN e CNH; a CNH fica fora do cartão porque depende do B.O.) e com uma etapa em CPF suspenso; "O que separar antes" com 4 grupos na ordem do plano e sem mesclar; na impressão emulada, cabeçalho, rodapé, formulários, preferência e dica de impressão escondidos, URL dos 7 links externos impressa, texto preto sobre branco; sem rolagem horizontal em 360 px; contraste mínimo de 6,41:1; foco visível nos links do cartão. O aviso de efeito e o link "Alterar essa resposta" não estavam na página verificada; a regra de impressão deles é coberta pelo teste da folha de estilo.
 
+**Fatia 6 — requisitos e canais condicionais.**
+
+- `Requirement.rule` e `ServiceChannel.rule` (FK opcional para `Rule`, `PROTECT`, como em `Dependency.rule`; migration `catalog/0005`). No TOML, `rule = "<slug>"` é opcional em `requirements` e `channels`. O carregador exige que a regra exista e não tenha `procedure`, e uma regra usada só por requisito ou canal deixa de ser órfã. Como as regras agora são protegidas, `_replace` apaga requisitos e canais antes das regras e os recria depois delas. O carregador também passou a exigir que toda pergunta citada por regra de um procedimento relevante de uma situação esteja ligada a ela (evita KeyError em `next_question`).
+- Motor: `RequirementDef.rule` e `ChannelDef.rule` (padrão `None`), `visible_items` em `guidance/engine/evaluation.py` e `PlanStep.requirements`/`channels` já filtrados. `next_question` ganhou um laço: regras de item indeterminadas de procedimentos aplicáveis pontuam suas perguntas ainda não respondidas, então "não sei" não repete a pergunta. `answer_effect` não mudou.
+- Repositório: regra, condições e citação dos itens vêm no prefetch (constante, até 6 consultas a mais, só quando há item com regra). Telas: o plano usa os itens visíveis (inclusive em "O que separar antes" e na ordenação por preferência); item indeterminado traz "Pode valer para você:" em texto, estilo `.maybe`; se todos os itens somem, aparece "Nenhum dos itens da fonte vale para o que você informou." em vez de "Não informado". Em "Onde resolvo?" os itens com regra aparecem marcados.
+- Motivo: RF25 e RN03/RN11. Um requisito ou canal que só vale para parte dos casos não deve aparecer para quem já sabe que não é o seu, nem sumir para quem ainda não sabe. Esta fatia não altera `content/*.toml`; as perguntas que usam o recurso vêm na fatia 7.
+- Gates: ruff format, ruff check, mypy e pytest verdes (404 passed; eram 376 na fatia 5). `git diff --check` limpo.
+- Verificação no navegador: junto da fatia 7, que traz o primeiro conteúdo condicional.
+
 ## Limitações conhecidas
 
 - O banco não garante que o snapshot de uma importação pertence à mesma fonte da importação. Essa garantia hoje é só do código de coleta (`sources/services.py`).

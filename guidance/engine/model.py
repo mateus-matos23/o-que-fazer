@@ -69,6 +69,7 @@ class RuleDef:
 class RequirementDef:
     description: str
     citation: Citation
+    rule: RuleDef | None = None  # sem regra = sempre vale
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,6 +78,7 @@ class ChannelDef:
     description: str
     url: str
     citation: Citation
+    rule: RuleDef | None = None  # sem regra = sempre vale
 
 
 @dataclass(frozen=True, slots=True)

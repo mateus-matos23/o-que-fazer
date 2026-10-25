@@ -54,6 +54,10 @@ Um ciclo indica que o modelo ou a interpretação das fontes exige revisão. O s
 
 Cada etapa deve manter relação com fatos, regras e fontes que justificaram sua inclusão. Ao corrigir uma resposta, o motor reavalia candidatos e dependências e atualiza o plano.
 
+### Requisitos e canais condicionais
+
+`Requirement` e `ServiceChannel` podem ter uma `rule` opcional (RF25). `visible_items(items, facts)` (`guidance/engine/evaluation.py`) reaproveita `evaluate_rule` e devolve pares `(item, Tri)` na ordem original: sem regra, o item vale sempre; `APPLICABLE` aparece; `NOT_APPLICABLE` sai; `UNDETERMINED` (pergunta não respondida ou "não sei", RN03) aparece marcado "Pode valer para você". `PlanStep.requirements` e `PlanStep.channels` guardam o resultado, então mudar uma resposta muda os itens (invariante 8). `next_question` pontua as perguntas ainda não respondidas das regras de item indeterminadas, só para procedimentos `APPLICABLE`. Limite: itens condicionais de pré-requisitos puxados e de esclarecimentos não geram pergunta (a marca "pode valer" persiste), porque `next_question` só pontua candidatos `APPLICABLE`. O carregador exige que toda pergunta citada por regra de um procedimento relevante esteja ligada à situação. Se todos os itens ficam escondidos, a página diz que nenhum item da fonte vale para o que o cidadão informou, e não "Não informado" (RN11). Na busca "Onde resolvo?" não há fatos, e os itens com regra aparecem marcados.
+
 ### Efeito da resposta
 
 `answer_effect(catalog, before, after)` (`guidance/engine/effect.py`) compara o plano de antes com o de depois, sendo "no plano" as etapas de `build_plan`. Devolve as etapas que entraram (`entered`), as que saíram (`left`) e quantos procedimentos seguem em análise (`in_play`, igual a `len(plan.undetermined)`). Comparar planos, e não apenas aplicabilidade, evita dizer que saiu algo que nunca esteve nas etapas e inclui o esclarecimento de "não sei". É função pura; a camada de visão guarda o resultado na sessão como aviso de uso único (só slugs e um inteiro), consumido ao ser mostrado. Ciclo entre dependências propaga `DependencyCycleError`.

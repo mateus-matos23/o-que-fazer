@@ -100,6 +100,9 @@ class ProcedureDetail(Cited):
 class Requirement(Cited):
     procedure = models.ForeignKey(Procedure, on_delete=models.CASCADE, related_name="requirements")
     description = models.TextField()
+    rule = models.ForeignKey(
+        "Rule", on_delete=models.PROTECT, null=True, blank=True, related_name="+"
+    )
 
     def __str__(self) -> str:
         return f"{self.procedure.slug}: {self.description[:50]}"
@@ -117,6 +120,9 @@ class ServiceChannel(Cited):
     kind = models.CharField(max_length=10, choices=Kind)
     description = models.TextField()
     url = models.URLField(max_length=500, blank=True)
+    rule = models.ForeignKey(
+        "Rule", on_delete=models.PROTECT, null=True, blank=True, related_name="+"
+    )
 
     def __str__(self) -> str:
         return f"{self.procedure.slug}:{self.kind}"
