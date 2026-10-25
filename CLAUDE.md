@@ -6,14 +6,20 @@ O sistema é **orientativo**: não executa serviços, não autentica nos portais
 
 ## Fase atual
 
-Modelagem. Ainda não há código de domínio — apenas o boilerplate do `uv init` com Django instalado. Antes de implementar algo, confira a documentação em `docs/` e as decisões em aberto em `docs/pendencias.md`.
+Implementação do núcleo (fontes → domínio → motor → fluxo mínimo); UI/UX e acessibilidade ficam para o fim. Antes de implementar algo, confira a documentação em `docs/` e as decisões em aberto em `docs/pendencias.md`.
+
+## Comandos
+
+- Banco local: `cp .env.example .env` e `docker compose --env-file .env up -d` (Postgres 18).
+- Comandos Django e gates sempre com `uv run --env-file .env ...`.
+- Gates: `uv run ruff format --check . && uv run ruff check . && uv run --env-file .env mypy . && uv run --env-file .env pytest`.
+- Os testes usam o banco `oqf_test`, criado e destruído pelo pytest-django; o banco de desenvolvimento é `oqf_dev`.
 
 ## Stack
 
 - Python 3.15, Django 6.1.2, PostgreSQL 18, uv 0.13.0 — ver `docs/arquitetura/decisoes/0001-stack.md`.
 - Aplicação monolítica Django; sem microsserviços.
 - Dependências sempre via `uv add <pacote>`; comandos via `uv run` (ex.: `uv run python manage.py migrate`).
-- Atenção: `pyproject.toml` declara `requires-python = ">=3.13"`, mas `.python-version` fixa 3.15.0. Alinhar quando o código começar.
 
 ## Convenções
 
