@@ -1,7 +1,7 @@
 from guidance.engine.evaluation import evaluate
 from guidance.engine.model import Catalog, Facts, Tri, Unknown
 from guidance.engine.questions import next_question
-from guidance.tests.factories import catalog, cond, procedure, question, rule
+from guidance.tests.factories import catalog, cond, dep, procedure, question, rule
 
 UNKNOWN = Unknown.UNKNOWN
 
@@ -95,3 +95,15 @@ def test_cpf_irregular_in_miniature() -> None:
     unknown: Facts = {"situacao": UNKNOWN}
     assert {e.status for e in evaluate(cat, unknown).values()} == {Tri.UNDETERMINED}
     assert ask(cat, unknown) is None
+
+
+def test_conditional_dependency_question_is_asked_when_after_is_applicable() -> None:
+    cat = catalog(
+        (question("q"),),
+        (procedure("a"), procedure("b")),
+        candidates=("a",),
+        dependencies=(dep("b", "a", "CONDITIONAL", rule("r", cond("q", "ANY_OF", "a"))),),
+    )
+    assert ask(cat, {}) == "q"
+    assert ask(cat, {"q": UNKNOWN}) is None
+    assert ask(cat, {"q": frozenset({"b"})}) is None

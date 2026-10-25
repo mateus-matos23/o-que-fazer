@@ -5,6 +5,7 @@ from guidance.engine.model import (
     Catalog,
     Citation,
     ConditionDef,
+    DependencyDef,
     OptionDef,
     ProcedureDef,
     QuestionDef,
@@ -43,6 +44,7 @@ def catalog(
     questions: tuple[QuestionDef, ...],
     procedures: tuple[ProcedureDef, ...],
     candidates: tuple[str, ...] | None = None,
+    dependencies: tuple[DependencyDef, ...] = (),
 ) -> Catalog:
     return Catalog(
         "situacao",
@@ -50,5 +52,14 @@ def catalog(
         frozenset(candidates if candidates is not None else (p.slug for p in procedures)),
         {q.slug: q for q in questions},
         {p.slug: p for p in procedures},
-        (),
+        dependencies,
     )
+
+
+def dep(
+    before: str,
+    after: str,
+    kind: Literal["MANDATORY", "CONDITIONAL", "RECOMMENDED"] = "MANDATORY",
+    when: RuleDef | None = None,
+) -> DependencyDef:
+    return DependencyDef(before, after, kind, when, CITATION)
