@@ -42,3 +42,30 @@ Fonte de identidade (`https://www.gov.br/identidade`) não foi amostrada: ver Fa
 - Todas as páginas HTML foram baixadas com `User-Agent: Mozilla/5.0`. As fichas da API foram baixadas sem User-Agent.
 - O extrato de texto é gerado por `/tmp/oqf-amostras-scripts/extract_text.py` (`python3 -I`, `html.parser`), fora do repositório.
 - Os HTML baixados estão somente em `/tmp/oqf-amostras-raw/`. Nenhum HTML bruto foi salvo no repositório.
+
+## Coleta de 24/10/2026
+
+Mesmo método da coleta de 10/10, com duas diferenças: o extrato de texto descarta o conteúdo de `script`, `style` e `noscript`, e o User-Agent é o de um navegador desktop (`Mozilla/5.0 (X11; Linux x86_64) ... Chrome/130`). Script fora do repositório (`/tmp/oqf-scripts/`); HTML bruto só em `/tmp/oqf-coleta/raw/`.
+
+| arquivo | fonte | tipo | HTTP | data da coleta | data declarada | sha256 (só HTML) |
+| --- | --- | --- | --- | --- | --- | --- |
+| `html-govbr-cin-faq.md` | https://www.gov.br/governodigital/pt-br/identidade/cin/perguntas-frequentes-sobre-a-cin | HTML (trecho: segunda via e CPF de menores) | 200 | 2026-10-24T23:54:06-03:00 | Publicado em 12/04/2023; Atualizado em 16/07/2026 | `c3424804bafd1f054ef0035844a52a0bae62a6e78162e308f97e9bdf5b65f096` |
+| `html-govbr-cin-faq-emissao.md` | mesma página e mesma coleta | HTML (trecho: emissão e certidão) | 200 | 2026-10-24T23:54:06-03:00 | Publicado em 12/04/2023; Atualizado em 16/07/2026 | `c3424804bafd1f054ef0035844a52a0bae62a6e78162e308f97e9bdf5b65f096` |
+| `html-ssp-cin-ma.md` | https://www.ssp.ma.gov.br/governo-passa-a-emitir-nova-carteira-de-identidade-nacional-em-todo-o-maranhao/ | HTML (trecho; notícia) | 200 | 2026-10-24T23:51:13-03:00 | Publicado em: sexta-feira, 12 de janeiro de 2024 | `b01123b71f3dd40545a86c579a3d1980ed031124eedff2768bc7116aaf102eb1` |
+| `html-detran-2via-cnh.md` | https://www.detran.ma.gov.br/inicio/paginas/Pagina.xhtml?id=19297 | HTML (trecho) | 200 | 2026-10-24T23:51:21-03:00 | não informado | `36ea71abdfef1f9ed6fd5899ecc5a4ce7cda1b5b4f9398f75c748b5ccac57ec7` |
+| `html-detran-taxas.md` | https://www.detran.ma.gov.br/inicio/paginas/Taxas.xhtml | HTML (trecho: segunda via CNH) | 200 | 2026-10-24T23:51:23-03:00 | não informado | `c1068152fb36ead0f92c128f91b9de5a447e85074ccb5bf263ea6cceadcfb566` |
+| `html-detran-transf-digital.md` | https://www.detran.ma.gov.br/inicio/paginas/Pagina.xhtml?id=23692 | HTML (trecho) | 200 | 2026-10-24T23:51:11-03:00 | não informado | `4b08e2995ce07e85f1870b48810a3642a1eef24fdc2acf13d6c44293d968c9ea` |
+| `html-govbr-restricoes-veiculo.md` | https://www.gov.br/pt-br/servicos/consultar-informacoes-sobre-restricoes-e-indicadores-de-veiculos | HTML (trecho) | 200 | 2026-10-24T23:51:13-03:00 | Última Modificação: 15/12/2025 | `ad46bf0e5d676b38554dd4cf30dea7e582e85156d76ecebd72407eb750623379` |
+| `html-govbr-sine-emprego.md` | https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine | HTML (trecho) | 200 | 2026-10-24T23:51:14-03:00 | Última Modificação: 15/12/2025 | `04e1324417abc7da680003731159f076e1d0e836da5e6bdcbd9e2483abb1e0cb` |
+| `html-govbr-cadunico-inscrever.md` | https://www.gov.br/pt-br/servicos/inscrever-se-no-cadastro-unico-para-programas-sociais-do-governo-federal | HTML (trecho) | 200 | 2026-10-24T23:51:14-03:00 | Última Modificação: 15/12/2025 | `5a4c098f1e8b0a5477a719f461177592c4811b2f01e85d3091a856daf659226b` |
+| `html-govbr-sus-cadastro.md` | https://www.gov.br/pt-br/servicos/atualizar-informacoes-cadastrais-do-cidadao-no-sus | HTML (trecho) | 200 | 2026-10-24T23:51:15-03:00 | Última Modificação: 21/10/2026 | `8e04ffe76d90f55acb0b711114c2e15524117dc6461f003858cb8f51c3ac7d72` |
+| `html-sl-2via-certidao-nascimento.md` | https://www.saoluis.ma.gov.br/portal/carta-servicos/11/ | HTML (trecho) | 200 | 2026-10-24T23:55:23-03:00 | Atualizado em: 05/05/2026 | `29862a69c836a92c15839dc8ae5051a296f727cd21f58f1b1e23c273a3968335` |
+
+### Falhas em 24/10/2026
+
+- **DETRAN-MA, URLs antigas** `.../paginas/detalhe/{id}`: HTTP 404. O conteúdo migrou para `.../inicio/paginas/Pagina.xhtml?id={id}`.
+- **DETRAN-MA, ids 19272 (transferência presencial), 19281 (mudança de município), 19279 (mudança de UF) e 19481 (orientações gerais)**: HTTP 200, mas o corpo vem sem o texto do serviço (só o título; conteúdo carregado por JavaScript). Sem amostra; exigem conferência no navegador.
+- **TSE e TRE-MA** (`tse.jus.br`, `tre-ma.jus.br`): HTTP 403, como em 10/10.
+- **Ident-MA** (`agendamento.ssp.ma.gov.br`): sem resposta (timeout).
+- **Catálogo estadual** (`ma.gov.br/todos-os-servicos`): a lista de serviços é carregada por JavaScript; o HTML não traz os serviços.
+- **Página federal da CIN** (`gov.br/governodigital/pt-br/identidade/cin`): 200, mas sem data declarada; foi usada a página de perguntas frequentes, que declara data.

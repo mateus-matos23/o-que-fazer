@@ -40,7 +40,7 @@
 ### Decisões que ainda precisam ser fechadas
 
 1. Ramificações e serviços finais das três jornadas prioritárias.
-2. URLs, exemplos e evidências reproduzíveis da prova de viabilidade. Em andamento: [matriz de evidências](dados/evidencias/README.md) das 3 jornadas (10/10/2026); amostras brutas coletadas em [amostras](dados/amostras/README.md). As fontes estaduais de perda de documentos ficaram fora do recorte do protótipo.
+2. URLs, exemplos e evidências reproduzíveis da prova de viabilidade. Em andamento: [matriz de evidências](dados/evidencias/README.md) das 3 jornadas (10/10/2026); amostras brutas coletadas em [amostras](dados/amostras/README.md). As fontes estaduais de perda de documentos ficaram fora do recorte do protótipo. Atualização de 24/10/2026: CIN (orientação federal e notícia SSP-MA), 2ª via da CNH (DETRAN-MA) e 2ª via de certidão de nascimento (São Luís) passaram a ter amostra em bruto; título de eleitor segue pendente (403). Levantamento preliminar das [jornadas candidatas](dados/evidencias/jornadas-candidatas.md).
 3. Critérios e frequência de atualização e resolução de divergências.
 4. Modelo físico de dados e persistência das sessões. Resolvido para fontes e catálogo (apps `sources` e `catalog`, ver [modelo físico](arquitetura/modelo-fisico-de-dados.md) e [registro de implementação](implementacao/README.md)); sessão do cidadão na sessão do Django, sem tabela própria e com expiração de 2 horas (decisão de 24/10/2026).
 5. ~~Stack de backend e acesso a dados~~ — resolvido: Django 6.1.2 + PostgreSQL 18 ([ADR 0001](arquitetura/decisoes/0001-stack.md)). Frontend resolvido em 24/10/2026: templates Django com CSS próprio, sem JavaScript ([ADR 0004](arquitetura/decisoes/0004-frontend-e-acessibilidade.md)). Hospedagem continua pendente.

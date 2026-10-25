@@ -14,6 +14,20 @@ Levantamento de fontes oficiais para a jornada "perdi minha carteira / meus docu
 | Registro de ocorrência de extravio/perda de documentos (Delegacia Online) | Polícia Civil do Maranhão / SSP-MA | Estadual (MA) | https://www.policiacivil.ma.gov.br/delegacia-online/ | HTML | Não exige (formulário público) | Confirmada (página com "Publicado em 1 de março de 2018"). Domínio delegaciaonline.ssp.ma.gov.br: não confirmado (falha de DNS) | 2026-10-10 |
 | CNH digital / CIN digital (perda do app) | DETRAN-MA / Ident-MA | Estadual (MA) | não informada | não informado | não informado | Não confirmada: nenhuma fonte oficial do MA foi localizada | 2026-10-10 |
 
+## Atualização de 24/10/2026
+
+A tabela acima registra a consulta de 10/10/2026 e fica como **Histórico**. Nova coleta em bruto ([amostras](../amostras/README.md#coleta-de-24102026)):
+
+| Serviço | Estado em 24/10/2026 | O que a amostra sustenta |
+| --- | --- | --- |
+| CIN (orientação federal) | **Confirmada**: [perguntas frequentes da CIN](../amostras/html-govbr-cin-faq-emissao.md), atualizada em 16/07/2026 | Emissão pelos órgãos de identificação civil dos estados; exige "certidão de nascimento ou casamento atualizada"; 2ª via em qualquer UF ([amostra](../amostras/html-govbr-cin-faq.md)); o órgão de identificação pode inscrever o CPF de menores. |
+| CIN no MA | **Confirmada com ressalva**: [notícia SSP-MA](../amostras/html-ssp-cin-ma.md) de 12/01/2024 | Locais (Ident-MA na Rua da Palma; postos Viva/Procon) e documentos da primeira via. Custo da 2ª via e agendamento: **não informado** (Ident-MA sem resposta). |
+| 2ª via da CNH/PpD no MA | **Confirmada**: [DETRAN-MA](../amostras/html-detran-2via-cnh.md), sem data declarada | Exige Boletim de Ocorrência e RG; atendimento nas unidades do DETRAN-MA; CNH de outra UF segue outro serviço. Taxas na [tabela](../amostras/html-detran-taxas.md). |
+| 2ª via da certidão de nascimento (São Luís) | **Confirmada**: [carta de serviços](../amostras/html-sl-2via-certidao-nascimento.md), atualizada em 05/05/2026 | Requerimento eletrônico pelo SEI externo; custo e prazo "em estudo" (= não informado). Não cobre certidões de outros municípios. |
+| Título de eleitor | **Pendente**: TSE e TRE-MA seguem com HTTP 403 | Exige conferência manual no navegador. |
+
+Consequência para a jornada: a CIN e a CNH podem sair de `out_of_coverage`, e surge a primeira **dependência obrigatória** com fonte (ocorrência → 2ª via da CNH) e uma **condicional** (certidão → CIN, se a certidão também foi perdida). A mudança no conteúdo (`content/perda-de-documentos.toml`) fica para uma fatia própria.
+
 ## Catálogo Gov.br e API de serviços (verificação técnica)
 
 Esta seção registra o que foi efetivamente testado. Ela não é um serviço de jornada, mas define o formato de coleta possível. Ver a subseção "API de serviços do Gov.br" abaixo.
