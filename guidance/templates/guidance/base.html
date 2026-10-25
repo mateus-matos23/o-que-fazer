@@ -1,14 +1,21 @@
-<!doctype html>
+{% load static %}<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}O que Fazer?{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'guidance/site.css' %}">
 </head>
 <body>
-  <header><a href="{% url 'guidance:situation_list' %}">O que Fazer?</a></header>
-  <main>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header">
+    <div class="page"><a href="{% url 'guidance:situation_list' %}">O que Fazer?</a></div>
+  </header>
+  <main id="conteudo" class="page" tabindex="-1">
     {% block content %}{% endblock %}
   </main>
+  <footer class="site-footer">
+    <div class="page"><p>O que Fazer? orienta e encaminha para os canais oficiais. Não executa serviços nem confirma direitos.</p></div>
+  </footer>
 </body>
 </html>

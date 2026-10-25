@@ -60,7 +60,7 @@ def question(request: HttpRequest, slug: str) -> HttpResponse:
         if current is None:
             return redirect("guidance:plan", slug=slug)
         form = AnswerForm(current, initial_answer=facts.get(current.slug))
-    context = {"catalog": catalog, "question": current, "form": form, "has_answers": bool(facts)}
+    context = {"catalog": catalog, "question": current, "form": form, "answer_count": len(facts)}
     return render(request, "guidance/question.html", context)
 
 
@@ -188,7 +188,7 @@ def edit_answer(request: HttpRequest, slug: str, question_slug: str) -> HttpResp
             return _see_other(reverse("guidance:question", args=[slug]))  # recalcula (invariante 8)
     else:
         form = AnswerForm(current, initial_answer=facts.get(current.slug))
-    context = {"catalog": catalog, "question": current, "form": form, "has_answers": bool(facts)}
+    context = {"catalog": catalog, "question": current, "form": form, "answer_count": len(facts)}
     return render(request, "guidance/question.html", context)
 
 

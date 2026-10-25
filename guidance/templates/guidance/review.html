@@ -1,19 +1,20 @@
 {% extends "guidance/base.html" %}
 {% block title %}Suas respostas - O que Fazer?{% endblock %}
 {% block content %}
+<p class="context-link"><a href="{% url 'guidance:question' catalog.situation_slug %}">{{ catalog.situation_title }}</a></p>
 <h1>Suas respostas</h1>
 {% if lines %}
-<ul>
+<ul class="answers">
   {% for line in lines %}
   <li>
     <p>{{ line.text }}</p>
     <p>{% if line.unknown %}Não sei{% elif line.labels %}{{ line.labels|join:", " }}{% else %}Nenhuma destas{% endif %}</p>
-    <a href="{% url 'guidance:edit_answer' catalog.situation_slug line.question_slug %}">Alterar</a>
+    <a href="{% url 'guidance:edit_answer' catalog.situation_slug line.question_slug %}">Alterar<span class="visually-hidden"> resposta: {{ line.text }}</span></a>
   </li>
   {% endfor %}
 </ul>
 {% else %}
 <p>Nenhuma pergunta respondida ainda.</p>
 {% endif %}
-<p><a href="{% url 'guidance:question' catalog.situation_slug %}">Continuar</a></p>
+<div class="actions"><a class="button" href="{% url 'guidance:question' catalog.situation_slug %}">Continuar</a></div>
 {% endblock %}

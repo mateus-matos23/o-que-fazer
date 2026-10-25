@@ -1,15 +1,16 @@
 {% extends "guidance/base.html" %}
-{% block title %}Seu plano - O que Fazer?{% endblock %}
+{% block title %}Seu plano - {{ catalog.situation_title }} - O que Fazer?{% endblock %}
 {% block content %}
+<p class="context-link"><a href="{% url 'guidance:question' catalog.situation_slug %}">{{ catalog.situation_title }}</a></p>
 <h1>Seu plano</h1>
-<p><strong>Atenção:</strong> este sistema é apenas orientativo. Ele não executa serviços nem confirma direitos; confira sempre na fonte oficial.</p>
+<p class="disclaimer">Este sistema é apenas orientativo. Ele não executa serviços nem confirma direitos; confira sempre na fonte oficial.</p>
 
 {% if uncovered %}
-<section id="limite-de-cobertura">
+<section id="limite-de-cobertura" class="notice">
   <h2>Limite de cobertura</h2>
   <p>Não encontramos orientação oficial para esta resposta nesta versão. As etapas abaixo não cobrem esse caso.</p>
   <ul>
-    {% for line in uncovered %}<li>{{ line.question_text }}: {{ line.option_label }}</li>{% endfor %}
+    {% for line in uncovered %}<li>{{ line.question_text }} Você respondeu: {{ line.option_label }}.</li>{% endfor %}
   </ul>
 </section>
 {% endif %}
@@ -17,18 +18,27 @@
 {% if steps %}
 <nav aria-label="Resumo do plano">
   <h2>Resumo</h2>
-  <ol>
-    {% for item in steps %}
-    <li><a href="#etapa-{{ item.step.procedure.slug }}">{{ item.step.procedure.title }}</a></li>
+  {% regroup steps by step.layer as layers %}
+  <ol class="route">
+    {% for group in layers %}
+    <li>
+      <span class="route-number"><span class="visually-hidden">Passo </span>{{ group.grouper }}</span>
+      <ul class="route-items">
+        {% for item in group.list %}
+        <li><a href="#etapa-{{ item.step.procedure.slug }}">{{ item.step.procedure.title }}</a></li>
+        {% endfor %}
+      </ul>
+      {% if group.list|length > 1 %}<p class="route-note">Podem ser feitas em qualquer ordem</p>{% endif %}
+    </li>
     {% endfor %}
   </ol>
 </nav>
 
 {% for item in steps %}
 {% with step=item.step procedure=item.step.procedure %}
-<section id="etapa-{{ procedure.slug }}" data-slug="{{ procedure.slug }}">
+<article id="etapa-{{ procedure.slug }}" class="step" data-slug="{{ procedure.slug }}">
   <h2>{{ procedure.title }}</h2>
-  <p>Passo {{ step.layer }} (etapas do mesmo passo podem ser feitas em qualquer ordem)</p>
+  <p class="muted">Passo {{ step.layer }}</p>
   <p>{{ procedure.description }}</p>
 
   {% if step.reasons %}
@@ -51,37 +61,44 @@
   </ul>
   {% endif %}
 
-  <h3>Órgão</h3>
-  <p>{{ procedure.agency_name }}</p>
+  <dl>
+    <dt>Órgão</dt>
+    <dd>{{ procedure.agency_name }}</dd>
 
-  <h3>Requisitos</h3>
-  {% if procedure.requirements %}
-  <ul>
-    {% for requirement in procedure.requirements %}<li>{{ requirement.description }}</li>{% endfor %}
-  </ul>
-  {% else %}
-  <p>Não informado</p>
-  {% endif %}
+    <dt>Requisitos</dt>
+    <dd>
+      {% if procedure.requirements %}
+      <ul>
+        {% for requirement in procedure.requirements %}<li>{{ requirement.description }}</li>{% endfor %}
+      </ul>
+      {% else %}<span class="not-informed">Não informado</span>{% endif %}
+    </dd>
 
-  <h3>Canais</h3>
-  {% if item.channels %}
-  <ul>
-    {% for line in item.channels %}
-    <li>{{ line.kind_label }}: {{ line.channel.description }}
-      {% if line.channel.url %}<a href="{{ line.channel.url }}" rel="noopener">Acessar</a>{% endif %}</li>
-    {% endfor %}
-  </ul>
-  {% else %}
-  <p>Não informado</p>
-  {% endif %}
+    <dt>Canais</dt>
+    <dd>
+      {% if item.channels %}
+      <ul>
+        {% for line in item.channels %}
+        <li>{{ line.kind_label }}: {% if line.channel.url %}<a href="{{ line.channel.url }}" rel="noopener">{{ line.channel.description }} (site oficial)</a>{% else %}{{ line.channel.description }}{% endif %}</li>
+        {% endfor %}
+      </ul>
+      {% else %}<span class="not-informed">Não informado</span>{% endif %}
+    </dd>
 
-  <p>Custo: {% if item.costs %}{{ item.costs|join:"; " }}{% else %}Não informado{% endif %}</p>
-  <p>Prazo: {% if item.deadlines %}{{ item.deadlines|join:"; " }}{% else %}Não informado{% endif %}</p>
+    <dt>Custo</dt>
+    <dd>{% if item.costs %}{{ item.costs|join:"; " }}{% else %}<span class="not-informed">Não informado</span>{% endif %}</dd>
 
-  <p>Fonte: <a href="{{ procedure.citation.source_url }}" rel="noopener">{{ procedure.citation.source_slug }}</a>.
-    Coletado em {{ procedure.citation.fetched_at|date:"d/m/Y H:i" }}.
-    Atualizado pelo órgão em {% if procedure.citation.declared_updated_at %}{{ procedure.citation.declared_updated_at|date:"d/m/Y" }}{% else %}Não informado{% endif %}.</p>
-</section>
+    <dt>Prazo</dt>
+    <dd>{% if item.deadlines %}{{ item.deadlines|join:"; " }}{% else %}<span class="not-informed">Não informado</span>{% endif %}</dd>
+
+    <dt>Fonte</dt>
+    <dd>
+      <a href="{{ procedure.citation.source_url }}" rel="noopener">{{ procedure.citation.source_slug }} (site oficial)</a><br>
+      Coletado em {{ procedure.citation.fetched_at|date:"d/m/Y H:i" }}.<br>
+      Atualizado pelo órgão em {% if procedure.citation.declared_updated_at %}{{ procedure.citation.declared_updated_at|date:"d/m/Y" }}{% else %}<span class="not-informed">Não informado</span>{% endif %}.
+    </dd>
+  </dl>
+</article>
 {% endwith %}
 {% endfor %}
 {% elif not undetermined %}
@@ -89,7 +106,7 @@
 {% endif %}
 
 {% if undetermined %}
-<section>
+<section class="notice">
   <h2>Pode se aplicar, mas faltam informações</h2>
   <ul>
     {% for title in undetermined %}<li>{{ title }}</li>{% endfor %}
@@ -97,9 +114,11 @@
 </section>
 {% endif %}
 
-<p><a href="{% url 'guidance:review' catalog.situation_slug %}">Revisar respostas</a></p>
-<form method="post" action="{% url 'guidance:restart' catalog.situation_slug %}">
-  {% csrf_token %}
-  <button type="submit">Recomeçar</button>
-</form>
+<div class="actions">
+  <a class="button secondary" href="{% url 'guidance:review' catalog.situation_slug %}">Revisar respostas</a>
+  <form method="post" action="{% url 'guidance:restart' catalog.situation_slug %}">
+    {% csrf_token %}
+    <button type="submit" class="secondary">Recomeçar</button>
+  </form>
+</div>
 {% endblock %}

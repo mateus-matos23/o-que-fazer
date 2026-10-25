@@ -1,0 +1,269 @@
+/*
+ * Contraste calculado (WCAG 2.x, luminância relativa). Mínimo AA: 4,5:1 texto, 3:1 componentes e foco.
+ *   --ink #1F2A2E sobre --bg #F5F7F6 ............ 13,66:1
+ *   --ink sobre superfície #FFFFFF .............. 14,70:1  (também o contorno de foco)
+ *   --action #0F6B5C sobre --bg ................. 5,95:1   (links)
+ *   --action sobre #FFFFFF ...................... 6,41:1
+ *   #FFFFFF sobre --action (botão primário) ..... 6,41:1
+ *   --action sobre --notice-bg .................. 5,85:1   (link dentro do aviso)
+ *   --muted #4A5A5F sobre --bg .................. 6,69:1
+ *   --muted sobre #FFFFFF ....................... 7,19:1
+ *   --notice-ink #5C3D00 sobre --notice-bg ...... 9,03:1
+ *   --notice-border #8A5A00 sobre --notice-bg ... 5,41:1
+ *   --line #C9D3D1 sobre --bg ................... 1,42:1   (só decorativo: separadores e linha do
+ *     roteiro; nenhuma informação ou controle depende dele. Estado marcado usa --ink, 13,66:1)
+ */
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("fonts/AtkinsonHyperlegibleNext-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("fonts/AtkinsonHyperlegibleNext-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #F5F7F6;
+  --surface: #FFFFFF;
+  --ink: #1F2A2E;
+  --action: #0F6B5C;
+  --muted: #4A5A5F;
+  --line: #C9D3D1;
+  --notice-bg: #FFF4D6;
+  --notice-ink: #5C3D00;
+  --notice-border: #8A5A00;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.page { max-width: 40rem; margin: 0 auto; padding: 0 1rem; }
+main { flex: 1 0 auto; width: 100%; padding-top: 1.5rem; padding-bottom: 2rem; }
+p, li, dd, dt { max-width: 65ch; }
+p { margin: 0 0 1rem; }
+
+h1, h2, h3 { line-height: 1.25; margin: 2rem 0 0.75rem; font-weight: 700; }
+h1 { font-size: 2.07rem; margin-top: 0.5rem; }
+h2 { font-size: 1.66rem; }
+h3 { font-size: 1.33rem; }
+
+a { color: var(--action); text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 3px; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -4rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  z-index: 10;
+}
+.skip-link:focus { top: 0.5rem; }
+
+.site-header { border-bottom: 1px solid var(--line); }
+.site-header a {
+  display: inline-block;
+  padding: 0.75rem 0;
+  min-height: 48px;
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+.site-footer { border-top: 1px solid var(--line); color: var(--muted); padding-top: 1rem; padding-bottom: 2rem; }
+.site-footer p { margin: 0; }
+
+.muted { color: var(--muted); }
+.context-link { margin: 0.5rem 0 0; }
+.context-link a { display: inline-block; min-height: 24px; padding: 0.25rem 0; }
+
+/* Botões e links de ação */
+.button, button {
+  display: inline-block;
+  min-height: 48px;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid var(--action);
+  border-radius: 0.25rem;
+  background: var(--action);
+  color: #FFFFFF;
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+button.secondary, .button.secondary { background: transparent; color: var(--action); }
+.answer-form > button { width: 100%; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+.actions form { margin: 0; }
+
+/* Home */
+.situations { list-style: none; margin: 1.5rem 0 0; padding: 0; border-top: 1px solid var(--line); max-width: none; }
+.situations li { border-bottom: 1px solid var(--line); max-width: none; }
+.situations a {
+  display: block;
+  min-height: 48px;
+  padding: 0.875rem 0.25rem;
+  font-weight: 700;
+}
+
+/* Pergunta */
+.progress { color: var(--muted); margin-bottom: 0.5rem; }
+fieldset { border: 0; margin: 1rem 0; padding: 0; min-width: 0; }
+legend { padding: 0; font-size: 1.33rem; font-weight: 700; line-height: 1.25; margin-bottom: 1rem; }
+legend h1 { font-size: 1.66rem; margin: 0; }
+.choices > div > div { margin: 0; }
+.choices label, .choice {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 48px;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+.choices input, .choice input { width: 1.5rem; height: 1.5rem; flex: none; margin: 0; accent-color: var(--action); }
+.choices label:has(input:checked), .choice:has(input:checked) {
+  border: 3px solid var(--ink);
+  padding: calc(0.75rem - 2px) calc(1rem - 2px);
+  font-weight: 700;
+}
+.has-unknown #id_answer > div:last-child { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--muted); }
+.unknown { margin-top: 1.5rem; }
+.errors {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--notice-bg);
+  color: var(--notice-ink);
+  border: 2px solid var(--notice-border);
+  border-radius: 0.25rem;
+}
+.errors p { margin: 0 0 0.5rem; }
+.errors ul { margin: 0; padding-left: 1.25rem; font-weight: 700; }
+
+/* Avisos */
+.disclaimer { margin: 1.5rem 0; padding-left: 0.75rem; border-left: 3px solid var(--muted); color: var(--muted); }
+.notice {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+  background: var(--notice-bg);
+  color: var(--notice-ink);
+  border: 2px solid var(--notice-border);
+  border-radius: 0.25rem;
+}
+.notice a { color: var(--notice-ink); }
+.notice h2 { font-size: 1.33rem; margin-top: 0; }
+.notice p:last-child, .notice ul:last-child { margin-bottom: 0; }
+
+/* Roteiro (resumo do plano) */
+.route { list-style: none; margin: 1.5rem 0 0; padding: 0; max-width: none; }
+.route > li {
+  position: relative;
+  max-width: none;
+  padding: 0 0 1.5rem 3.25rem;
+}
+.route > li::before {
+  content: "";
+  position: absolute;
+  left: 1.125rem;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--line);
+}
+.route > li:first-child::before { top: 1.125rem; }
+.route > li:last-child { padding-bottom: 0; }
+.route > li:last-child::before { bottom: auto; height: 1.125rem; }
+.route > li:only-child::before { display: none; }
+.route-number {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-weight: 700;
+}
+.route-items { list-style: none; margin: 0; padding: 0; }
+.route-items li { margin: 0; }
+.route-items a { display: inline-block; min-height: 40px; padding: 0.35rem 0; font-weight: 700; }
+.route-note { margin: 0; color: var(--muted); }
+
+/* Etapas */
+.step {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.25rem;
+}
+.step h2 { margin-top: 0; }
+.step h3 { font-size: 1.0625rem; margin: 1.25rem 0 0.25rem; }
+.step ul { margin: 0 0 1rem; padding-left: 1.25rem; }
+dl { margin: 1rem 0 0; }
+dt { font-weight: 700; margin-top: 1rem; }
+dd { margin: 0; }
+dd ul { margin: 0; padding-left: 1.25rem; }
+.not-informed { color: var(--muted); }
+
+/* Revisão */
+.answers { list-style: none; margin: 1.5rem 0 0; padding: 0; border-top: 1px solid var(--line); max-width: none; }
+.answers li { padding: 1rem 0.25rem; border-bottom: 1px solid var(--line); max-width: none; }
+.answers p { margin: 0 0 0.25rem; }
+.answers p:nth-child(2) { font-weight: 700; }
+.answers a { display: inline-block; min-height: 40px; padding: 0.5rem 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+@media (min-width: 40rem) {
+  .answer-form > button { width: auto; min-width: 12rem; }
+}
+
+@media print {
+  body { background: #FFFFFF; font-size: 12pt; }
+  .skip-link, .site-header, .site-footer, .actions, button, .context-link { display: none !important; }
+  .step { break-inside: avoid; border-color: #000000; }
+  .route > li { break-inside: avoid; }
+  a { color: #000000; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; overflow-wrap: anywhere; }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

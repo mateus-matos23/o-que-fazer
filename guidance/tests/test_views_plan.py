@@ -53,8 +53,11 @@ def test_plan_shows_step_details(loaded: dict[str, int], client: Client) -> None
         in html
     )
     assert 'rel="noopener"' in html
-    assert "Custo: Gratuito, exceto em unidades conveniadas" in html
-    assert "Prazo: Não informado" in html  # RN11
+    assert re.search(r"<dt>Custo</dt>\s*<dd>Gratuito, exceto em unidades conveniadas", html)
+    assert re.search(
+        r'<dt>Prazo</dt>\s*<dd><span class="not-informed">Não informado</span></dd>', html
+    )  # RN11
+    assert "(site oficial)" in html
     assert "Coletado em 09/10/2026 21:00" in html  # RN12
     assert "Atualizado pelo órgão em" in html
     assert "Revisar respostas" in html and "Recomeçar" in html
@@ -97,7 +100,7 @@ def test_uncovered_warning_shows_without_steps() -> None:
             "undetermined": [],
         },
     )
-    assert "Limite de cobertura" in html and "q: a" in html
+    assert "Limite de cobertura" in html and "q Você respondeu: a." in html
 
 
 def test_unknown_gives_clarification_and_undetermined(
@@ -144,8 +147,9 @@ def test_dates_use_local_timezone(loaded: dict[str, int], client: Client) -> Non
 
 
 def test_review_lists_answers_and_edit_changes_plan(loaded: dict[str, int], client: Client) -> None:
-    assert "Revisar respostas" not in _html(client, URL)
+    assert "Rever respostas" not in _html(client, URL)
     _answer(client, "suspenso")
+    assert "Rever respostas" in _html(client, URL + "respostas/" + QUESTION + "/")
     html = _html(client, URL + "respostas/")
     assert "Suspenso" in html and "Alterar" in html
     edit = _html(client, f"{URL}respostas/{QUESTION}/")

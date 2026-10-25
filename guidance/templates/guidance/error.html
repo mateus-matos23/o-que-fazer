@@ -1,7 +1,7 @@
 {% extends "guidance/base.html" %}
 {% block title %}Erro - O que Fazer?{% endblock %}
 {% block content %}
-<h1>Algo deu errado</h1>
-<p>{{ message }}</p>
-<p><a href="{% url 'guidance:situation_list' %}">Voltar ao início</a></p>
+<h1>Não foi possível continuar</h1>
+<div class="notice"><p>{{ message }}</p></div>
+<p><a class="button" href="{% url 'guidance:situation_list' %}">Voltar ao início</a></p>
 {% endblock %}

@@ -1,9 +1,8 @@
 {% extends "guidance/base.html" %}
-{% block title %}{{ catalog.situation_title }} - O que Fazer?{% endblock %}
+{% block title %}{% if form.errors %}Erro: {% endif %}{{ catalog.situation_title }} - O que Fazer?{% endblock %}
 {% block content %}
-<h1>{{ catalog.situation_title }}</h1>
+<p class="context-link"><a href="{% url 'guidance:question' catalog.situation_slug %}">{{ catalog.situation_title }}</a></p>
+<p class="progress">Você já respondeu {{ answer_count }} pergunta{{ answer_count|pluralize }}.
+  {% if answer_count %}<a href="{% url 'guidance:review' catalog.situation_slug %}">Rever respostas</a>{% endif %}</p>
 {% include "guidance/_answer_form.html" %}
-{% if has_answers %}
-<p><a href="{% url 'guidance:review' catalog.situation_slug %}">Revisar respostas</a></p>
-{% endif %}
 {% endblock %}

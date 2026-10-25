@@ -2,7 +2,8 @@
 {% block title %}O que aconteceu? - O que Fazer?{% endblock %}
 {% block content %}
 <h1>O que aconteceu?</h1>
-<ul>
+<p>Escolha a situação mais próxima da sua. Este site orienta os próximos passos e indica onde resolver; ele não executa serviços.</p>
+<ul class="situations">
   {% for situation in situations %}
   <li><a href="{% url 'guidance:question' situation.slug %}">{{ situation.title }}</a></li>
   {% empty %}

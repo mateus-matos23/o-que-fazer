@@ -1,14 +1,21 @@
-<form method="post">
+<form method="post" class="answer-form">
   {% csrf_token %}
   <input type="hidden" name="question" value="{{ question.slug }}">
-  {{ form.non_field_errors }}
-  <fieldset>
-    <legend>{{ form.answer.label }}</legend>
+  {% if form.errors %}
+  <div id="form-errors" class="errors" tabindex="-1" autofocus>
+    <p><strong>Erro:</strong> corrija a resposta antes de continuar.</p>
+    {{ form.non_field_errors }}
     {{ form.answer.errors }}
-    {{ form.answer }}
-  </fieldset>
-  {% if form.unknown %}
-  <p>{{ form.unknown }} <label for="{{ form.unknown.id_for_label }}">{{ form.unknown.label }}</label></p>
+  </div>
   {% endif %}
+  <fieldset{% if form.errors %} aria-describedby="form-errors"{% endif %}>
+    <legend><h1>{{ form.answer.label }}</h1></legend>
+    <div class="choices{% if question.kind == 'SINGLE' and question.allows_unknown %} has-unknown{% endif %}">
+      {{ form.answer }}
+    </div>
+    {% if form.unknown %}
+    <label class="choice unknown">{{ form.unknown }} {{ form.unknown.label }}</label>
+    {% endif %}
+  </fieldset>
   <button type="submit">Continuar</button>
 </form>
