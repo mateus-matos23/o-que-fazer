@@ -14,6 +14,8 @@ SLUG = "perda-de-documentos"
 QUESTION = "documentos-perdidos"
 CPF = "segunda-via-cpf"
 BO = "registrar-ocorrencia-extravio"
+CIN = "segunda-via-cin"
+CNH = "segunda-via-cnh"
 
 
 def _facts(*options: str) -> Facts:
@@ -31,12 +33,13 @@ def catalog(loaded: dict[str, int]) -> Catalog:
 
 CASES = [
     (("cpf",), {CPF, BO}, ()),
-    (("cnh",), {BO}, ((QUESTION, "cnh"),)),
-    (("cin",), {BO}, ((QUESTION, "cin"),)),
+    (("cnh",), {BO, CNH}, ()),
+    (("cin",), {BO, CIN}, ()),
+    (("titulo-de-eleitor",), {BO}, ((QUESTION, "titulo-de-eleitor"),)),
     (
-        ("cpf", "cin", "titulo-de-eleitor"),
-        {CPF, BO},
-        ((QUESTION, "cin"), (QUESTION, "titulo-de-eleitor")),
+        ("cpf", "cin", "cnh", "titulo-de-eleitor"),
+        {CPF, BO, CIN, CNH},
+        ((QUESTION, "titulo-de-eleitor"),),
     ),
     ((), {BO}, ()),
 ]
@@ -55,6 +58,12 @@ def test_plan_table(
     assert not plan.undetermined
 
 
+def test_police_report_comes_before_cnh(catalog: Catalog) -> None:
+    layers = {s.procedure.slug: s.layer for s in build_plan(catalog, _facts("cnh", "cin")).steps}
+    assert layers[BO] < layers[CNH]
+    assert layers[CIN] == layers[BO]  # sem dependência documentada para a CIN
+
+
 def test_changing_answer_recomputes(catalog: Catalog) -> None:
     assert CPF in _slugs(build_plan(catalog, _facts("cpf")))
     assert CPF not in _slugs(build_plan(catalog, _facts("cnh")))
@@ -68,9 +77,10 @@ def test_every_cited_step_has_sources(catalog: Catalog) -> None:
 
 
 def test_http_flow_shows_coverage_warning(loaded: dict[str, int], client: Client) -> None:
-    response = client.post(f"/s/{SLUG}/", {"question": QUESTION, "answer": ["cpf", "cnh"]})
+    answer = ["cpf", "cnh", "titulo-de-eleitor"]
+    response = client.post(f"/s/{SLUG}/", {"question": QUESTION, "answer": answer})
     assert isinstance(response, HttpResponse) and response.status_code == 303
     html = client.get(f"/s/{SLUG}/plano/").content.decode()
-    assert f'data-slug="{CPF}"' in html and f'data-slug="{BO}"' in html
+    assert all(f'data-slug="{slug}"' in html for slug in (CPF, BO, CNH))
     assert "Limite de cobertura" in html
-    assert "Carteira Nacional de Habilitação (CNH)" in html
+    assert "Título de eleitor" in html

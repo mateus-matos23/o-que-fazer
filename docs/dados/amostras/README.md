@@ -49,8 +49,7 @@ Mesmo método da coleta de 10/10, com duas diferenças: o extrato de texto desca
 
 | arquivo | fonte | tipo | HTTP | data da coleta | data declarada | sha256 (só HTML) |
 | --- | --- | --- | --- | --- | --- | --- |
-| `html-govbr-cin-faq.md` | https://www.gov.br/governodigital/pt-br/identidade/cin/perguntas-frequentes-sobre-a-cin | HTML (trecho: segunda via e CPF de menores) | 200 | 2026-10-24T23:54:06-03:00 | Publicado em 12/04/2023; Atualizado em 16/07/2026 | `c3424804bafd1f054ef0035844a52a0bae62a6e78162e308f97e9bdf5b65f096` |
-| `html-govbr-cin-faq-emissao.md` | mesma página e mesma coleta | HTML (trecho: emissão e certidão) | 200 | 2026-10-24T23:54:06-03:00 | Publicado em 12/04/2023; Atualizado em 16/07/2026 | `c3424804bafd1f054ef0035844a52a0bae62a6e78162e308f97e9bdf5b65f096` |
+| `html-govbr-cin-faq.md` | https://www.gov.br/governodigital/pt-br/identidade/cin/perguntas-frequentes-sobre-a-cin | HTML (trecho: emissão, certidão, segunda via e CPF de menores; 60 linhas) | 200 | 2026-10-24T23:54:06-03:00 | Publicado em 12/04/2023; Atualizado em 16/07/2026 | `c3424804bafd1f054ef0035844a52a0bae62a6e78162e308f97e9bdf5b65f096` |
 | `html-ssp-cin-ma.md` | https://www.ssp.ma.gov.br/governo-passa-a-emitir-nova-carteira-de-identidade-nacional-em-todo-o-maranhao/ | HTML (trecho; notícia) | 200 | 2026-10-24T23:51:13-03:00 | Publicado em: sexta-feira, 12 de janeiro de 2024 | `b01123b71f3dd40545a86c579a3d1980ed031124eedff2768bc7116aaf102eb1` |
 | `html-detran-2via-cnh.md` | https://www.detran.ma.gov.br/inicio/paginas/Pagina.xhtml?id=19297 | HTML (trecho) | 200 | 2026-10-24T23:51:21-03:00 | não informado | `36ea71abdfef1f9ed6fd5899ecc5a4ce7cda1b5b4f9398f75c748b5ccac57ec7` |
 | `html-detran-taxas.md` | https://www.detran.ma.gov.br/inicio/paginas/Taxas.xhtml | HTML (trecho: segunda via CNH) | 200 | 2026-10-24T23:51:23-03:00 | não informado | `c1068152fb36ead0f92c128f91b9de5a447e85074ccb5bf263ea6cceadcfb566` |

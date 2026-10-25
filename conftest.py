@@ -43,6 +43,10 @@ SAMPLE_FILES = {
     "govbr-obter-cartao-cpf": "html-obter-cartao-de-cpf.md",
     "api-servicos-10424": "api-servicos-10424.json",
     "policiacivil-delegacia-online": "html-policiacivil-delegacia-online.md",
+    "govbr-cin-faq": "html-govbr-cin-faq.md",
+    "ssp-cin-ma": "html-ssp-cin-ma.md",
+    "detran-2via-cnh": "html-detran-2via-cnh.md",
+    "detran-taxas": "html-detran-taxas.md",
 }
 
 

@@ -230,6 +230,7 @@ Templates Django sem CSS nem JavaScript, com HTML semântico (`fieldset` e `lege
 | 5a-1 | Opção de resposta fora da cobertura (`AnswerOption.out_of_coverage`) e aviso no plano | Consolidado (`b62e309`) |
 | 5a-2 | Jornada "desligamento do trabalho" | Consolidado (`96870db`) |
 | 5b | Jornada "perda de documentos" | Consolidado (`28c9b32`) |
+| 5c | Perda de documentos: 2ª via da CIN e da CNH, com a primeira dependência obrigatória | Consolidado |
 
 **Opção fora da cobertura** (decisão do autor em 24/10/2026)
 - Algumas respostas reais não têm orientação oficial lida nesta versão. Exemplos: término por acordo, culpa recíproca ou fim de contrato; perda de CIN, CNH ou título de eleitor.
@@ -257,6 +258,16 @@ Templates Django sem CSS nem JavaScript, com HTML semântico (`fieldset` e `lege
 - Não há dependência entre o B.O. e a segunda via, porque nenhum trecho a sustenta.
 - A amostra da Delegacia Online terminava no menu do site. Recebeu o parágrafo do snapshot coletado em 24/10/2026, que o procedimento cita.
 - A condição do canal "sem gov.br" (não ter declarado IR nos últimos dois anos) está no texto da página e entrou. Isso resolve a observação 6 da evidência.
+
+**5c — CIN e CNH na perda de documentos** (25/10/2026)
+- Por quê: a coleta de 24/10/2026 achou trechos literais para as duas segundas vias e, na página do DETRAN-MA, o primeiro trecho que sustenta uma precedência ("Boletim de Ocorrência;" entre os documentos da 2ª via da CNH). Isso põe a ordenação topológica em uso com conteúdo real.
+- CIN e CNH deixaram de ser `out_of_coverage`; o título de eleitor continua fora (fonte do TSE não localizada).
+- Segunda via da CNH (DETRAN-MA): requisitos B.O., RG e taxa; vale só para CNH do Maranhão (outro estado é "alteração de dados"); atendimento presencial; custo R$ 90,00 pela tabela de taxas.
+- Segunda via da CIN (Ident-MA): certidão de nascimento ou casamento atualizada e RG atual, se houver; postos na Grande Ilha, nos demais municípios e em qualquer UF. Custo "não informado" (RN11).
+- Dependência MANDATORY `registrar-ocorrencia-extravio` → `segunda-via-cnh`. A CIN não depende do B.O.: nenhuma fonte lida exige.
+- Adiado: certidão como etapa antes da CIN. A única fonte é um serviço da SEMCAS com requisitos vagos e a via normal (cartório) não tem fonte. A certidão fica como requisito.
+- Amostras novas: `html-govbr-cin-faq.md` (unificada; a `html-govbr-cin-faq-emissao.md` saiu), `html-ssp-cin-ma.md`, `html-detran-2via-cnh.md`, `html-detran-taxas.md`.
+- Não verificado: carga contra as páginas ao vivo no `oqf_dev` (os testes conferem os trechos nas amostras). As páginas de balcão do DETRAN estão em defeso eleitoral; a de 2ª via da CNH respondeu com texto em 24/10/2026.
 
 **Verificação**
 - 253 testes:
@@ -311,13 +322,13 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
 - O banco não garante que o snapshot de uma importação pertence à mesma fonte da importação. Essa garantia hoje é só do código de coleta (`sources/services.py`).
 - `load_sources` recusa a troca de URL entre duas fontes já cadastradas (marcado como `shortcut:` no código). Isso será tratado se surgir um caso real.
 - A validação de `load_content` roda fora da transação de escrita. Uma coleta concorrente entre as duas etapas pode invalidar a verificação. É um risco baixo para um comando executado manualmente.
-- Uma dependência condicional cuja etapa dependente é um pré-requisito puxado (não candidato) não torna a sua pergunta elegível como próxima pergunta. Sem dependências no conteúdo atual, isso ainda não tem efeito.
+- Uma dependência condicional cuja etapa dependente é um pré-requisito puxado (não candidato) não torna a sua pergunta elegível como próxima pergunta. Sem dependências condicionais no conteúdo atual, isso ainda não tem efeito.
 - **Fonte mostrada por slug.** O plano mostra a fonte pelo slug, e o link de fontes `GOVBR_API` abre o JSON da API, o que não serve ao cidadão. Na Fase 6, exibir um nome legível e preferir a página HTML do serviço.
 - **Etapa sem data de atualização.** As etapas citadas pela ficha da API, como "regularizar CPF suspenso", aparecem com data de atualização "Não informado", porque a API não declara essa data. Revisar o conteúdo para citar a página HTML, que traz "Última Modificação" (RN12).
 - **Esquema de URL não validado.** O loader não valida o esquema das URLs de canais e fontes; aceita qualquer texto. O conteúdo é curado e versionado, mas convém restringir a `https://`.
 - O conteúdo bruto completo da página HTML é guardado em `TEXT` no banco. As páginas têm até cerca de 150 KB. Não há armazenamento de arquivos brutos fora do banco.
 - **Trecho dependente da ordem do JSONB.** O prazo do CAGED cita "30 dias-corridos" da API 7839. Esse texto é formado pela ordem das chaves do JSONB (`max`, depois `unidade`). Se o formato mudar, a carga falha de forma explícita. Melhor citar a página HTML quando a amostra cobrir esse trecho.
 - **Amostras HTML truncadas.** As amostras são trechos do texto da página. Afirmações fora do trecho ficam de fora do conteúdo, mesmo existindo na página real (exemplos: conta gov.br, custo dos seguros). Para ampliar a cobertura, é preciso refazer as amostras com o texto completo.
-- **Sem dependências no conteúdo.** As três jornadas têm zero dependências, porque nenhuma fonte lida estabelece precedência. A ordenação topológica só é exercida pelos testes do motor.
+- **Uma só dependência no conteúdo.** Só a perda de documentos tem dependência (B.O. antes da 2ª via da CNH, desde a 5c). Dependências condicionais e recomendadas só são exercidas pelos testes do motor.
 - **Esfera da Caixa inferida.** A Caixa (FGTS) foi cadastrada como FEDERAL por inferência; a página não declara a esfera.
 - **Busca sensível a acentos.** A busca "Onde resolvo?" usa `icontains`: "demissao" não encontra "demissão". Com o catálogo pequeno o impacto é baixo; a alternativa é a extensão `unaccent` ou a busca textual do Postgres.

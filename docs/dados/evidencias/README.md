@@ -74,7 +74,7 @@ Dependências entre procedimentos sustentadas por trecho literal (primeiras do p
 | Dependência | Tipo proposto | Trecho e amostra |
 | --- | --- | --- |
 | Registrar ocorrência → 2ª via da CNH (MA) | Obrigatória | "DOCUMENTOS NECESSÁRIOS: • Boletim de Ocorrência;" ([amostra](../amostras/html-detran-2via-cnh.md)) |
-| 2ª via da certidão de nascimento → CIN | Condicional (só se a certidão também foi perdida) | "é necessário levar a certidão de nascimento ou casamento atualizada" ([amostra](../amostras/html-govbr-cin-faq-emissao.md)) |
+| 2ª via da certidão de nascimento → CIN | Condicional (só se a certidão também foi perdida) | "é necessário levar a certidão de nascimento ou casamento atualizada" ([amostra](../amostras/html-govbr-cin-faq.md)) |
 | Vistoria aprovada em ECV → transferência digital de veículo (MA) | Obrigatória | "O Procedimento inicia com agendamento da vistoria veicular em ECV do Maranhão; Após aprovação, o usuário seguirá para a plataforma online" ([amostra](../amostras/html-detran-transf-digital.md)) |
 
 Ressalvas: a WebSearch devolveu valores (R$ 61,30 para a 2ª via da CNH; R$ 32,83 para a 2ª via do RG em 2019) que **não** aparecem nas amostras brutas. A tabela de taxas do DETRAN-MA traz R$ 90,00 de serviço e itens opcionais (total de R$ 199,27). Só os valores das amostras podem ser citados.

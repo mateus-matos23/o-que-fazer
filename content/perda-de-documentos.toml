@@ -4,30 +4,34 @@
 #
 # Decisões:
 # - Pergunta "documentos-perdidos" é MULTIPLE sem "não sei": o cidadão marca o que perdeu; vazio = nenhum.
-# - CIN, CNH e título de eleitor são opções out_of_coverage: a evidência não tem fonte oficial lida
-#   (CIN: a notícia da SSP-MA trata da primeira emissão e não há amostra; CNH: DETRAN-MA 404; título:
-#   TSE/TRE-MA 403). O plano mostra o aviso de limite de cobertura.
+# - Título de eleitor segue out_of_coverage: TSE/TRE-MA 403 e página não localizada na conferência
+#   manual de 25/10/2026. O plano mostra o aviso de limite de cobertura.
+# - CIN e CNH entraram em 24/10/2026 (amostras em bruto). A 2ª via da CNH exige Boletim de Ocorrência:
+#   dependência MANDATORY registrar-ocorrencia-extravio -> segunda-via-cnh.
+# - CIN: custo da 2ª via e exigência de B.O. não constam das fontes lidas (não informado; sem dependência).
+#   A certidão como pré-requisito da CIN fica como requisito; a 2ª via da certidão não tem fonte
+#   adequada (só um serviço da SEMCAS com requisitos vagos) e não entra.
 # - O registro na Delegacia Online é candidato SEM regra: a página trata de "extravio de documentos"
 #   em geral, então vale para qualquer escolha.
 #
 # Fora por falta de trecho literal nas amostras (a afirmação não entra; custo/prazo vira "não informado"):
 # - Delegacia Online: custo e prazo não constam da página. Domínio delegaciaonline.ssp.ma.gov.br: não
 #   confirmado (DNS), não entra.
-# - Dependência B.O. -> segunda via: nenhum trecho a sustenta; o B.O. como pré-requisito é pendência
-#   da evidência (observação 5). Nenhuma dependência criada.
+# - Dependência B.O. -> segunda via: só a da CNH tem trecho (DETRAN-MA). CPF e CIN seguem sem
+#   dependência (observação 5 da evidência).
 # - Esclarecimento intermediário: "não sabe o número do CPF" só tem a orientação genérica de contatar
 #   a Receita, sem canal lido; não foi criado.
 # - Conta gov.br nível prata/ouro para o canal gov.br: o trecho está fora do bloco de texto da amostra.
 # - Condição do canal "sem gov.br" (não ter declarado IR nos últimos dois anos): está no texto da página
 #   (amostra), o que resolve a observação 6 da evidência; entra na descrição do canal.
-# - Segunda via de CIN, CNH e título de eleitor: sem procedimento (sem fonte oficial lida). Valores de
-#   terceiros (R$ 45,00, R$ 61,30, R$ 44,19) e portarias do TSE não entram.
+# - Segunda via do título de eleitor: sem procedimento (sem fonte oficial lida). Valores de terceiros
+#   (R$ 45,00, R$ 61,30, R$ 44,19) e portarias do TSE não entram; da CNH vale só a tabela do DETRAN-MA.
 # - Prazo do CPF: só o atendimento por e-mail tem número ("em média, 48 horas"); a API não traz prazo.
 
 [[situations]]
 slug = "perda-de-documentos"
 title = "Perdi meus documentos"
-candidates = ["segunda-via-cpf", "registrar-ocorrencia-extravio"]
+candidates = ["segunda-via-cpf", "registrar-ocorrencia-extravio", "segunda-via-cin", "segunda-via-cnh"]
 
 [[questions]]
 slug = "documentos-perdidos"
@@ -37,8 +41,8 @@ allows_unknown = false
 situations = ["perda-de-documentos"]
 options = [
   {slug = "cpf", label = "CPF"},
-  {slug = "cin", label = "Carteira de Identidade (RG / CIN)", out_of_coverage = true},
-  {slug = "cnh", label = "Carteira Nacional de Habilitação (CNH)", out_of_coverage = true},
+  {slug = "cin", label = "Carteira de Identidade (RG / CIN)"},
+  {slug = "cnh", label = "Carteira Nacional de Habilitação (CNH)"},
   {slug = "titulo-de-eleitor", label = "Título de eleitor", out_of_coverage = true},
 ]
 
@@ -88,3 +92,65 @@ explanation = "A segunda via do CPF é para quem perdeu o comprovante de inscri�
 source = "govbr-obter-cartao-cpf"
 excerpt = "Obtenha o seu cartão de CPF (comprovante de inscrição) para impressão."
 conditions = [{question = "documentos-perdidos", operator = "ANY_OF", options = ["cpf"]}]
+
+[[procedures]]
+slug = "segunda-via-cin"
+title = "Solicitar a Carteira de Identidade Nacional (CIN)"
+description = "A Carteira de Identidade Nacional é emitida pelo órgão de identificação civil do estado; no Maranhão, pelo Instituto de Identificação (Ident-MA). A segunda via pode ser pedida em qualquer estado."
+agency = "ident-ma"
+jurisdiction = "MARANHAO"
+source = "govbr-cin-faq"
+excerpt = "A emissão do documento é feita pelos Órgãos de Identificação Civil dos Estados e do Distrito Federal."
+requirements = [
+  {description = "Certidão de nascimento ou de casamento atualizada.", source = "govbr-cin-faq", excerpt = "é necessário levar a certidão de nascimento ou casamento atualizada."},
+  {description = "RG atual, caso possua.", source = "ssp-cin-ma", excerpt = "levar certidão de nascimento ou de casamento (original ou cópia) e o RG atual – caso possua"},
+]
+channels = [
+  {kind = "IN_PERSON", description = "Na Grande Ilha: sede do Ident-MA (Rua da Palma, Centro de São Luís) e postos do Ident nas unidades do Viva/Procon.", source = "ssp-cin-ma", excerpt = "pode ser solicitada na sede do Instituto de Identificação do Maranhão (Ident-MA), na Rua da Palma, Centro de São Luís, e nos postos do Ident situados nas unidades do Viva/Procon."},
+  {kind = "IN_PERSON", description = "Demais municípios do Maranhão: unidades do Viva/Procon e postos conveniados com as prefeituras.", source = "ssp-cin-ma", excerpt = "Nos demais municípios do estado, a emissão da nova CIN pode ser feita também nas unidades do Viva/Procon e nos postos conveniados com as prefeituras municipais."},
+  {kind = "IN_PERSON", description = "Órgão de identificação civil de qualquer estado: a segunda via não precisa ser feita no estado em que você nasceu ou mora.", source = "govbr-cin-faq", excerpt = "A segunda via do documento poderá ser emitida pelo Órgãos de Identificação Civil de qualquer uma das Unidades Federativas do país."},
+]
+
+[[procedures]]
+slug = "segunda-via-cnh"
+title = "Solicitar a segunda via da CNH ou da Permissão para Dirigir no DETRAN-MA"
+description = "Nova emissão da CNH ou da Permissão para Dirigir (PpD) em caso de extravio, furto, roubo ou dano do documento original."
+agency = "detran-ma"
+jurisdiction = "MARANHAO"
+source = "detran-2via-cnh"
+excerpt = "É o processo de uma nova emissão de uma Carteira Nacional de Habilitação (CNH) ou Permissão para Dirigir (PpD), em casos de extravio, furto, roubo ou danificação do documento original."
+requirements = [
+  {description = "Boletim de Ocorrência.", source = "detran-2via-cnh", excerpt = "Boletim de Ocorrência;"},
+  {description = "RG (original e cópia).", source = "detran-2via-cnh", excerpt = "RG (original e cópia)."},
+  {description = "Pagamento da taxa de serviço.", source = "detran-2via-cnh", excerpt = "Pagamento da taxa de serviço."},
+  {description = "Vale para CNH ou PpD do Maranhão. Se o documento for de outro estado, o DETRAN-MA indica outro serviço (alteração de dados, com averbação).", source = "detran-2via-cnh", excerpt = "Se a Carteira Nacional de Habilitação ou Permissão para Dirigir NÃO for do estado do Maranhão, o serviço a ser realizado é o de alteração de dados"},
+]
+channels = [
+  {kind = "IN_PERSON", description = "Unidades de atendimento do DETRAN-MA.", source = "detran-2via-cnh", excerpt = "Nas unidades de atendimento do Detran-MA."},
+]
+details = [
+  {kind = "COST", text = "Taxa \"Segunda Via CNH\": R$ 90,00 na tabela de taxas do DETRAN-MA, que também lista outros itens, como a consulta ao RENACH e itens opcionais.", source = "detran-taxas", excerpt = "Segunda Via CNH R$ 90.00"},
+]
+
+[[rules]]
+slug = "regra-cin-perdida"
+procedure = "segunda-via-cin"
+explanation = "A segunda via da Carteira de Identidade é para quem perdeu o documento de identidade."
+source = "govbr-cin-faq"
+excerpt = "A segunda via do documento poderá ser emitida"
+conditions = [{question = "documentos-perdidos", operator = "ANY_OF", options = ["cin"]}]
+
+[[rules]]
+slug = "regra-cnh-perdida"
+procedure = "segunda-via-cnh"
+explanation = "A segunda via da CNH é para quem perdeu a CNH ou a Permissão para Dirigir."
+source = "detran-2via-cnh"
+excerpt = "em casos de extravio, furto, roubo ou danificação do documento original."
+conditions = [{question = "documentos-perdidos", operator = "ANY_OF", options = ["cnh"]}]
+
+[[dependencies]]
+before = "registrar-ocorrencia-extravio"
+after = "segunda-via-cnh"
+kind = "MANDATORY"
+source = "detran-2via-cnh"
+excerpt = "Boletim de Ocorrência;"

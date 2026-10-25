@@ -22,6 +22,8 @@ A versão acadêmica enfatiza poucas jornadas representativas, com qualidade e a
 
 **Consolidado em 10/10/2026 (decisão do autor):** no protótipo, a jornada cobre apenas procedimentos com fonte oficial acessível: CPF (comprovante ou 2ª via, Receita Federal), registro de ocorrência na Delegacia Online da Polícia Civil do MA. A orientação geral sobre identidade no Gov.br também estava prevista, mas a página `gov.br/identidade` retornou HTTP 404 na coleta de 10/10/2026 e fica **Pendente** até haver fonte oficial (RN01). A 2ª via da CNH (DETRAN-MA), a 2ª via da Carteira de Identidade Nacional no MA, o título de eleitor (TSE/TRE-MA) e as versões digitais ficam como **Futuro**, porque não houve fonte oficial confirmada ([matriz de evidências](../dados/evidencias/README.md)).
 
+**Consolidado em 25/10/2026:** a 2ª via da CNH (DETRAN-MA) e a 2ª via da Carteira de Identidade Nacional no MA (Ident-MA) entraram, com fontes coletadas em 24/10/2026. A 2ª via da CNH exige o Boletim de Ocorrência, então o registro na Delegacia Online vem antes dela no plano. O título de eleitor e as versões digitais continuam **Futuro** ([evidências](../dados/evidencias/perda-de-documentos.md)).
+
 Quando o cidadão declarar ter perdido um documento fora do recorte, o sistema informa o limite da cobertura e encaminha ao órgão competente, sem montar etapas sem fundamento ([casos de borda](#casos-de-borda-discutidos): "Situação fora da cobertura").
 
 ### Diferença em relação às estimativas iniciais

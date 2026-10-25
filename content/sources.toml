@@ -174,3 +174,58 @@ url = "https://www.policiacivil.ma.gov.br/delegacia-online/"
 format = "HTML"
 jurisdiction = "MARANHAO"
 access_notes = "Página pública da Polícia Civil do MA. Só declara \"Publicado em: quinta-feira, 1 de março de 2018\"; sem data de atualização. O trecho de texto da amostra contém apenas o menu do site."
+
+# Atualização de 24/10/2026 da jornada "perda de documentos" (CIN e CNH).
+# Origem: docs/dados/evidencias/perda-de-documentos.md, seção "Atualização de 24/10/2026".
+
+[[agencies]]
+slug = "detran-ma"
+name = "Departamento Estadual de Trânsito do Maranhão (DETRAN-MA)"
+jurisdiction = "MARANHAO"
+
+[[agencies]]
+slug = "ident-ma"
+name = "Instituto de Identificação do Maranhão (Ident-MA), da Perícia Oficial do Maranhão"
+jurisdiction = "MARANHAO"
+
+[[agencies]]
+slug = "ssp-ma"
+name = "Secretaria de Segurança Pública do Maranhão (SSP-MA)"
+jurisdiction = "MARANHAO"
+
+[[agencies]]
+slug = "mgi-governo-digital"
+name = "Ministério da Gestão e da Inovação em Serviços Públicos (Governo Digital)"
+jurisdiction = "FEDERAL"
+
+[[sources]]
+slug = "govbr-cin-faq"
+agency = "mgi-governo-digital"
+url = "https://www.gov.br/governodigital/pt-br/identidade/cin/perguntas-frequentes-sobre-a-cin"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Perguntas frequentes sobre a CIN; leitura sem login. Declara \"Publicado em 12/04/2023\" e \"Atualizado em 16/07/2026\"."
+
+[[sources]]
+slug = "ssp-cin-ma"
+agency = "ssp-ma"
+url = "https://www.ssp.ma.gov.br/governo-passa-a-emitir-nova-carteira-de-identidade-nacional-em-todo-o-maranhao/"
+format = "HTML"
+jurisdiction = "MARANHAO"
+access_notes = "Notícia oficial de 12/01/2024 sobre a emissão da CIN no MA (locais e documentos). Não trata de custo nem de requisitos próprios da segunda via; o agendamento do Ident-MA não traz requisitos."
+
+[[sources]]
+slug = "detran-2via-cnh"
+agency = "detran-ma"
+url = "https://www.detran.ma.gov.br/inicio/paginas/Pagina.xhtml?id=19297"
+format = "HTML"
+jurisdiction = "MARANHAO"
+access_notes = "Página do serviço Segunda via de CNH/PpD; leitura sem login; sem data declarada. A URL antiga (/paginas/detalhe/19297) responde 404."
+
+[[sources]]
+slug = "detran-taxas"
+agency = "detran-ma"
+url = "https://www.detran.ma.gov.br/inicio/paginas/Taxas.xhtml"
+format = "HTML"
+jurisdiction = "MARANHAO"
+access_notes = "Tabela de taxas do DETRAN-MA; sem data declarada."
