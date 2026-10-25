@@ -2,24 +2,24 @@
 
 import pytest
 
-from catalog.models import Procedure, Question, Situation
+from catalog.models import AnswerOption, Procedure, Question, Rule, Situation
 
 pytestmark = pytest.mark.django_db
 
+_PROCEDURES = [
+    "consultar-situacao-cpf",
+    "regularizar-cpf-suspenso",
+    "entregar-dirpf-pendente",
+    "atendimento-receita-cpf",
+]
 
-def test_counts(loaded: dict[str, int]) -> None:
-    assert loaded == {
-        "Situation": 1,
-        "Question": 1,
-        "AnswerOption": 5,
-        "Procedure": 4,
-        "ProcedureDetail": 2,
-        "Requirement": 4,
-        "ServiceChannel": 8,
-        "Rule": 3,
-        "Condition": 3,
-        "Dependency": 0,
-    }
+
+def test_journey_counts(loaded: dict[str, int]) -> None:
+    # Contagens globais (todas as jornadas) ficam em test_content_desligamento.py.
+    slugs = ["cpf-situacao-cadastral"]
+    assert AnswerOption.objects.filter(question__slug__in=slugs).count() == 5
+    assert Rule.objects.filter(procedure__slug__in=_PROCEDURES).count() == 3
+    assert Procedure.objects.filter(slug__in=_PROCEDURES).count() == 4
 
 
 def test_situation_candidates(loaded: dict[str, int]) -> None:

@@ -32,6 +32,14 @@ SAMPLE_FILES = {
     "govbr-inscrever-cpf": "html-inscrever-no-cpf.md",
     "govbr-declarar-irpf": "html-declarar-meu-imposto-de-renda.md",
     "receita-meu-cpf": "html-receitafederal-meu-cpf.md",
+    "api-servicos-1045": "api-servicos-1045.json",
+    "api-servicos-9815": "api-servicos-9815.json",
+    "api-servicos-7839": "api-servicos-7839.json",
+    "govbr-seguro-desemprego": "html-solicitar-o-seguro-desemprego.md",
+    "govbr-seguro-desemprego-domestico": "html-solicitar-seguro-desemprego-empregado-domestico.md",
+    "govbr-caged": "html-solicitar-vinculos-empregaticios-do-caged.md",
+    "fgts-saque-dispensa": "html-fgts-saque-dispensa.md",
+    "govbr-obter-carteira-de-trabalho": "html-obter-a-carteira-de-trabalho.md",
 }
 
 

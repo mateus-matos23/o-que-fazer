@@ -64,3 +64,81 @@ url = "https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao/Con
 format = "HTML"
 jurisdiction = "FEDERAL"
 access_notes = "Formulário de consulta pública (CPF e data de nascimento); o sistema só encaminha, não consulta dados pessoais."
+
+# Jornada "desligamento do trabalho". Origem das URLs: docs/dados/evidencias/desligamento-do-trabalho.md
+# (tabela-resumo). As URLs da API seguem a evidência (sem "www"), diferentes das da jornada do CPF.
+
+[[agencies]]
+slug = "mte"
+name = "Ministério do Trabalho e Emprego"
+jurisdiction = "FEDERAL"
+
+# Esfera FEDERAL inferida (a Caixa é empresa pública federal); a página do FGTS não a declara.
+[[agencies]]
+slug = "caixa-fgts"
+name = "Caixa Econômica Federal (operadora do FGTS)"
+jurisdiction = "FEDERAL"
+
+[[sources]]
+slug = "api-servicos-1045"
+agency = "mgi-portal-servicos"
+url = "https://servicos.gov.br/api/v1/servicos/1045"
+format = "GOVBR_API"
+jurisdiction = "FEDERAL"
+access_notes = "Ficha da API do serviço Solicitar o Seguro-Desemprego (ID 1045); pública, sem credencial. Órgão competente do serviço: MTE."
+
+[[sources]]
+slug = "api-servicos-9815"
+agency = "mgi-portal-servicos"
+url = "https://servicos.gov.br/api/v1/servicos/9815"
+format = "GOVBR_API"
+jurisdiction = "FEDERAL"
+access_notes = "Ficha da API do serviço Seguro-desemprego para empregado doméstico (ID 9815); pública, sem credencial. Órgão competente do serviço: MTE."
+
+[[sources]]
+slug = "api-servicos-7839"
+agency = "mgi-portal-servicos"
+url = "https://servicos.gov.br/api/v1/servicos/7839"
+format = "GOVBR_API"
+jurisdiction = "FEDERAL"
+access_notes = "Ficha da API do serviço Extrato de Vínculos Empregatícios do CAGED (ID 7839); pública, sem credencial. Órgão competente do serviço: MTE."
+
+[[sources]]
+slug = "govbr-seguro-desemprego"
+agency = "mte"
+url = "https://www.gov.br/pt-br/servicos/solicitar-o-seguro-desemprego"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do catálogo gov.br; leitura sem login. Declara \"Última Modificação: 25/09/2026\". O serviço exige conta gov.br."
+
+[[sources]]
+slug = "govbr-seguro-desemprego-domestico"
+agency = "mte"
+url = "https://www.gov.br/pt-br/servicos/solicitar-seguro-desemprego-empregado-domestico"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do catálogo gov.br; leitura sem login. Declara \"Última Modificação: 23/09/2026\". O serviço exige conta gov.br."
+
+[[sources]]
+slug = "govbr-caged"
+agency = "mte"
+url = "https://www.gov.br/pt-br/servicos/solicitar-vinculos-empregaticios-do-caged"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do catálogo gov.br; leitura sem login. Declara \"Última Modificação: 25/08/2026\"."
+
+[[sources]]
+slug = "fgts-saque-dispensa"
+agency = "caixa-fgts"
+url = "https://www.fgts.gov.br/Paginas/subpaginas/saque-dispensa.aspx"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página informativa do FGTS, lida sem login; não declara data de atualização nem o órgão gestor."
+
+[[sources]]
+slug = "govbr-obter-carteira-de-trabalho"
+agency = "mte"
+url = "https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do catálogo gov.br; leitura sem login. Declara \"Última Modificação: 15/12/2025\". O serviço exige conta gov.br."

@@ -1,0 +1,214 @@
+# Jornada "desligamento do trabalho". Fonte da verdade: docs/dados/evidencias/desligamento-do-trabalho.md.
+# Fonte principal de cada procedimento: a página HTML (declara data de atualização); a API entra só
+# onde tem o campo (prazo estimado). Nas amostras HTML vale só o bloco de texto, que é truncado.
+#
+# Decisões:
+# - A forma de término restringe os seguros e o saque do FGTS a "sem justa causa" (as fontes só citam
+#   essa hipótese). Pedido de demissão e justa causa ficam NOT_APPLICABLE: é intencional e aprovado.
+# - "Acordo", "culpa recíproca" e "fim de contrato" são opções fora de cobertura (out_of_coverage):
+#   nenhuma fonte consultada trata delas; o plano mostra o aviso de limite.
+# - O tipo de vínculo existe porque separa o seguro-desemprego 1045 do doméstico 9815 (RN02).
+# - CTPS e CAGED são candidatos sem regra (aplicáveis a qualquer forma de término, conforme a evidência).
+#
+# Fora por falta de trecho literal nas amostras (a afirmação não entra; custo/prazo vira "não informado"):
+# - Esclarecimento intermediário: nenhum trecho orienta a descobrir a forma de término nem o tipo de
+#   vínculo; não foi criado.
+# - Dependências: nenhum trecho estabelece precedência entre os procedimentos; nenhuma foi criada.
+# - Custo do seguro-desemprego, do doméstico, do CAGED e do FGTS: "gratuito" só existe como campo
+#   booleano da API (gratuito: "true"); o texto "Este serviço é gratuito" está fora das amostras.
+#   O custo da CTPS (página "obter a carteira") tem trecho e entra.
+# - Conta gov.br obrigatória (seguro, doméstico, CAGED, CTPS): o trecho "Utilize a sua conta GOV.BR"
+#   está fora da amostra HTML.
+# - Prazo do doméstico "7 a 90 dias": entra (HTML). O número de terceiros (7 a 120) não é usado.
+# - Prazo para requerer o seguro 1045 e número máximo de solicitações: não informados na fonte.
+# - Prazo estimado do CAGED: só a API tem ("30 dias-corridos", média); a página tem o texto fora da amostra.
+#   Prazo estimado do seguro 1045 (31 a 60 dias corridos): fora. A API só o guarda como campos min/max
+#   separados, sem texto corrido; o jsonb reordena as chaves, então não há trecho literal estável.
+# - FGTS: documentos da agência, lotérica, telefones e o passo a passo do app estão fora da amostra
+#   (truncada). Regras do saque-aniversário além da multa rescisória não entram (a evidência não as
+#   confirma; blog e MP 1.290/2025 não são fonte oficial lida).
+# - Consulta de vínculos na CTPS Digital: não há página própria (404). O vínculo entre CTPS e vínculos
+#   só tem trecho na página do CAGED ("por meio da CTPS Digital"); o FAQ da CTPS não está nas amostras.
+# - Atendimento presencial SINE/SRTE em São Luís e Maranhão: endereços, telefones e horários não
+#   confirmados em fonte oficial; nenhum canal local foi criado.
+# - Divergência de documentos do doméstico (página atual x eSocial 2020): prevalece a página atual (RN13).
+# - Parcelas e valor do seguro 1045: trecho fora da amostra; do doméstico só a descrição genérica.
+
+[[situations]]
+slug = "desligamento-do-trabalho"
+title = "Saí do meu emprego"
+candidates = [
+  "seguro-desemprego",
+  "seguro-desemprego-domestico",
+  "saque-fgts-dispensa",
+  "conferir-vinculos-ctps",
+  "extrato-vinculos-caged",
+]
+
+[[questions]]
+slug = "forma-de-termino"
+text = "Como terminou o seu vínculo de trabalho?"
+kind = "SINGLE"
+allows_unknown = true
+situations = ["desligamento-do-trabalho"]
+options = [
+  {slug = "sem-justa-causa", label = "Fui dispensado sem justa causa"},
+  {slug = "pedido-de-demissao", label = "Pedi demissão"},
+  {slug = "justa-causa", label = "Fui dispensado por justa causa"},
+  {slug = "acordo", label = "Rescisão por acordo", out_of_coverage = true},
+  {slug = "culpa-reciproca", label = "Culpa recíproca", out_of_coverage = true},
+  {slug = "fim-de-contrato", label = "Fim de contrato (por exemplo, prazo determinado)", out_of_coverage = true},
+]
+
+[[questions]]
+slug = "tipo-de-vinculo"
+text = "Qual era o seu tipo de vínculo de trabalho?"
+kind = "SINGLE"
+allows_unknown = true
+situations = ["desligamento-do-trabalho"]
+options = [
+  {slug = "empregado", label = "Empregado com carteira assinada (não doméstico)"},
+  {slug = "domestico", label = "Empregado doméstico"},
+]
+
+[[procedures]]
+slug = "seguro-desemprego"
+title = "Solicitar o seguro-desemprego"
+description = "Benefício que garante assistência financeira temporária ao trabalhador dispensado sem justa causa. O sistema não confirma se você tem direito: os critérios são avaliados pelo órgão."
+agency = "mte"
+jurisdiction = "FEDERAL"
+source = "govbr-seguro-desemprego"
+excerpt = "Trabalhadores formais que foram demitidos involuntariamente (sem justa causa) e que:"
+requirements = [
+  {description = "Não ter renda própria suficiente para a manutenção sua e da sua família.", source = "govbr-seguro-desemprego", excerpt = "não possuem renda própria que seja suficiente à sua manutenção e de sua família."},
+  {description = "Primeira solicitação: ter recebido salários de pelo menos 12 meses nos últimos 18 meses anteriores à dispensa.", source = "govbr-seguro-desemprego", excerpt = "pelo menos 12 meses nos últimos 18 meses imediatamente anteriores à data de dispensa, quando da primeira solicitação"},
+  {description = "Segunda solicitação: ter recebido salários de pelo menos 9 meses nos últimos 12 meses anteriores à dispensa.", source = "govbr-seguro-desemprego", excerpt = "pelo menos 9 meses nos últimos 12 meses imediatamente anteriores à data de dispensa, quando da segunda solicitação"},
+  {description = "Demais solicitações: ter recebido salários em cada um dos 6 meses anteriores à dispensa.", source = "govbr-seguro-desemprego", excerpt = "cada um dos 6 meses imediatamente anteriores à data de dispensa, quando das demais solicitações"},
+  {description = "Não receber benefício previdenciário de prestação continuada (exceto auxílio-acidente, auxílio suplementar e abono de permanência em serviço).", source = "govbr-seguro-desemprego", excerpt = "não recebem qualquer benefício previdenciário de prestação continuada, com exceção do auxílio-acidente, do auxílio suplementar e do abono de permanência em serviço."},
+  {description = "Documento do Requerimento do Seguro-Desemprego, entregue pelo empregador na dispensa.", source = "govbr-seguro-desemprego", excerpt = "Documento do Requerimento do Seguro-Desemprego (você recebe do empregador este documento no momento que é dispensado sem justa causa)"},
+  {description = "Número do CPF.", source = "govbr-seguro-desemprego", excerpt = "Número do CPF"},
+]
+channels = [
+  {kind = "ONLINE", description = "Portal de Serviços.", source = "govbr-seguro-desemprego", excerpt = "Portal de Serviços"},
+  {kind = "APP", description = "Aplicativo da Carteira de Trabalho Digital (Android e iOS).", source = "govbr-seguro-desemprego", excerpt = "por meio do aplicativo da Carteira de Trabalho Digital"},
+  {kind = "IN_PERSON", description = "Atendimento presencial, com agendamento pela Plataforma FACILITA.", source = "govbr-seguro-desemprego", excerpt = "Acesse a Plataforma FACILITA para agendar seu atendimento presencial"},
+  {kind = "PHONE", description = "Telefone 158.", source = "govbr-seguro-desemprego", excerpt = "Telefone 158"},
+]
+
+[[procedures]]
+slug = "seguro-desemprego-domestico"
+title = "Solicitar o seguro-desemprego do empregado doméstico"
+description = "Benefício que garante assistência financeira temporária ao trabalhador doméstico dispensado sem justa causa. O sistema não confirma se você tem direito: os critérios são avaliados pelo órgão."
+agency = "mte"
+jurisdiction = "FEDERAL"
+source = "govbr-seguro-desemprego-domestico"
+excerpt = "Trabalhador doméstico dispensado sem justa causa que:"
+requirements = [
+  {description = "Não ter renda própria para o seu sustento e o da sua família.", source = "govbr-seguro-desemprego-domestico", excerpt = "não possua renda própria para seu sustento e de sua família"},
+  {description = "Ter trabalhado pelo menos 15 meses nos últimos 24 meses.", source = "govbr-seguro-desemprego-domestico", excerpt = "tenha trabalhado pelo menos 15 meses nos últimos 24 meses"},
+  {description = "Não receber benefício previdenciário, exceto auxílio-acidente e pensão por morte.", source = "govbr-seguro-desemprego-domestico", excerpt = "não receba nenhum benefício previdenciário, com exceção do auxílio-acidente e de pensão por morte"},
+  {description = "Solicitar o seguro-desemprego de 7 a 90 dias depois da data da demissão.", source = "govbr-seguro-desemprego-domestico", excerpt = "tenha solicitado o seguro-desemprego no prazo de 7 a 90 dias contados da data da demissão"},
+  {description = "CPF do empregador.", source = "govbr-seguro-desemprego-domestico", excerpt = "CPF do empregador"},
+  {description = "Data de admissão.", source = "govbr-seguro-desemprego-domestico", excerpt = "Data de admissão"},
+  {description = "Data de demissão.", source = "govbr-seguro-desemprego-domestico", excerpt = "Data de demissão"},
+]
+channels = [
+  {kind = "APP", description = "Aplicativo da Carteira de Trabalho Digital (Android e iOS).", source = "govbr-seguro-desemprego-domestico", excerpt = "Carteira de Trabalho Digital, disponíveis para as versões ANDROID e IOS"},
+  {kind = "ONLINE", description = "Plataforma Facilita.", source = "govbr-seguro-desemprego-domestico", excerpt = "Plataforma Facilita."},
+  {kind = "PHONE", description = "Telefone 158.", source = "govbr-seguro-desemprego-domestico", excerpt = "Telefone : 158"},
+  {kind = "IN_PERSON", description = "Unidades do SINE e Superintendências Regionais do Trabalho e Emprego (SRTEs); nas SRTEs, o agendamento é pela Plataforma FACILITA.", source = "govbr-seguro-desemprego-domestico", excerpt = "O trabalhador poderá receber atendimento presencial nas unidades do Sistema Nacional de Emprego (SINE) e nas Superintendências Regionais do Trabalho e Emprego (SRTEs). Para atendimento presencial nas unidades das SRTEs, o agendamento poderá ser realizado por meio da Plataforma FACILITA."},
+]
+details = [
+  {kind = "DEADLINE", text = "Solicitar de 7 a 90 dias contados da data da demissão.", source = "govbr-seguro-desemprego-domestico", excerpt = "tenha solicitado o seguro-desemprego no prazo de 7 a 90 dias contados da data da demissão"},
+]
+
+[[procedures]]
+slug = "saque-fgts-dispensa"
+title = "Sacar o FGTS por dispensa sem justa causa"
+description = "O trabalhador demitido sem justa causa pode sacar o saldo da conta do FGTS."
+agency = "caixa-fgts"
+jurisdiction = "FEDERAL"
+source = "fgts-saque-dispensa"
+excerpt = "O trabalhador demitido sem justa causa pode realizar o saque do saldo da sua conta do FGTS."
+requirements = [
+  {description = "Se for optante pelo Saque-Aniversário na data da rescisão, é possível sacar a multa rescisória.", source = "fgts-saque-dispensa", excerpt = "Caso você seja optante pelo Saque-Aniversário na data em que ocorrer a rescisão, poderá sacar a multa rescisória"},
+]
+channels = [
+  {kind = "APP", description = "Aplicativo FGTS, onde também se cadastra a conta bancária para receber o valor.", source = "fgts-saque-dispensa", excerpt = "poderá cadastrar acessando o app FGTS"},
+]
+details = [
+  {kind = "DEADLINE", text = "Até 5 dias úteis após o débito da conta do FGTS, se o empregador já informou a dispensa e há conta bancária cadastrada no app FGTS.", source = "fgts-saque-dispensa", excerpt = "Se o empregador já informou sua dispensa sem justa causa e você possui uma conta bancária cadastrada no app FGTS, o dinheiro entrará na sua conta bancária em até 5 dias úteis após o débito da conta do FGTS"},
+]
+
+# Candidato sem regra: aplicável a qualquer forma de término (evidência, tabela "Forma de término").
+[[procedures]]
+slug = "conferir-vinculos-ctps"
+title = "Conferir os vínculos na Carteira de Trabalho Digital"
+description = "A Carteira de Trabalho Digital registra a vida profissional do trabalhador."
+agency = "mte"
+jurisdiction = "FEDERAL"
+source = "govbr-obter-carteira-de-trabalho"
+excerpt = "o documento que registra a vida profissional do trabalhador"
+requirements = [
+  {description = "Número do CPF.", source = "govbr-obter-carteira-de-trabalho", excerpt = "do número do CPF"},
+  {description = "Conta autenticada no gov.br.", source = "govbr-obter-carteira-de-trabalho", excerpt = "criar uma conta autenticada no gov.br"},
+]
+channels = [
+  {kind = "APP", description = "Aplicativo da Carteira de Trabalho Digital (Android e iOS).", source = "govbr-obter-carteira-de-trabalho", excerpt = "Aplicativo móvel : Para Android ou para iOS."},
+  {kind = "PHONE", description = "Central 158.", source = "govbr-obter-carteira-de-trabalho", excerpt = "Central 158"},
+]
+details = [
+  {kind = "COST", text = "Obter a Carteira de Trabalho Digital é gratuito para o cidadão.", source = "govbr-obter-carteira-de-trabalho", excerpt = "Este serviço é gratuito para o cidadão."},
+]
+
+# Candidato sem regra: aplicável a qualquer forma de término (evidência).
+[[procedures]]
+slug = "extrato-vinculos-caged"
+title = "Solicitar o extrato de vínculos do CAGED"
+description = "Relatório dos vínculos formais celetistas declarados ao CAGED, com selo de autenticidade do Ministério do Trabalho e Emprego."
+agency = "mte"
+jurisdiction = "FEDERAL"
+source = "govbr-caged"
+excerpt = "Trabalhador ou trabalhadora que desejar obter os seus vínculos formais celetistas declarados ao CAGED."
+requirements = [
+  {description = "Documento de identificação.", source = "govbr-caged", excerpt = "Documento de identificação"},
+  {description = "Informar o período desejado das declarações.", source = "govbr-caged", excerpt = "Período desejado das declarações"},
+]
+channels = [
+  {kind = "ONLINE", description = "CTPS Digital, na aba \"Extrato do CAGED\".", source = "govbr-caged", excerpt = "por meio da CTPS Digital, na aba \"Extrato do CAGED\", imprimir o relatório de vínculos trabalhistas do CAGED, com selo de autenticidade do Ministério do Trabalho e Emprego"},
+  {kind = "ONLINE", description = "Portal Emprega Brasil.", source = "govbr-caged", excerpt = "Portal Emprega Brasil"},
+  {kind = "PHONE", description = "Central 158.", source = "govbr-caged", excerpt = "Central 158"},
+]
+details = [
+  {kind = "DEADLINE", text = "Em média 30 dias corridos.", source = "api-servicos-7839", excerpt = "30 dias-corridos"},
+]
+
+[[rules]]
+slug = "regra-seguro-sem-justa-causa"
+procedure = "seguro-desemprego"
+explanation = "O seguro-desemprego é para trabalhador formal dispensado sem justa causa."
+source = "govbr-seguro-desemprego"
+excerpt = "Trabalhadores formais que foram demitidos involuntariamente (sem justa causa)"
+conditions = [
+  {question = "forma-de-termino", operator = "ANY_OF", options = ["sem-justa-causa"]},
+  {question = "tipo-de-vinculo", operator = "ANY_OF", options = ["empregado"]},
+]
+
+[[rules]]
+slug = "regra-seguro-domestico-sem-justa-causa"
+procedure = "seguro-desemprego-domestico"
+explanation = "O seguro-desemprego do doméstico é para o trabalhador doméstico dispensado sem justa causa."
+source = "govbr-seguro-desemprego-domestico"
+excerpt = "Trabalhador doméstico dispensado sem justa causa"
+conditions = [
+  {question = "forma-de-termino", operator = "ANY_OF", options = ["sem-justa-causa"]},
+  {question = "tipo-de-vinculo", operator = "ANY_OF", options = ["domestico"]},
+]
+
+[[rules]]
+slug = "regra-fgts-sem-justa-causa"
+procedure = "saque-fgts-dispensa"
+explanation = "O saque do FGTS por dispensa é para o trabalhador demitido sem justa causa."
+source = "fgts-saque-dispensa"
+excerpt = "O trabalhador demitido sem justa causa pode realizar o saque do saldo da sua conta do FGTS."
+conditions = [{question = "forma-de-termino", operator = "ANY_OF", options = ["sem-justa-causa"]}]
