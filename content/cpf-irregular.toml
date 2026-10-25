@@ -1,0 +1,124 @@
+# Jornada "CPF irregular". Fonte da verdade: docs/dados/evidencias/cpf-irregular.md.
+# Rótulos divergentes entre fontes (RN13): gov.br usa "Suspensa"; a Receita usa "Suspenso".
+# Aqui a opção segue o rótulo da Receita (meu-cpf), que é a fonte dos trechos das regras.
+# Fora desta jornada, por não estar confirmado em fonte oficial: título de eleitor (obs. 5 da evidência).
+# Custo e prazo não documentados são omitidos (a interface mostra "não informado").
+
+[[situations]]
+slug = "cpf-irregular"
+title = "Meu CPF está irregular"
+candidates = [
+  "regularizar-cpf-suspenso",
+  "entregar-dirpf-pendente",
+  "atendimento-receita-cpf",
+]
+
+[[questions]]
+slug = "cpf-situacao-cadastral"
+text = "Qual é a situação cadastral do seu CPF na consulta oficial?"
+kind = "SINGLE"
+allows_unknown = true
+situations = ["cpf-irregular"]
+options = [
+  {slug = "suspenso", label = "Suspenso"},
+  {slug = "pendente-de-regularizacao", label = "Pendente de Regularização"},
+  {slug = "cancelado", label = "Cancelado"},
+  {slug = "nulo", label = "Nulo"},
+  {slug = "falecido", label = "Falecido"},
+]
+
+# Esclarecimento intermediário: não é candidato; entra no plano quando a situação é "não sei"
+# (via clarifies), já que sem saber a situação nenhum outro procedimento é aplicável.
+[[procedures]]
+slug = "consultar-situacao-cpf"
+title = "Consultar a situação cadastral do CPF"
+description = "Descubra a situação do seu CPF na consulta oficial da Receita Federal e volte para continuar. O sistema não consulta seus dados."
+agency = "receita-federal"
+jurisdiction = "FEDERAL"
+clarifies = "cpf-situacao-cadastral"
+source = "receita-meu-cpf"
+excerpt = "O primeiro passo é descobrir o que deu errado."
+requirements = [
+  {description = "Informar CPF e data de nascimento no formulário de consulta.", source = "receita-consulta-situacao-cpf", excerpt = "Data de Nascimento:"},
+]
+channels = [
+  {kind = "ONLINE", description = "Consulta pública da situação cadastral no CPF.", url = "https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao/ConsultaPublica.asp", source = "receita-consulta-situacao-cpf", excerpt = "limita-se tão somente a comprovar a situação cadastral no CPF"},
+]
+
+[[procedures]]
+slug = "regularizar-cpf-suspenso"
+title = "Regularizar o CPF suspenso"
+description = "Corrija as informações incorretas ou incompletas do cadastro para voltar à situação regular."
+agency = "receita-federal"
+jurisdiction = "FEDERAL"
+source = "api-servicos-10416"
+excerpt = "ou a regularização da inscrição que se encontra na situação"
+requirements = [
+  {description = "Ser inscrito no CPF.", source = "api-servicos-10416", excerpt = "Pessoa inscrita no Cadastro de Pessoas Físicas (CPF)."},
+  {description = "Documento de identificação oficial com foto do interessado.", source = "api-servicos-10416", excerpt = "Documento de identificação oficial com foto do interessado"},
+]
+channels = [
+  {kind = "ONLINE", description = "Formulário online para regularizar CPF suspenso.", url = "https://servicos.receita.fazenda.gov.br/Servicos/CPF/regularizar/Default.asp", source = "govbr-atualizar-cpf", excerpt = "Regularizar CPF, se a situações for suspenso"},
+  {kind = "IN_PERSON", description = "Unidades da Receita Federal e pontos de atendimento virtual.", source = "receita-meu-cpf", excerpt = "agende horário para ser atendido em uma unidade da Receita Federal ou vá até um de nossos pontos de atendimento virtual em sua cidade"},
+  {kind = "EMAIL", description = "Atendimento por e-mail.", source = "govbr-atualizar-cpf", excerpt = "Atendimento por e-mail"},
+]
+details = [
+  {kind = "COST", text = "Gratuito, exceto em unidades conveniadas (R$ 7,00).", source = "govbr-atualizar-cpf", excerpt = "A atualização do CPF é gratuita, exceto quando realizada em unidades conveniadas (neste caso será cobrado uma taxa de R$ 7,00)"},
+]
+
+[[procedures]]
+slug = "entregar-dirpf-pendente"
+title = "Entregar as declarações de imposto de renda faltantes"
+description = "Envie à Receita Federal as declarações de imposto de renda (DIRPF) não entregues para voltar à situação regular."
+agency = "receita-federal"
+jurisdiction = "FEDERAL"
+source = "receita-meu-cpf"
+excerpt = "Envie as declarações faltantes para voltar à situação REGULAR."
+requirements = [
+  {description = "Pessoa física residente no Brasil.", source = "govbr-declarar-irpf", excerpt = "Pessoa física residente no Brasil."},
+]
+channels = [
+  {kind = "ONLINE", description = "Meu Imposto de Renda (declaração online) ou programa para baixar.", url = "https://www.gov.br/pt-br/servicos/declarar-meu-imposto-de-renda", source = "govbr-declarar-irpf", excerpt = "Preencha e envie a sua declaração de imposto de renda."},
+  {kind = "APP", description = "App Receita Federal.", source = "govbr-declarar-irpf", excerpt = "App Receita Federal"},
+]
+details = [
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-declarar-irpf", excerpt = "Este serviço é gratuito para o cidadão."},
+]
+
+# Cancelado, nulo e falecido: a Receita não informa providência; encaminha-se ao atendimento (obs. 6).
+[[procedures]]
+slug = "atendimento-receita-cpf"
+title = "Procurar o atendimento da Receita Federal"
+description = "A Receita Federal não informa uma providência online para esta situação do CPF. Procure o atendimento para saber como proceder."
+agency = "receita-federal"
+jurisdiction = "FEDERAL"
+source = "receita-meu-cpf"
+excerpt = "Localize a unidade de atendimento presencial da Receita Federal mais próxima"
+channels = [
+  {kind = "IN_PERSON", description = "Unidade de atendimento presencial da Receita Federal.", source = "receita-meu-cpf", excerpt = "Localize a unidade de atendimento presencial da Receita Federal mais próxima"},
+  {kind = "EMAIL", description = "Atendimento por e-mail.", source = "receita-meu-cpf", excerpt = "Saiba quais serviços podem ser obtidos via e-mail"},
+]
+
+[[rules]]
+slug = "regra-cpf-suspenso"
+procedure = "regularizar-cpf-suspenso"
+explanation = "CPF suspenso: o cadastro está com informações incorretas ou incompletas."
+source = "receita-meu-cpf"
+excerpt = "Esta situação indica que o cadastro está com informações incorretas ou incompletas."
+conditions = [{question = "cpf-situacao-cadastral", operator = "ANY_OF", options = ["suspenso"]}]
+
+[[rules]]
+slug = "regra-cpf-pendente"
+procedure = "entregar-dirpf-pendente"
+explanation = "CPF pendente de regularização: alguma declaração de imposto de renda não foi enviada."
+source = "receita-meu-cpf"
+excerpt = "Esta situação indica que alguma declaração de imposto de renda não foi enviada à Receita Federal."
+conditions = [{question = "cpf-situacao-cadastral", operator = "ANY_OF", options = ["pendente-de-regularizacao"]}]
+
+[[rules]]
+slug = "regra-cpf-sem-providencia"
+procedure = "atendimento-receita-cpf"
+explanation = "Falecido, cancelado ou nulo: a página da Receita descreve a situação sem indicar providência."
+source = "receita-meu-cpf"
+excerpt = "Esta situação indica que a inscrição no CPF está com data de falecimento informada. Cancelado Esta situação indica que a inscrição no CPF foi cancelada em razão de duplicidade ou decisão por processo. Nulo Esta situação indica que a inscrição no CPF foi considerada nula em razão de fraude."
+conditions = [{question = "cpf-situacao-cadastral", operator = "ANY_OF", options = ["falecido", "cancelado", "nulo"]}]

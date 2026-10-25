@@ -1,0 +1,66 @@
+# Órgãos e fontes da jornada "CPF irregular".
+# Origem das URLs: docs/dados/evidencias/cpf-irregular.md (tabela-resumo e seção da API).
+
+[[agencies]]
+slug = "receita-federal"
+name = "Receita Federal do Brasil"
+jurisdiction = "FEDERAL"
+
+[[agencies]]
+slug = "mgi-portal-servicos"
+name = "Ministério da Gestão e Inovação (Portal de Serviços gov.br)"
+jurisdiction = "FEDERAL"
+
+[[sources]]
+slug = "api-servicos-10416"
+agency = "mgi-portal-servicos"
+url = "https://www.servicos.gov.br/api/v1/servicos/10416"
+format = "GOVBR_API"
+jurisdiction = "FEDERAL"
+access_notes = "Ficha da API do serviço Atualizar CPF (ID 10416); pública, sem credencial. Órgão competente do serviço: Receita Federal."
+
+[[sources]]
+slug = "api-servicos-10420"
+agency = "mgi-portal-servicos"
+url = "https://www.servicos.gov.br/api/v1/servicos/10420"
+format = "GOVBR_API"
+jurisdiction = "FEDERAL"
+access_notes = "Ficha da API do serviço Inscrever Cidadão no CPF (ID 10420); pública, sem credencial."
+
+[[sources]]
+slug = "govbr-atualizar-cpf"
+agency = "receita-federal"
+url = "https://www.gov.br/pt-br/servicos/atualizar-cadastro-de-pessoas-fisicas"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do catálogo gov.br; leitura sem login."
+
+[[sources]]
+slug = "govbr-inscrever-cpf"
+agency = "receita-federal"
+url = "https://www.gov.br/pt-br/servicos/inscrever-no-cpf"
+format = "HTML"
+jurisdiction = "FEDERAL"
+
+[[sources]]
+slug = "govbr-declarar-irpf"
+agency = "receita-federal"
+url = "https://www.gov.br/pt-br/servicos/declarar-meu-imposto-de-renda"
+format = "HTML"
+jurisdiction = "FEDERAL"
+
+[[sources]]
+slug = "receita-meu-cpf"
+agency = "receita-federal"
+url = "https://www.gov.br/receitafederal/pt-br/assuntos/meu-cpf"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página Meu CPF da Receita; não declara data de atualização."
+
+[[sources]]
+slug = "receita-consulta-situacao-cpf"
+agency = "receita-federal"
+url = "https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao/ConsultaPublica.asp"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Formulário de consulta pública (CPF e data de nascimento); o sistema só encaminha, não consulta dados pessoais."
