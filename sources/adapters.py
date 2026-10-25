@@ -7,10 +7,10 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from datetime import date
-from html.parser import HTMLParser
 from typing import Any
 
 from .models import Source
+from .text import TextExtractor
 
 TIMEOUT_SECONDS = 60
 MAX_BYTES = 5 * 1024 * 1024
@@ -65,18 +65,9 @@ def parse_govbr_service(text: str) -> dict[str, Any]:
     return document
 
 
-class _TextExtractor(HTMLParser):
-    def __init__(self) -> None:
-        super().__init__()
-        self.chunks: list[str] = []
-
-    def handle_data(self, data: str) -> None:
-        self.chunks.append(data)
-
-
 def extract_declared_update(html: str) -> date | None:
     """Data "Última Modificação" declarada na página; None quando não informada."""
-    extractor = _TextExtractor()
+    extractor = TextExtractor()
     extractor.feed(html)
     text = " ".join(" ".join(extractor.chunks).split())
     found: set[date] = set()
