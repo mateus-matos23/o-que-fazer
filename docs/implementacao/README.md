@@ -28,7 +28,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 2 | Domínio normalizado, conhecimento e carregador de conteúdo (app `catalog`, comandos `load_sources`/`load_content`, jornada CPF irregular, ADR 0003) | Consolidado |
 | 3 | Motor de orientação (`guidance/engine`, Python puro: avaliação ternária, próxima pergunta, plano em camadas com Kahn; `guidance/repository.py`) | Consolidado (commits `3b957cb`, `90969f6`, `a12eaa1`) |
 | 4 | Fluxo mínimo HTTP com templates Django sem estilo e sessão Django | Consolidado (commits `ad23d39`, `c14f994`) |
-| 5 | Jornadas desligamento do trabalho e perda de documentos | Pendente |
+| 5 | Jornadas desligamento do trabalho e perda de documentos | Consolidado |
 | 6 | UI/UX, acessibilidade, frontend, RF18 e RF02 | Pendente |
 
 ## Decisões tomadas em 24/10/2026 (aprovadas pelo autor)
@@ -223,10 +223,53 @@ Templates Django sem CSS nem JavaScript, com HTML semântico (`fieldset` e `lege
 - Em 24/10/2026, a jornada foi percorrida por HTTP com `runserver` sobre o `oqf_dev`: lista, pergunta com 6 opções ("Não sei" incluída), POST 303 e plano com fonte e data de coleta.
 - Não houve verificação no navegador com o `verificador-ui`. Motivo: as telas não têm estilo e serão refeitas na Fase 6, onde a verificação visual e de acessibilidade acontece.
 
+## Fase 5 — Demais jornadas
+
+| Fatia | Escopo | Estado |
+| --- | --- | --- |
+| 5a-1 | Opção de resposta fora da cobertura (`AnswerOption.out_of_coverage`) e aviso no plano | Consolidado (`b62e309`) |
+| 5a-2 | Jornada "desligamento do trabalho" | Consolidado (`96870db`) |
+| 5b | Jornada "perda de documentos" | Consolidado (`28c9b32`) |
+
+**Opção fora da cobertura** (decisão do autor em 24/10/2026)
+- Algumas respostas reais não têm orientação oficial lida nesta versão. Exemplos: término por acordo, culpa recíproca ou fim de contrato; perda de CIN, CNH ou título de eleitor.
+- Essas opções continuam disponíveis para o cidadão, que não fica sem a sua resposta. Elas recebem `out_of_coverage = true` no TOML.
+- O plano mostra a seção "Limite de cobertura" com as respostas afetadas. As demais etapas aplicáveis continuam no plano.
+- A avaliação das regras não muda. O aviso não cita órgão nem canal, porque não há fonte para isso.
+- Alternativas rejeitadas:
+  - tornar o procedimento indeterminado, o que mudaria a lógica de Kleene do motor;
+  - omitir as opções, o que empurraria o cidadão para o "não sei".
+
+**Desligamento do trabalho** (`content/desligamento-do-trabalho.toml`)
+- Perguntas: forma de término e tipo de vínculo (empregado ou doméstico). O vínculo existe porque separa o seguro 1045 do 9815 (RN02).
+- Procedimentos:
+  - seguro-desemprego e seguro-desemprego do doméstico, quando a dispensa é sem justa causa e o vínculo corresponde;
+  - saque do FGTS por dispensa sem justa causa;
+  - CTPS Digital e extrato do CAGED, sem regra, aplicáveis a qualquer forma de término.
+- Pedido de demissão e justa causa deixam os seguros e o FGTS não aplicáveis. As fontes só tratam da dispensa sem justa causa (decisão do autor).
+- "Não sei" na forma de término deixa os seguros e o FGTS indeterminados, nunca não aplicáveis.
+
+**Perda de documentos** (`content/perda-de-documentos.toml`)
+- Pergunta de escolha múltipla: CPF; CIN, CNH e título de eleitor fora da cobertura.
+- Procedimentos:
+  - segunda via do CPF, quando o CPF foi perdido;
+  - registro de extravio na Delegacia Online da Polícia Civil do Maranhão, sem regra, porque a página trata de "extravio de documentos" em geral.
+- Não há dependência entre o B.O. e a segunda via, porque nenhum trecho a sustenta.
+- A amostra da Delegacia Online terminava no menu do site. Recebeu o parágrafo do snapshot coletado em 24/10/2026, que o procedimento cita.
+- A condição do canal "sem gov.br" (não ter declarado IR nos últimos dois anos) está no texto da página e entrou. Isso resolve a observação 6 da evidência.
+
+**Verificação**
+- 253 testes:
+  - estruturais por jornada;
+  - tabelas de casos fatos → plano sobre o conteúdo real;
+  - percursos com o client do Django até o plano;
+  - contagens globais em `catalog/tests/test_content_counts.py`.
+- Em 24/10/2026, a carga real no `oqf_dev` (`load_sources`, `fetch_sources` e `load_content`) encontrou todos os trechos nas páginas e APIs oficiais. Resultado: 18 fontes, 3 situações e 11 procedimentos.
+- O que ficou de fora por falta de trecho literal está listado no cabeçalho de cada TOML.
+
 ## Limitações conhecidas
 
 - O banco não garante que o snapshot de uma importação pertence à mesma fonte da importação. Essa garantia hoje é só do código de coleta (`sources/services.py`).
-- Nenhuma coleta real pela rede foi executada ainda. As fontes serão cadastradas pelo `load_sources`, da Fase 2.
 - `load_sources` recusa a troca de URL entre duas fontes já cadastradas (marcado como `shortcut:` no código). Isso será tratado se surgir um caso real.
 - A validação de `load_content` roda fora da transação de escrita. Uma coleta concorrente entre as duas etapas pode invalidar a verificação. É um risco baixo para um comando executado manualmente.
 - Uma dependência condicional cuja etapa dependente é um pré-requisito puxado (não candidato) não torna a sua pergunta elegível como próxima pergunta. Sem dependências no conteúdo atual, isso ainda não tem efeito.
@@ -234,3 +277,7 @@ Templates Django sem CSS nem JavaScript, com HTML semântico (`fieldset` e `lege
 - **Etapa sem data de atualização.** As etapas citadas pela ficha da API, como "regularizar CPF suspenso", aparecem com data de atualização "Não informado", porque a API não declara essa data. Revisar o conteúdo para citar a página HTML, que traz "Última Modificação" (RN12).
 - **Esquema de URL não validado.** O loader não valida o esquema das URLs de canais e fontes; aceita qualquer texto. O conteúdo é curado e versionado, mas convém restringir a `https://`.
 - O conteúdo bruto completo da página HTML é guardado em `TEXT` no banco. As páginas têm até cerca de 150 KB. Não há armazenamento de arquivos brutos fora do banco.
+- **Trecho dependente da ordem do JSONB.** O prazo do CAGED cita "30 dias-corridos" da API 7839. Esse texto é formado pela ordem das chaves do JSONB (`max`, depois `unidade`). Se o formato mudar, a carga falha de forma explícita. Melhor citar a página HTML quando a amostra cobrir esse trecho.
+- **Amostras HTML truncadas.** As amostras são trechos do texto da página. Afirmações fora do trecho ficam de fora do conteúdo, mesmo existindo na página real (exemplos: conta gov.br, custo dos seguros). Para ampliar a cobertura, é preciso refazer as amostras com o texto completo.
+- **Sem dependências no conteúdo.** As três jornadas têm zero dependências, porque nenhuma fonte lida estabelece precedência. A ordenação topológica só é exercida pelos testes do motor.
+- **Esfera da Caixa inferida.** A Caixa (FGTS) foi cadastrada como FEDERAL por inferência; a página não declara a esfera.
