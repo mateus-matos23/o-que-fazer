@@ -61,7 +61,8 @@ _TABLES = {
                     {
                         "slug": _slug(AnswerOption),
                         "label": text_of(AnswerOption, "label"),
-                    }
+                    },
+                    {"out_of_coverage": bool},
                 )
             ],
         },
@@ -195,6 +196,7 @@ class QuestionDef:
     order: int
     situations: list[str]
     options: list[tuple[str, str]]
+    out_of_coverage: frozenset[str]  # slugs das opções sem orientação oficial
 
 
 @dataclass(frozen=True)
@@ -223,6 +225,7 @@ def _parse(file: str, doc: dict[str, Any], content: Content) -> None:
         content.situations.append(SituationDef(file, r["slug"], r["title"], r["candidates"]))
     for r in doc.get("questions", []):
         options = [(o["slug"], o["label"]) for o in r["options"]]
+        uncovered = frozenset(o["slug"] for o in r["options"] if o.get("out_of_coverage", False))
         content.questions.append(
             QuestionDef(
                 file,
@@ -233,6 +236,7 @@ def _parse(file: str, doc: dict[str, Any], content: Content) -> None:
                 r.get("order", 0),
                 r["situations"],
                 options,
+                uncovered,
             )
         )
     for r in doc.get("procedures", []):
@@ -494,7 +498,10 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
         question_by_slug[q.slug] = question
         for slug, label in q.options:
             option_by_key[(q.slug, slug)] = AnswerOption.objects.create(
-                question=question, slug=slug, label=label
+                question=question,
+                slug=slug,
+                label=label,
+                out_of_coverage=slug in q.out_of_coverage,
             )
 
     agency_by_slug = {a.slug: a for a in Agency.objects.all()}

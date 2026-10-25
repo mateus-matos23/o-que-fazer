@@ -188,7 +188,9 @@ def load_catalog(situation_slug: str) -> Catalog:
                 kind=_choice(q.kind, QUESTION_KINDS),
                 allows_unknown=q.allows_unknown,
                 order=q.order,
-                options=tuple(OptionDef(o.slug, o.label) for o in q.options.all()),
+                options=tuple(
+                    OptionDef(o.slug, o.label, o.out_of_coverage) for o in q.options.all()
+                ),
             )
             for q in questions
         },

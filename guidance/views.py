@@ -106,6 +106,21 @@ def _step_view(catalog: Catalog, step: PlanStep) -> StepView:
     )
 
 
+@dataclass(frozen=True, slots=True)
+class UncoveredLine:
+    question_text: str
+    option_label: str
+
+
+def _uncovered_lines(catalog: Catalog, pairs: tuple[tuple[str, str], ...]) -> list[UncoveredLine]:
+    lines = []
+    for question_slug, option_slug in pairs:
+        question = catalog.questions[question_slug]
+        label = next(o.label for o in question.options if o.slug == option_slug)
+        lines.append(UncoveredLine(question.text, label))
+    return lines
+
+
 def plan(request: HttpRequest, slug: str) -> HttpResponse:
     catalog = _load(slug)
     facts = read_facts(request.session, catalog)
@@ -125,6 +140,7 @@ def plan(request: HttpRequest, slug: str) -> HttpResponse:
         "catalog": catalog,
         "plan": result,
         "steps": [_step_view(catalog, step) for step in result.steps],
+        "uncovered": _uncovered_lines(catalog, result.uncovered),
         "undetermined": [catalog.procedures[s].title for s in result.undetermined],
     }
     return render(request, "guidance/plan.html", context)

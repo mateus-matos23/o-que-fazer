@@ -6,7 +6,7 @@ import pytest
 from django.core.management import CommandError, call_command
 
 from catalog.loader import load_content
-from catalog.models import Dependency, Procedure, Question, Rule
+from catalog.models import AnswerOption, Dependency, Procedure, Question, Rule
 from sources.models import Agency, Jurisdiction, Source, SourceImport, SourceSnapshot
 from sources.toml_schema import ContentError
 
@@ -157,6 +157,24 @@ def test_happy_path(content: Path) -> None:
     assert load_content(content) == EXPECTED
     assert Procedure.objects.get(slug="proc-a").clarifies == Question.objects.get(slug="q1")
     assert Rule.objects.get(slug="r-cond").conditions.get().options.get().slug == "x"
+
+
+def _option_flags() -> dict[str, bool]:
+    return {o.slug: o.out_of_coverage for o in AnswerOption.objects.filter(question__slug="q1")}
+
+
+def test_out_of_coverage_true_false_and_absent(content: Path) -> None:
+    load_content(content)
+    assert _option_flags() == {"sim": False, "nao": False}
+    (content / "journey.toml").write_text(
+        _bump(
+            '{slug = "sim", label = "Sim"}, {slug = "nao", label = "Não"}',
+            '{slug = "sim", label = "Sim", out_of_coverage = true}, '
+            '{slug = "nao", label = "Não", out_of_coverage = false}',
+        )
+    )
+    load_content(content)
+    assert _option_flags() == {"sim": True, "nao": False}
 
 
 def test_idempotent(content: Path) -> None:
@@ -363,6 +381,10 @@ ERRORS = {
     "order out of range": (
         _bump("allows_unknown = true", "allows_unknown = true\norder = -1"),
         "q1: order: fora da faixa 0..32767",
+    ),
+    "out_of_coverage not bool": (
+        _bump('{slug = "x", label = "X"}', '{slug = "x", label = "X", out_of_coverage = "sim"}'),
+        "q2: options[0].out_of_coverage: esperado bool",
     ),
     "unknown nested key": (
         _bump('{slug = "x", label = "X"}', '{slug = "x", label = "X", z = 1}'),

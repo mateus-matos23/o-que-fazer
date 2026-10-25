@@ -24,9 +24,15 @@ def question(
     kind: Literal["SINGLE", "MULTIPLE"] = "SINGLE",
     allows_unknown: bool = True,
     order: int = 0,
+    uncovered: tuple[str, ...] = (),
 ) -> QuestionDef:
     return QuestionDef(
-        slug, slug, kind, allows_unknown, order, tuple(OptionDef(o, o) for o in options)
+        slug,
+        slug,
+        kind,
+        allows_unknown,
+        order,
+        tuple(OptionDef(o, o, o in uncovered) for o in options),
     )
 
 

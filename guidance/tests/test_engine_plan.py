@@ -173,3 +173,29 @@ def test_deterministic() -> None:
     cat = catalog((), tuple(procedure(s) for s in "dcba"), dependencies=(dep("a", "d"),))
     assert build_plan(cat, {}) == build_plan(cat, {})
     assert slugs(build_plan(cat, {})) == ["a", "b", "c", "d"]
+
+
+def test_uncovered_single_and_multiple_in_question_then_option_order() -> None:
+    cat = catalog(
+        (
+            question("late", order=2, uncovered=("a",)),
+            question("early", ("x", "y", "z"), kind="MULTIPLE", order=1, uncovered=("x", "z")),
+            question("covered", order=0),
+        ),
+        (procedure("p"),),
+    )
+    facts: Facts = {
+        "late": A,
+        "early": frozenset({"z", "x", "y"}),
+        "covered": A,
+    }
+    assert build_plan(cat, facts).uncovered == (("early", "x"), ("early", "z"), ("late", "a"))
+    assert slugs(build_plan(cat, facts)) == ["p"]  # as demais etapas seguem normais
+
+
+def test_uncovered_ignores_unknown_unanswered_and_covered_choice() -> None:
+    cat = catalog((question("q", uncovered=("b",)),), (procedure("p"),))
+    assert build_plan(cat, {"q": UNKNOWN}).uncovered == ()
+    assert build_plan(cat, {}).uncovered == ()
+    assert build_plan(cat, {"q": A}).uncovered == ()
+    assert build_plan(cat, {"q": B}).uncovered == (("q", "b"),)

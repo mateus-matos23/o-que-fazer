@@ -21,7 +21,7 @@ Na carga, o trecho é procurado no texto da versão coletada (HTML sem tags ou v
 | --- | --- | --- |
 | `Situation` | `slug`, `title`, `candidates` M2M → `Procedure` | Entrada da jornada (RF01). |
 | `Question` | `slug`, `text`, `kind` (`SINGLE`/`MULTIPLE`), `allows_unknown`, `order`, `situations` M2M | Reutilizável entre situações. `order` só desempata a próxima pergunta. |
-| `AnswerOption` | `question` FK, `slug`, `label` | Único por (`question`, `slug`). "Não sei" **não** é opção: é `allows_unknown` e mantém o fato desconhecido (RN03). |
+| `AnswerOption` | `question` FK, `slug`, `label`, `out_of_coverage` (padrão falso) | Único por (`question`, `slug`). "Não sei" **não** é opção: é `allows_unknown` e mantém o fato desconhecido (RN03). `out_of_coverage` marca resposta sem orientação oficial nesta versão: continua sendo oferecida e o plano exibe um aviso de limite de cobertura, sem alterar a avaliação das regras. |
 | `Procedure` | `slug`, `title`, `description`, `agency` FK, `jurisdiction`, `clarifies` FK → `Question` (nulo), citação | Com `clarifies` preenchido, é um **esclarecimento intermediário**: entra no plano quando aquela pergunta foi respondida com "não sei". |
 | `ProcedureDetail` | `procedure` FK, `kind` (`COST`/`DEADLINE`), `text`, citação | Único por (`procedure`, `kind`). Sem linha = "não informado" (RN11). |
 | `Requirement` | `procedure` FK, `description`, citação | Requisitos parecidos não são unificados. |

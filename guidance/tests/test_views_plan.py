@@ -7,12 +7,13 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import Client
 
+from catalog.models import AnswerOption
 from guidance.engine.model import Catalog
 from guidance.engine.ordering import DependencyCycleError
 from guidance.engine.plan import build_plan
 from guidance.forms import UNKNOWN_VALUE
 from guidance.tests import factories as f
-from guidance.views import _step_view
+from guidance.views import _step_view, _uncovered_lines
 from sources.models import SourceImport
 
 pytestmark = pytest.mark.django_db
@@ -67,6 +68,36 @@ def test_empty_plan_message() -> None:
         {"catalog": catalog, "plan": plan, "steps": [], "undetermined": []},
     )
     assert "Nenhuma providência encontrada para as respostas dadas." in html
+
+
+def test_uncovered_warning_only_with_out_of_coverage_option(
+    loaded: dict[str, int], client: Client
+) -> None:
+    _answer(client, "suspenso")
+    assert "Limite de cobertura" not in _html(client, PLAN)
+    AnswerOption.objects.filter(question__slug=QUESTION, slug="suspenso").update(
+        out_of_coverage=True
+    )
+    html = _html(client, PLAN)
+    assert "Limite de cobertura" in html
+    assert "Não encontramos orientação oficial para esta resposta nesta versão." in html
+    assert 'data-slug="regularizar-cpf-suspenso"' in html  # as etapas seguem no plano
+
+
+def test_uncovered_warning_shows_without_steps() -> None:
+    catalog = f.catalog((f.question("q", uncovered=("a",)),), (), ())
+    plan = build_plan(catalog, {"q": frozenset({"a"})})
+    html = render_to_string(
+        "guidance/plan.html",
+        {
+            "catalog": catalog,
+            "plan": plan,
+            "steps": [],
+            "uncovered": _uncovered_lines(catalog, plan.uncovered),
+            "undetermined": [],
+        },
+    )
+    assert "Limite de cobertura" in html and "q: a" in html
 
 
 def test_unknown_gives_clarification_and_undetermined(

@@ -4,6 +4,16 @@
 <h1>Seu plano</h1>
 <p><strong>Atenção:</strong> este sistema é apenas orientativo. Ele não executa serviços nem confirma direitos; confira sempre na fonte oficial.</p>
 
+{% if uncovered %}
+<section id="limite-de-cobertura">
+  <h2>Limite de cobertura</h2>
+  <p>Não encontramos orientação oficial para esta resposta nesta versão. As etapas abaixo não cobrem esse caso.</p>
+  <ul>
+    {% for line in uncovered %}<li>{{ line.question_text }}: {{ line.option_label }}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
 {% if steps %}
 <nav aria-label="Resumo do plano">
   <h2>Resumo</h2>

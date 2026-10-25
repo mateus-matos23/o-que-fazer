@@ -32,6 +32,8 @@ class PlanStep:
 class Plan:
     steps: tuple[PlanStep, ...]
     undetermined: tuple[str, ...]  # candidatos indeterminados que não entraram
+    # (pergunta, opção) escolhidas que estão fora da cobertura; UNKNOWN nunca entra
+    uncovered: tuple[tuple[str, str], ...]
 
 
 def build_plan(catalog: Catalog, facts: Facts) -> Plan:
@@ -113,4 +115,18 @@ def build_plan(catalog: Catalog, facts: Facts) -> Plan:
             if e.status is Tri.UNDETERMINED and slug not in status
         )
     )
-    return Plan(steps, undetermined)
+    return Plan(steps, undetermined, _uncovered(catalog, facts))
+
+
+def _uncovered(catalog: Catalog, facts: Facts) -> tuple[tuple[str, str], ...]:
+    pairs: list[tuple[str, str]] = []
+    for question in sorted(catalog.questions.values(), key=lambda q: (q.order, q.slug)):
+        answer = facts.get(question.slug)
+        if answer is None or isinstance(answer, Unknown):
+            continue
+        pairs.extend(
+            (question.slug, o.slug)
+            for o in question.options
+            if o.out_of_coverage and o.slug in answer
+        )
+    return tuple(pairs)

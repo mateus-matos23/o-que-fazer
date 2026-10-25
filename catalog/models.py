@@ -47,6 +47,7 @@ class AnswerOption(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="options")
     slug = models.SlugField()
     label = models.CharField(max_length=200)
+    out_of_coverage = models.BooleanField(default=False)  # sem orientação oficial nesta versão
 
     class Meta:
         constraints = [

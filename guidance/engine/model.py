@@ -36,6 +36,7 @@ class Citation:
 class OptionDef:
     slug: str
     label: str
+    out_of_coverage: bool = False  # sem orientação oficial nesta versão
 
 
 @dataclass(frozen=True, slots=True)
