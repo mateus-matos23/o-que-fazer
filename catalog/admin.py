@@ -13,6 +13,8 @@ from .models import (
     Rule,
     ServiceChannel,
     Situation,
+    TriageChoice,
+    TriageNode,
 )
 
 
@@ -65,3 +67,13 @@ class ConditionAdmin(ReadOnlyAdmin):
 class DependencyAdmin(ReadOnlyAdmin):
     list_display = ("before", "after", "kind", "rule")
     list_filter = ("kind",)
+
+
+@admin.register(TriageNode)
+class TriageNodeAdmin(ReadOnlyAdmin):
+    list_display = ("slug", "text")
+
+
+@admin.register(TriageChoice)
+class TriageChoiceAdmin(ReadOnlyAdmin):
+    list_display = ("node", "order", "label", "next_node", "situation")

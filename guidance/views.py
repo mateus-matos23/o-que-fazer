@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 from typing import Literal
 
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.http import (
     Http404,
     HttpRequest,
@@ -12,9 +12,16 @@ from django.http import (
 )
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from catalog.models import Procedure, ServiceChannel, Situation
+from catalog.models import (
+    START_NODE,
+    Procedure,
+    ServiceChannel,
+    Situation,
+    TriageChoice,
+    TriageNode,
+)
 from guidance.engine.evaluation import evaluate
 from guidance.engine.model import Catalog, ChannelDef, DependencyDef, ProcedureDef, Unknown
 from guidance.engine.ordering import DependencyCycleError
@@ -45,9 +52,35 @@ def _see_other(url: str) -> HttpResponseRedirect:
     return response
 
 
+@require_GET
 def situation_list(request: HttpRequest) -> HttpResponse:
     situations = Situation.objects.order_by("title")
     return render(request, "guidance/situation_list.html", {"situations": situations})
+
+
+@require_GET
+def triage(request: HttpRequest, slug: str = START_NODE) -> HttpResponse:
+    home = reverse("guidance:home")
+    if slug == START_NODE and request.path != home:
+        return redirect(home)  # o início tem uma só URL
+    node = (
+        TriageNode.objects.filter(slug=slug)
+        .prefetch_related(
+            Prefetch("choices", TriageChoice.objects.select_related("next_node", "situation"))
+        )
+        .first()
+    )
+    if node is None:
+        if slug == START_NODE:  # conteúdo sem funil: a lista de situações é a entrada
+            return situation_list(request)
+        raise Http404("Pergunta não encontrada")
+    return render(request, "guidance/triage.html", {"node": node, "is_start": slug == START_NODE})
+
+
+@require_GET
+def uncovered(request: HttpRequest) -> HttpResponse:
+    situations = Situation.objects.order_by("title")
+    return render(request, "guidance/uncovered.html", {"situations": situations})
 
 
 @require_http_methods(["GET", "POST"])

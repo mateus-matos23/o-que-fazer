@@ -22,6 +22,7 @@ from sources.toml_schema import (
 )
 
 from .models import (
+    START_NODE,
     AnswerOption,
     Condition,
     Dependency,
@@ -32,6 +33,8 @@ from .models import (
     Rule,
     ServiceChannel,
     Situation,
+    TriageChoice,
+    TriageNode,
 )
 
 RESERVED_OPTION_SLUGS = frozenset({"nao-sei", "unknown"})
@@ -111,6 +114,19 @@ _TABLES = {
             **_CITATION,
         },
         {"procedure": str},
+    ),
+    "triage": Schema(
+        {
+            "slug": _slug(TriageNode),
+            "text": str,
+            "options": [
+                Schema(
+                    {"label": text_of(TriageChoice, "label")},
+                    {"next": str, "situation": str, "uncovered": bool},
+                )
+            ],
+        },
+        {"help": str},
     ),
     "dependencies": Schema(
         {
@@ -208,6 +224,23 @@ class SituationDef:
     candidates: list[str]
 
 
+@dataclass(frozen=True)
+class TriageOptionDef:
+    label: str
+    next_node: str | None
+    situation: str | None
+    uncovered: bool
+
+
+@dataclass(frozen=True)
+class TriageNodeDef:
+    file: str
+    slug: str
+    text: str
+    help_text: str
+    options: list[TriageOptionDef]
+
+
 @dataclass
 class Content:
     situations: list[SituationDef] = field(default_factory=list)
@@ -215,6 +248,7 @@ class Content:
     procedures: list[ProcedureDef] = field(default_factory=list)
     rules: list[RuleDef] = field(default_factory=list)
     dependencies: list[DependencyDef] = field(default_factory=list)
+    triage: list[TriageNodeDef] = field(default_factory=list)
 
 
 def _cite(raw: dict[str, Any]) -> Cite:
@@ -267,6 +301,14 @@ def _parse(file: str, doc: dict[str, Any], content: Content) -> None:
         content.rules.append(
             RuleDef(file, r["slug"], r.get("procedure"), r["explanation"], _cite(r), conditions)
         )
+    for r in doc.get("triage", []):
+        choices = [
+            TriageOptionDef(
+                o["label"], o.get("next"), o.get("situation"), o.get("uncovered", False)
+            )
+            for o in r["options"]
+        ]
+        content.triage.append(TriageNodeDef(file, r["slug"], r["text"], r.get("help", ""), choices))
     for r in doc.get("dependencies", []):
         content.dependencies.append(
             DependencyDef(file, r["before"], r["after"], r["kind"], r.get("rule"), _cite(r))
@@ -383,6 +425,8 @@ def _structure_problems(content: Content) -> list[str]:
                 problems.append(
                     f"{d.file}: {d.label}: regra {d.rule} define aplicabilidade (tem procedure)"
                 )
+    if content.triage:
+        problems += _triage_problems(content, situations)
     return problems + _cycle_problems(content, procedures)
 
 
@@ -403,6 +447,64 @@ def _cycle_problems(content: Content, procedures: set[str]) -> list[str]:
         )
         return [f"{first.file}: {first.label}: {exc}"]
     return []
+
+
+def _triage_problems(content: Content, situations: set[str]) -> list[str]:
+    """Funil de triagem: destinos válidos, sem ciclo e com toda situação e todo nó alcançáveis."""
+    problems = _duplicates([(n.file, n.slug) for n in content.triage], "triage")
+    nodes = {n.slug: n for n in content.triage}
+    if START_NODE not in nodes:
+        problems.append(f"{content.triage[0].file}: {START_NODE}: nó inicial ausente")
+    edges: set[tuple[str, str]] = set()
+    for n in content.triage:
+        if not n.text.strip():
+            problems.append(f"{n.file}: {n.slug}: text vazio")
+        if not n.options:
+            problems.append(f"{n.file}: {n.slug}: nó sem opções")
+        for i, o in enumerate(n.options):
+            where = f"{n.file}: {n.slug}: options[{i}]"
+            if not o.label.strip():
+                problems.append(f"{where}: label vazio")
+            destinations = [o.next_node is not None, o.situation is not None, o.uncovered]
+            if sum(destinations) != 1:
+                problems.append(f"{where}: informe exatamente um entre next, situation e uncovered")
+            if o.next_node is not None:
+                if o.next_node in nodes:
+                    edges.add((n.slug, o.next_node))
+                else:
+                    problems.append(f"{where}: nó inexistente em next: {o.next_node}")
+            if o.situation is not None and o.situation not in situations:
+                problems.append(f"{where}: situação inexistente: {o.situation}")
+    try:
+        kahn_layers(nodes, edges)
+    except DependencyCycleError as exc:
+        first = exc.nodes[0]
+        problems.append(
+            f"{nodes[first].file}: {first}: ciclo no funil de triagem envolvendo: "
+            + ", ".join(exc.nodes)
+        )
+    reached = {START_NODE} & nodes.keys()
+    pending = list(reached)
+    while pending:
+        current = pending.pop()
+        for before, target in edges:
+            if before == current and target not in reached:
+                reached.add(target)
+                pending.append(target)
+    problems += [
+        f"{n.file}: {n.slug}: nó inalcançável a partir de {START_NODE}"
+        for n in content.triage
+        if n.slug not in reached
+    ]
+    covered = {
+        o.situation for n in content.triage if n.slug in reached for o in n.options if o.situation
+    }
+    problems += [
+        f"{s.file}: {s.slug}: situação não alcançável pelo funil de triagem"
+        for s in content.situations
+        if s.slug not in covered
+    ]
+    return problems
 
 
 def _citations(content: Content) -> Iterator[tuple[str, str, str, Cite]]:
@@ -488,7 +590,7 @@ def validate(directory: Path) -> tuple[Content, dict[str, SourceSnapshot]]:
 
 
 def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
-    for model in (Dependency, Rule, Situation, Procedure, Question):
+    for model in (TriageNode, Dependency, Rule, Situation, Procedure, Question):
         model.objects.all().delete()
 
     question_by_slug: dict[str, Question] = {}
@@ -556,6 +658,8 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
     for q in content.questions:
         question_by_slug[q.slug].situations.set(Situation.objects.filter(slug__in=q.situations))
 
+    _create_triage(content.triage)
+
     rule_by_slug: dict[str, Rule] = {}
     for r in content.rules:
         rule = Rule.objects.create(
@@ -583,6 +687,23 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
         )
 
 
+def _create_triage(nodes: list[TriageNodeDef]) -> None:
+    node_by_slug = {
+        n.slug: TriageNode.objects.create(slug=n.slug, text=n.text, help_text=n.help_text)
+        for n in nodes
+    }
+    situation_by_slug = {s.slug: s for s in Situation.objects.all()}
+    for n in nodes:
+        for order, o in enumerate(n.options, start=1):
+            TriageChoice.objects.create(
+                node=node_by_slug[n.slug],
+                label=o.label,
+                order=order,
+                next_node=node_by_slug[o.next_node] if o.next_node else None,
+                situation=situation_by_slug[o.situation] if o.situation else None,
+            )
+
+
 _COUNTED: tuple[type[models.Model], ...] = (
     Situation,
     Question,
@@ -594,6 +715,8 @@ _COUNTED: tuple[type[models.Model], ...] = (
     Rule,
     Condition,
     Dependency,
+    TriageNode,
+    TriageChoice,
 )
 
 

@@ -6,7 +6,7 @@ import pytest
 from django.core.management import CommandError, call_command
 
 from catalog.loader import load_content
-from catalog.models import AnswerOption, Dependency, Procedure, Question, Rule
+from catalog.models import AnswerOption, Dependency, Procedure, Question, Rule, TriageNode
 from sources.models import Agency, Jurisdiction, Source, SourceImport, SourceSnapshot
 from sources.toml_schema import ContentError
 
@@ -110,6 +110,8 @@ EXPECTED = {
     "Rule": 2,
     "Condition": 2,
     "Dependency": 2,
+    "TriageNode": 0,
+    "TriageChoice": 0,
 }
 
 
@@ -477,3 +479,143 @@ def test_no_content_files_preserves_catalog(content: Path, tmp_path: Path, setup
     with pytest.raises(ContentError):
         load_content(target)
     assert load_content_counts() == EXPECTED
+
+
+TRIAGE = """
+[[triage]]
+slug = "inicio"
+text = "Assunto?"
+help = "Dica."
+options = [
+  {label = "Um", next = "sub"},
+  {label = "Dois", situation = "sit"},
+  {label = "Três", uncovered = true},
+  {label = "Quatro", uncovered = false, situation = "sit"},
+]
+
+[[triage]]
+slug = "sub"
+text = "Detalhe?"
+options = [{label = "Fora", uncovered = true}, {label = "Volta", next = "inicio2"}]
+
+[[triage]]
+slug = "inicio2"
+text = "Outro"
+options = [{label = "Fim", uncovered = true}]
+"""
+
+
+def _triage(old: str = "", new: str = "") -> str:
+    assert old in TRIAGE
+    return JOURNEY + TRIAGE.replace(old, new, 1)
+
+
+TRIAGE_ERRORS = {
+    "missing start": (
+        _triage('slug = "inicio"\n', 'slug = "comeco"\n'),
+        "journey.toml: inicio: nó inicial ausente",
+    ),
+    "duplicate node": (
+        _triage('slug = "sub"', 'slug = "inicio"'),
+        "journey.toml: inicio: slug duplicado em triage",
+    ),
+    "no destination": (
+        _triage('{label = "Três", uncovered = true}', '{label = "Três"}'),
+        "inicio: options[2]: informe exatamente um entre next, situation e uncovered",
+    ),
+    "two destinations": (
+        _triage(
+            '{label = "Três", uncovered = true}',
+            '{label = "Três", next = "sub", situation = "sit"}',
+        ),
+        "inicio: options[2]: informe exatamente um entre next, situation e uncovered",
+    ),
+    "uncovered false does not count": (
+        _triage('{label = "Três", uncovered = true}', '{label = "Três", uncovered = false}'),
+        "inicio: options[2]: informe exatamente um entre next, situation e uncovered",
+    ),
+    "unknown next": (
+        _triage('next = "sub"', 'next = "nada"'),
+        "inicio: options[0]: nó inexistente em next: nada",
+    ),
+    "unknown situation": (
+        _triage('situation = "sit"', 'situation = "nada"'),
+        "inicio: options[1]: situação inexistente: nada",
+    ),
+    "cycle": (
+        _triage('next = "inicio2"', 'next = "inicio"'),
+        "inicio: ciclo no funil de triagem envolvendo: inicio, sub",
+    ),
+    "self cycle": (
+        _triage('{label = "Fim", uncovered = true}', '{label = "Fim", next = "inicio2"}'),
+        "inicio2: ciclo no funil de triagem envolvendo: inicio2",
+    ),
+    "isolated cycle is also unreachable": (
+        _triage()
+        + '\n[[triage]]\nslug = "a"\ntext = "A"\noptions = [{label = "B", next = "b"}]\n'
+        + '\n[[triage]]\nslug = "b"\ntext = "B"\noptions = [{label = "A", next = "a"}]\n',
+        "a: ciclo no funil de triagem envolvendo: a, b",
+    ),
+    "empty text": (_triage('text = "Detalhe?"', 'text = "  "'), "sub: text vazio"),
+    "empty label": (
+        _triage('{label = "Fora", uncovered = true}', '{label = "", uncovered = true}'),
+        "sub: options[0]: label vazio",
+    ),
+    "unreachable node": (
+        _triage('{label = "Um", next = "sub"},', '{label = "Um", uncovered = true},'),
+        "sub: nó inalcançável a partir de inicio",
+    ),
+    "situation not reachable": (
+        _triage(
+            '{label = "Dois", situation = "sit"},', '{label = "Dois", uncovered = true},'
+        ).replace('{label = "Quatro", uncovered = false, situation = "sit"},', ""),
+        "journey.toml: sit: situação não alcançável pelo funil de triagem",
+    ),
+    "node without options": (
+        _triage('options = [{label = "Fim", uncovered = true}]', "options = []"),
+        "inicio2: nó sem opções",
+    ),
+}
+
+
+@pytest.mark.parametrize(("text", "expected"), TRIAGE_ERRORS.values(), ids=TRIAGE_ERRORS.keys())
+def test_triage_error_writes_nothing(content: Path, text: str, expected: str) -> None:
+    (content / "journey.toml").write_text(text)
+    with pytest.raises(ContentError) as info:
+        load_content(content)
+    assert any(expected in line for line in info.value.lines), info.value.lines
+    assert sum(load_content_counts().values()) == 0
+
+
+def test_triage_stores_nodes_and_choices_in_order(content: Path) -> None:
+    (content / "journey.toml").write_text(
+        JOURNEY
+        + TRIAGE.replace('{label = "Volta", next = "inicio2"}', '{label = "Volta", next = "fim"}')
+        .replace('slug = "inicio2"', 'slug = "fim"')
+        .replace('  {label = "Quatro", uncovered = false, situation = "sit"},\n', "")
+    )
+    counts = load_content(content)
+    assert (counts["TriageNode"], counts["TriageChoice"]) == (3, 6)
+    inicio = TriageNode.objects.get(slug="inicio")
+    assert inicio.help_text == "Dica."
+    first, second, third = inicio.choices.all()
+    assert [c.order for c in (first, second, third)] == [1, 2, 3]
+    assert first.next_node == TriageNode.objects.get(slug="sub")
+    assert second.situation is not None and second.situation.slug == "sit"
+    assert (third.next_node, third.situation) == (None, None)
+    assert load_content(content) == counts  # recarga substitui tudo
+
+
+def test_content_without_triage_is_valid(content: Path) -> None:
+    assert load_content(content) == EXPECTED
+
+
+def test_triage_duplicate_slug_across_files(content: Path) -> None:
+    (content / "journey.toml").write_text(_triage().replace('"inicio2"', '"sub2"', 2))
+    (content / "other.toml").write_text(
+        '[[triage]]\nslug = "sub"\ntext = "T"\noptions = [{label = "x", uncovered = true}]\n'
+    )
+    with pytest.raises(ContentError) as info:
+        load_content(content)
+    assert "journey.toml: sub: slug duplicado em triage" in info.value.lines
+    assert "other.toml: sub: slug duplicado em triage" in info.value.lines

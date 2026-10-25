@@ -4,7 +4,10 @@ from guidance import views
 
 app_name = "guidance"
 urlpatterns = [
-    path("", views.situation_list, name="situation_list"),
+    path("", views.triage, name="home"),
+    path("comecar/<slug:slug>/", views.triage, name="triage"),
+    path("situacoes/", views.situation_list, name="situation_list"),
+    path("fora-da-cobertura/", views.uncovered, name="uncovered"),
     path("onde-resolvo/", views.search, name="search"),
     path("onde-resolvo/<slug:slug>/", views.procedure_detail, name="procedure"),
     path("s/<slug:slug>/", views.question, name="question"),

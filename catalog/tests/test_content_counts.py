@@ -2,6 +2,9 @@
 
 import pytest
 
+from catalog.loader import validate
+from conftest import ROOT
+
 pytestmark = pytest.mark.django_db
 
 
@@ -18,4 +21,11 @@ def test_global_counts(loaded: dict[str, int]) -> None:
         "Rule": 9,
         "Condition": 11,
         "Dependency": 1,
+        "TriageNode": 3,
+        "TriageChoice": 12,
     }
+
+
+def test_real_content_passes_validation_with_triage(loaded: dict[str, int]) -> None:
+    content, _ = validate(ROOT / "content")
+    assert {n.slug for n in content.triage} == {"inicio", "documentos", "trabalho"}

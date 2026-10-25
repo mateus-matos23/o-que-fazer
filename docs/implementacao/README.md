@@ -321,7 +321,7 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
 
 ## Fase 7 — Conversa guiada
 
-Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; a fatia 1 está consolidada, as demais seguem pendentes.
+Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 e 2 estão consolidadas, as demais seguem pendentes.
 
 **Motivação.** Hoje o cidadão escolhe a situação numa lista e responde uma ou duas perguntas antes do plano. O autor quer uma experiência de "conversa guiada", inspirada no Akinator, para um público com idade, escolaridade e familiaridade com tecnologia variadas. A conversa leva à situação por um funil de triagem, mostra o efeito de cada resposta no plano e termina num plano com ponto de partida. Requisitos RF21 a RF26 e regras RN02, RN14 e RN16 em [requisitos](../produto/requisitos.md).
 
@@ -339,7 +339,7 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; a fatia 1 está co
 | --- | --- | --- |
 | 0 | Documentação base (produto, glossário, pendências e este registro) | Consolidado |
 | 1 | Linguagem simples e dica por pergunta | Consolidado |
-| 2 | Funil de triagem, com limite de cobertura nos ramos sem jornada | Pendente |
+| 2 | Funil de triagem, com limite de cobertura nos ramos sem jornada | Consolidado |
 | 3 | Efeito da resposta no plano | Pendente |
 | 4 | Preferência de atendimento e ordenação dos canais | Pendente |
 | 5 | Plano com "Comece por aqui", "O que separar antes" e versão para impressão | Pendente |
@@ -356,6 +356,14 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; a fatia 1 está co
 - Gates: ruff, mypy e pytest verdes (281 passed).
 - Verificação no Chromium headless via CDP em 25/10/2026, após migrate e load_content no `oqf_dev` (autorizados pelo autor para a Fase 7): textos, dicas e `aria-describedby` conferidos; contraste da dica 6,69:1; sem rolagem horizontal em 320 px; sem erros de console.
 - Limite observado: o envio vazio é barrado pela validação nativa do navegador (`required` nos radios, anterior à fatia), então o bloco `#form-errors` só aparece quando o navegador não valida. O caminho do servidor segue coberto por testes.
+
+**Fatia 2 — funil de triagem.**
+
+- `TriageNode` e `TriageChoice` (migration 0004), tabela TOML `triage` e `content/triage.toml` com 3 nós e 12 opções. A raiz `/` mostra o nó `inicio`; `/comecar/<slug>/` mostra os demais; `/fora-da-cobertura/` é o limite de cobertura; a lista de situações passou a `/situacoes/`. Sem nó `inicio` no conteúdo, a raiz mostra a lista.
+- Validação na carga: nó `inicio` ausente, slug duplicado, opção sem exatamente um destino, `next` ou `situation` inexistente, ciclo, nó inalcançável, situação não alcançável pelo funil e nó sem opções.
+- Motivo: o público variado (RF21, RF24) não deve precisar reconhecer o nome da situação. O funil é encaminhamento (RN02), por isso não tem fonte. Decisão em [ADR 0005](../arquitetura/decisoes/0005-funil-de-triagem.md).
+- Gates: ruff, mypy e pytest verdes (311 passed).
+- Verificação no navegador (25/10/2026, Chromium headless via CDP, `oqf_dev` com a migration 0004 e o conteúdo carregado): 41 de 41 verificações passaram — textos, ordem e destino das opções, navegação por teclado com foco visível, redirecionamento de `/comecar/inicio/`, 404 em nó inexistente, sem rolagem horizontal em 360 e 1280 px, alvos ≥ 24×24 px, contraste da dica 6,69:1 e das opções 5,95:1.
 
 ## Limitações conhecidas
 

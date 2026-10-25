@@ -1,0 +1,17 @@
+{% extends "guidance/base.html" %}
+{% block title %}{{ node.text }} - O que Fazer?{% endblock %}
+{% block content %}
+<h1>{{ node.text }}</h1>
+{% if node.help_text %}<p class="question-help">{{ node.help_text }}</p>{% endif %}
+<ul class="situations">
+  {% for choice in node.choices.all %}
+  <li><a href="{% if choice.next_node %}{% url 'guidance:triage' choice.next_node.slug %}{% elif choice.situation %}{% url 'guidance:question' choice.situation.slug %}{% else %}{% url 'guidance:uncovered' %}{% endif %}">{{ choice.label }}</a></li>
+  {% endfor %}
+</ul>
+{% if is_start %}
+<p class="search-link"><a href="{% url 'guidance:situation_list' %}">Ver todas as situações</a></p>
+<p class="search-link">Já sabe qual serviço procura? <a href="{% url 'guidance:search' %}">Onde resolvo?</a></p>
+{% else %}
+<p class="search-link"><a href="{% url 'guidance:home' %}">Voltar ao início</a></p>
+{% endif %}
+{% endblock %}

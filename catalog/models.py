@@ -5,6 +5,8 @@ from django.db.models import F, Q
 
 from sources.models import Agency, Jurisdiction, SourceSnapshot
 
+START_NODE = "inicio"  # slug do primeiro nó do funil de triagem
+
 
 class Cited(models.Model):
     """Toda afirmação em nome de um órgão cita a versão da fonte e o trecho literal."""
@@ -175,3 +177,41 @@ class Dependency(Cited):
 
     def __str__(self) -> str:
         return f"{self.before.slug} -> {self.after.slug} ({self.kind})"
+
+
+class TriageNode(models.Model):
+    """Pergunta ampla do funil. É encaminhamento (RN02): não afirma nada, então não cita fonte."""
+
+    slug = models.SlugField(unique=True)
+    text = models.TextField()
+    help_text = models.TextField(blank=True)
+
+    def __str__(self) -> str:
+        return self.slug
+
+
+class TriageChoice(models.Model):
+    node = models.ForeignKey(TriageNode, on_delete=models.CASCADE, related_name="choices")
+    label = models.CharField(max_length=200)
+    order = models.PositiveSmallIntegerField()
+    # CASCADE no destino; PROTECT na situação vale porque `_replace` apaga os nós antes.
+    next_node = models.ForeignKey(
+        TriageNode, on_delete=models.CASCADE, null=True, blank=True, related_name="+"
+    )
+    situation = models.ForeignKey(
+        Situation, on_delete=models.PROTECT, null=True, blank=True, related_name="+"
+    )
+
+    class Meta:
+        ordering = ["order"]
+        constraints = [
+            models.UniqueConstraint(fields=["node", "order"], name="unique_choice_order_per_node"),
+            # Ambos nulos = ramo fora da cobertura.
+            models.CheckConstraint(
+                condition=Q(next_node__isnull=True) | Q(situation__isnull=True),
+                name="triage_choice_at_most_one_destination",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.node.slug}:{self.order}"

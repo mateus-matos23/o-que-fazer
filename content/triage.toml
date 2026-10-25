@@ -1,0 +1,33 @@
+# Funil de triagem: encaminhamento (RN02), sem fonte porque não afirma nada em nome de órgão.
+# Ver docs/arquitetura/decisoes/0005-funil-de-triagem.md.
+
+[[triage]]
+slug = "inicio"
+text = "Sobre o que é o que aconteceu com você?"
+help = "Escolha o assunto mais próximo. Se errar, é só voltar."
+options = [
+  {label = "Documentos pessoais (CPF, identidade, carteira de motorista)", next = "documentos"},
+  {label = "Trabalho ou emprego", next = "trabalho"},
+  {label = "Família (nascimento de filho, falecimento)", uncovered = true},
+  {label = "Veículo (compra ou venda)", uncovered = true},
+  {label = "Outro assunto", uncovered = true},
+]
+
+[[triage]]
+slug = "documentos"
+text = "O que aconteceu com seus documentos?"
+options = [
+  {label = "Perdi um ou mais documentos", situation = "perda-de-documentos"},
+  {label = "Meu CPF está com problema (por exemplo, suspenso ou pendente de regularização)", situation = "cpf-irregular"},
+  {label = "Preciso tirar um documento pela primeira vez", uncovered = true},
+  {label = "Outra coisa", uncovered = true},
+]
+
+[[triage]]
+slug = "trabalho"
+text = "O que aconteceu no trabalho?"
+options = [
+  {label = "Saí do emprego (fui mandado embora, pedi para sair ou o contrato acabou)", situation = "desligamento-do-trabalho"},
+  {label = "Estou procurando o primeiro emprego", uncovered = true},
+  {label = "Outra coisa", uncovered = true},
+]

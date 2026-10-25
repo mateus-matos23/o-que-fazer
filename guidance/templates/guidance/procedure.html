@@ -5,7 +5,7 @@
 <article class="step">
   <h1>{{ procedure.title }}</h1>
   <p>{{ procedure.description }}</p>
-  <p class="disclaimer">Esta página descreve o serviço. Ela não confirma se ele se aplica ao seu caso; para isso, <a href="{% url 'guidance:situation_list' %}">comece pelo que aconteceu</a>.</p>
+  <p class="disclaimer">Esta página descreve o serviço. Ela não confirma se ele se aplica ao seu caso; para isso, <a href="{% url 'guidance:home' %}">comece pelo que aconteceu</a>.</p>
   {% include "guidance/_procedure_facts.html" %}
 </article>
 {% endblock %}

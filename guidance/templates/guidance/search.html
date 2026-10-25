@@ -23,7 +23,7 @@
   {% endfor %}
 </ul>
 {% else %}
-<p>Nenhum serviço encontrado para "{{ form.cleaned_data.q }}". Tente outra palavra ou <a href="{% url 'guidance:situation_list' %}">comece pelo que aconteceu</a>.</p>
+<p>Nenhum serviço encontrado para "{{ form.cleaned_data.q }}". Tente outra palavra ou <a href="{% url 'guidance:home' %}">comece pelo que aconteceu</a>.</p>
 {% endif %}
 {% endif %}
 {% endblock %}
