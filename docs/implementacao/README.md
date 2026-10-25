@@ -79,8 +79,45 @@ Pontos que a leitura do código não deixa óbvios:
 - **Comando** `uv run --env-file .env python manage.py fetch_sources [--source SLUG]`. A opção `--source` pode ser repetida. Slug inexistente é rejeitado. O comando termina com erro se alguma fonte falhar, mas registra todas as importações antes disso.
 - **Admin somente leitura** (`ReadOnlyAdmin` em `sources/admin.py`): não permite adicionar, alterar nem excluir. O conteúdo entra pelos comandos `load_sources`, `fetch_sources` e `load_content` (Fase 2).
 
+## Fase 2 — Domínio normalizado e carregador de conteúdo
+
+Estado por fatia:
+
+| Fatia | Escopo | Estado |
+| --- | --- | --- |
+| 2a | Models do app `catalog` e migration | Consolidado (commit `adf48b9`) |
+| 2b | Comandos `load_sources` e `load_content`, verificação de trecho e ordenação de Kahn | Consolidado (commit `3075b63`) |
+| 2c | `content/sources.toml` e `content/cpf-irregular.toml` | Pendente |
+| 2d | ADR 0003 | Pendente |
+
+**2a — models.** As tabelas e o porquê de cada uma estão no [modelo físico de dados](../arquitetura/modelo-fisico-de-dados.md). O banco impõe as seguintes restrições:
+
+- `Dependency` tem `rule` se e somente se é `CONDITIONAL`;
+- `before ≠ after`;
+- o par `(before, after)` é único;
+- o slug de opção é único por pergunta;
+- há no máximo um custo e um prazo por procedimento.
+
+**2b — carga de conteúdo.**
+
+- **`load_sources <arquivo>`** (`sources/loader.py`): upsert de órgãos e fontes por slug, sem apagar nada, porque importações e snapshots dependem das fontes.
+- **`load_content <diretório>`** (`catalog/loader.py`): lê todos os `.toml` do diretório, exceto `sources.toml`, e valida tudo antes de gravar. Só depois apaga e recria o conteúdo do `catalog` em uma única transação.
+  - A validação acontece em duas etapas. Primeiro o formato: chaves desconhecidas, tipos, valores permitidos, formato de slug e tamanho máximo das colunas, lido do próprio model. Depois as referências cruzadas. Motivo: um erro de formato não gera dezenas de erros de referência falsos.
+  - Os erros são acumulados e mostrados juntos, um por linha, no formato `<arquivo>: <slug>: <problema>`.
+  - Diretório inexistente, vazio ou só com `sources.toml` também é erro. Motivo: sem essa checagem, um caminho errado apagaria o catálogo inteiro.
+- **Verificação do trecho** (`sources/text.py`): o trecho citado precisa aparecer no texto normalizado da versão mais recente coletada com sucesso. Esse texto é o HTML sem tags ou todas as strings do JSON, com espaços normalizados. Em caso de empate de data, vale a importação de maior `id`, para que o resultado seja determinístico.
+- **Validações de domínio:**
+  - "não sei" não pode ser opção (`nao-sei`/`unknown` são reservados), porque é representado por `allows_unknown` (RN03);
+  - `clarifies` só pode apontar para uma pergunta que aceita "não sei";
+  - regra de dependência não tem procedimento, e regra sem procedimento precisa ser usada por alguma dependência;
+  - condição sem opções e regra sem condições são recusadas.
+- **Ciclo** (`guidance/engine/ordering.py`): ordenação de Kahn em camadas, com cada camada ordenada por slug. A carga recusa ciclos sobre todas as arestas, inclusive as recomendadas. O erro lista só os procedimentos que formam o ciclo, sem os que apenas dependem dele (invariante 5). O mesmo módulo será usado pelo motor na Fase 3.
+- **Revisão.** O agente `revisor` apontou seis problemas, corrigidos antes do commit. Os principais eram um diretório vazio que apagava o catálogo, limites de coluna que viravam erro do banco sem arquivo nem slug, e empate de data na escolha da versão.
+
 ## Limitações conhecidas
 
 - O banco não garante que o snapshot de uma importação pertence à mesma fonte da importação. Essa garantia hoje é só do código de coleta (`sources/services.py`).
 - Nenhuma coleta real pela rede foi executada ainda. As fontes serão cadastradas pelo `load_sources`, da Fase 2.
+- `load_sources` recusa a troca de URL entre duas fontes já cadastradas (marcado como `shortcut:` no código). Isso será tratado se surgir um caso real.
+- A validação de `load_content` roda fora da transação de escrita. Uma coleta concorrente entre as duas etapas pode invalidar a verificação. É um risco baixo para um comando executado manualmente.
 - O conteúdo bruto completo da página HTML é guardado em `TEXT` no banco. As páginas têm até cerca de 150 KB. Não há armazenamento de arquivos brutos fora do banco.
