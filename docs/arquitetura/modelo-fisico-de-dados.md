@@ -2,7 +2,7 @@
 
 > Tabelas do domínio normalizado e do conhecimento (app `catalog`), como cada uma garante as invariantes e por quê. Complementa o [modelo conceitual](modelo-de-dominio.md); a camada de fontes está no [registro de implementação](../implementacao/README.md).
 
-**Estado:** Proposto em 24/10/2026 para a Fase 2; passa a Consolidado quando a fatia correspondente for implementada.
+**Estado:** Consolidado em 24/10/2026 (fatias 2a a 2c; decisão no [ADR 0003](decisoes/0003-regras-como-dados.md)).
 
 ## Princípio: toda afirmação cita fonte e trecho
 
@@ -32,7 +32,7 @@ Na carga, o trecho é procurado no texto da versão coletada (HTML sem tags ou v
 
 `Agency` e `Jurisdiction` vêm da app `sources`.
 
-## Semântica de avaliação (detalhada no ADR 0003)
+## Semântica de avaliação (detalhada no [ADR 0003](decisoes/0003-regras-como-dados.md))
 
 - Condição sobre um fato ausente ou "não sei" → `UNDETERMINED`.
 - `ANY_OF`: alguma opção escolhida está na lista. `NONE_OF`: nenhuma opção escolhida está na lista.

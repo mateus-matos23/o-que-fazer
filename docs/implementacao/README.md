@@ -25,7 +25,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | --- | --- | --- |
 | 0 | Fundação | Consolidado (commit `e57fcbf`) |
 | 1 | Fontes e proveniência (app `sources`) | Consolidado (commits `bc4a2c0`, `8c21ca0`, `8f3c093`) |
-| 2 | Domínio normalizado, conhecimento e carregador de conteúdo (app `catalog`, comando `load_content`, jornada CPF irregular, ADR 0003 ainda não criado) | Em andamento |
+| 2 | Domínio normalizado, conhecimento e carregador de conteúdo (app `catalog`, comandos `load_sources`/`load_content`, jornada CPF irregular, ADR 0003) | Consolidado |
 | 3 | Motor de orientação (app `guidance`, Python puro: avaliação ternária, próxima pergunta, ordenação topológica em camadas com algoritmo de Kahn, plano explicável) | Pendente |
 | 4 | Fluxo mínimo HTTP com templates Django sem estilo e sessão Django | Pendente |
 | 5 | Jornadas desligamento do trabalho e perda de documentos | Pendente |
@@ -87,8 +87,8 @@ Estado por fatia:
 | --- | --- | --- |
 | 2a | Models do app `catalog` e migration | Consolidado (commit `adf48b9`) |
 | 2b | Comandos `load_sources` e `load_content`, verificação de trecho e ordenação de Kahn | Consolidado (commit `3075b63`) |
-| 2c | `content/sources.toml` e `content/cpf-irregular.toml` | Pendente |
-| 2d | ADR 0003 | Pendente |
+| 2c | `content/sources.toml` e `content/cpf-irregular.toml` | Consolidado (commits `2fbd178`, `de5d0b0`) |
+| 2d | [ADR 0003](../arquitetura/decisoes/0003-regras-como-dados.md) | Consolidado |
 
 **2a — models.** As tabelas e o porquê de cada uma estão no [modelo físico de dados](../arquitetura/modelo-fisico-de-dados.md). O banco impõe as seguintes restrições:
 
@@ -113,6 +113,22 @@ Estado por fatia:
   - condição sem opções e regra sem condições são recusadas.
 - **Ciclo** (`guidance/engine/ordering.py`): ordenação de Kahn em camadas, com cada camada ordenada por slug. A carga recusa ciclos sobre todas as arestas, inclusive as recomendadas. O erro lista só os procedimentos que formam o ciclo, sem os que apenas dependem dele (invariante 5). O mesmo módulo será usado pelo motor na Fase 3.
 - **Revisão.** O agente `revisor` apontou seis problemas, corrigidos antes do commit. Os principais eram um diretório vazio que apagava o catálogo, limites de coluna que viravam erro do banco sem arquivo nem slug, e empate de data na escolha da versão.
+
+**2c — jornada CPF irregular** (`content/`).
+
+- **Fontes:** 2 órgãos e 7 fontes. São as fichas da API Gov.br 10416 e 10420 e cinco páginas HTML; todas as URLs vêm de [evidências](../dados/evidencias/cpf-irregular.md).
+- **Pergunta:** uma única, sobre a situação cadastral. Aceita "não sei" e tem cinco opções: suspenso, pendente de regularização, cancelado, nulo e falecido.
+- **Procedimentos com regra:** regularizar CPF suspenso, entregar declarações faltantes e procurar o atendimento da Receita. Este último vale para cancelado, nulo e falecido, que a Receita descreve sem indicar providência (observação 6 da evidência).
+- **Esclarecimento:** "consultar a situação do CPF" não é candidato; entra só pelo "não sei" ([ADR 0003](../arquitetura/decisoes/0003-regras-como-dados.md)).
+- **Sem dependências:** a única ordem documentada ("o primeiro passo é descobrir o que deu errado") só vale quando a situação é desconhecida. Nesse caso nenhum outro procedimento é aplicável.
+- **Validação real, em 24/10/2026, no banco `oqf_dev`:** `load_sources` → `fetch_sources` (7 de 7 fontes OK) → `load_content`.
+  - A primeira carga falhou em dois trechos. A extração de HTML separava a pontuação nas fronteiras de tag ("gratuita ,"); a normalização foi corrigida (`2fbd178`) e a carga passou.
+  - O teste `catalog/tests/test_content_cpf.py` carrega o `content/` real com as amostras de `docs/dados/amostras/`.
+- **Ficou de fora por falta de trecho literal ou de confirmação** (pendências de conteúdo):
+  - título de eleitor;
+  - prazo de 48 h do atendimento por e-mail;
+  - canais `alterar/default.asp` e `cav.receita`;
+  - critério de cinco anos da DIRPF.
 
 ## Limitações conhecidas
 
