@@ -1,0 +1,11 @@
+{% extends "guidance/base.html" %}
+{% block title %}{{ procedure.title }} - O que Fazer?{% endblock %}
+{% block content %}
+<p class="context-link"><a href="{% url 'guidance:search' %}">Onde resolvo?</a></p>
+<article class="step">
+  <h1>{{ procedure.title }}</h1>
+  <p>{{ procedure.description }}</p>
+  <p class="disclaimer">Esta página descreve o serviço. Ela não confirma se ele se aplica ao seu caso; para isso, <a href="{% url 'guidance:situation_list' %}">comece pelo que aconteceu</a>.</p>
+  {% include "guidance/_procedure_facts.html" %}
+</article>
+{% endblock %}

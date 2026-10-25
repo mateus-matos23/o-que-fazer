@@ -61,43 +61,7 @@
   </ul>
   {% endif %}
 
-  <dl>
-    <dt>Órgão</dt>
-    <dd>{{ procedure.agency_name }}</dd>
-
-    <dt>Requisitos</dt>
-    <dd>
-      {% if procedure.requirements %}
-      <ul>
-        {% for requirement in procedure.requirements %}<li>{{ requirement.description }}</li>{% endfor %}
-      </ul>
-      {% else %}<span class="not-informed">Não informado</span>{% endif %}
-    </dd>
-
-    <dt>Canais</dt>
-    <dd>
-      {% if item.channels %}
-      <ul>
-        {% for line in item.channels %}
-        <li>{{ line.kind_label }}: {% if line.channel.url %}<a href="{{ line.channel.url }}" rel="noopener">{{ line.channel.description }} (site oficial)</a>{% else %}{{ line.channel.description }}{% endif %}</li>
-        {% endfor %}
-      </ul>
-      {% else %}<span class="not-informed">Não informado</span>{% endif %}
-    </dd>
-
-    <dt>Custo</dt>
-    <dd>{% if item.costs %}{{ item.costs|join:"; " }}{% else %}<span class="not-informed">Não informado</span>{% endif %}</dd>
-
-    <dt>Prazo</dt>
-    <dd>{% if item.deadlines %}{{ item.deadlines|join:"; " }}{% else %}<span class="not-informed">Não informado</span>{% endif %}</dd>
-
-    <dt>Fonte</dt>
-    <dd>
-      <a href="{{ procedure.citation.source_url }}" rel="noopener">{{ procedure.citation.source_slug }} (site oficial)</a><br>
-      Coletado em {{ procedure.citation.fetched_at|date:"d/m/Y H:i" }}.<br>
-      Atualizado pelo órgão em {% if procedure.citation.declared_updated_at %}{{ procedure.citation.declared_updated_at|date:"d/m/Y" }}{% else %}<span class="not-informed">Não informado</span>{% endif %}.
-    </dd>
-  </dl>
+  {% include "guidance/_procedure_facts.html" with channels=item.channels costs=item.costs deadlines=item.deadlines %}
 </article>
 {% endwith %}
 {% endfor %}

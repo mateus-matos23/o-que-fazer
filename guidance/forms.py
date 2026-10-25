@@ -54,3 +54,7 @@ class AnswerForm(forms.Form):
         if value == UNKNOWN_VALUE or self.cleaned_data.get("unknown"):
             return Unknown.UNKNOWN
         return frozenset([value] if isinstance(value, str) else value)
+
+
+class SearchForm(forms.Form):
+    q = forms.CharField(label="Qual serviço você procura?", min_length=2, max_length=100)

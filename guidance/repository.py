@@ -4,7 +4,7 @@ from collections.abc import Iterable
 from datetime import datetime
 from typing import Literal
 
-from django.db.models import Max, Prefetch, Q
+from django.db.models import Max, Prefetch, Q, QuerySet
 
 from catalog.models import (
     AnswerOption,
@@ -48,6 +48,10 @@ type CitedRow = Rule | Procedure | Requirement | ServiceChannel | Detail | Depen
 
 
 class SituationNotFound(Exception):
+    pass
+
+
+class ProcedureNotFound(Exception):
     pass
 
 
@@ -110,6 +114,79 @@ class CitationFactory:
         )
 
 
+CITED_SELECT = ("snapshot__source",)
+
+
+def _procedures() -> QuerySet[Procedure]:
+    return (
+        Procedure.objects.select_related("agency", "clarifies", *CITED_SELECT)
+        .prefetch_related(
+            Prefetch(
+                "requirements", Requirement.objects.select_related(*CITED_SELECT).order_by("id")
+            ),
+            Prefetch(
+                "channels", ServiceChannel.objects.select_related(*CITED_SELECT).order_by("id")
+            ),
+            Prefetch("details", Detail.objects.select_related(*CITED_SELECT).order_by("id")),
+            Prefetch(
+                "rules",
+                Rule.objects.select_related(*CITED_SELECT)
+                .prefetch_related("conditions__question", "conditions__options")
+                .order_by("id"),
+            ),
+        )
+        .order_by("id")
+    )
+
+
+def _procedure_snapshot_ids(procedures: list[Procedure]) -> set[int]:
+    return _snapshot_ids(
+        procedures,
+        (r for p in procedures for r in p.requirements.all()),
+        (c for p in procedures for c in p.channels.all()),
+        (d for p in procedures for d in p.details.all()),
+        (r for p in procedures for r in p.rules.all()),
+    )
+
+
+def _fetched_at(snapshot_ids: set[int]) -> dict[int, datetime]:
+    return dict(
+        SourceImport.objects.filter(outcome=SourceImport.Outcome.OK, snapshot_id__in=snapshot_ids)
+        .values_list("snapshot_id")
+        .annotate(last=Max("fetched_at"))
+    )
+
+
+def _procedure_def(p: Procedure, cite: CitationFactory) -> ProcedureDef:
+    return ProcedureDef(
+        slug=p.slug,
+        title=p.title,
+        description=p.description,
+        agency_name=p.agency.name,
+        jurisdiction=p.jurisdiction,
+        clarifies=p.clarifies.slug if p.clarifies else None,
+        rules=tuple(_rule_def(r, cite) for r in p.rules.all()),
+        requirements=tuple(RequirementDef(r.description, cite(r)) for r in p.requirements.all()),
+        channels=tuple(
+            ChannelDef(_choice(c.kind, CHANNEL_KINDS), c.description, c.url, cite(c))
+            for c in p.channels.all()
+        ),
+        details=tuple(
+            DetailDef(_choice(d.kind, DETAIL_KINDS), d.text, cite(d)) for d in p.details.all()
+        ),
+        citation=cite(p),
+    )
+
+
+def load_procedure(slug: str) -> ProcedureDef:
+    """Um procedimento isolado, para a busca direta (RF18): sem situação nem fatos."""
+    procedures = list(_procedures().filter(slug=slug))
+    if not procedures:
+        raise ProcedureNotFound(slug)
+    cite = CitationFactory(_fetched_at(_procedure_snapshot_ids(procedures)))
+    return _procedure_def(procedures[0], cite)
+
+
 def _snapshot_ids(*groups: Iterable[CitedRow]) -> set[int]:
     return {c.snapshot_id for group in groups for c in group}
 
@@ -133,49 +210,18 @@ def load_catalog(situation_slug: str) -> Catalog:
     candidate_slugs = frozenset(situation.candidates.values_list("slug", flat=True))
     relevant = _closure_of_prerequisites(seeds)
 
-    cited_select = ("snapshot__source",)
-    procedures = list(
-        Procedure.objects.filter(id__in=relevant)
-        .select_related("agency", "clarifies", *cited_select)
-        .prefetch_related(
-            Prefetch(
-                "requirements", Requirement.objects.select_related(*cited_select).order_by("id")
-            ),
-            Prefetch(
-                "channels", ServiceChannel.objects.select_related(*cited_select).order_by("id")
-            ),
-            Prefetch("details", Detail.objects.select_related(*cited_select).order_by("id")),
-            Prefetch(
-                "rules",
-                Rule.objects.select_related(*cited_select)
-                .prefetch_related("conditions__question", "conditions__options")
-                .order_by("id"),
-            ),
-        )
-        .order_by("id")
-    )
+    procedures = list(_procedures().filter(id__in=relevant))
     dependencies = list(
         Dependency.objects.filter(before_id__in=relevant, after_id__in=relevant)
-        .select_related("before", "after", "rule__snapshot__source", *cited_select)
+        .select_related("before", "after", "rule__snapshot__source", *CITED_SELECT)
         .prefetch_related("rule__conditions__question", "rule__conditions__options")
         .order_by("id")
     )
 
-    snapshot_ids = _snapshot_ids(
-        procedures,
-        (r for p in procedures for r in p.requirements.all()),
-        (c for p in procedures for c in p.channels.all()),
-        (d for p in procedures for d in p.details.all()),
-        (r for p in procedures for r in p.rules.all()),
-        dependencies,
-        (d.rule for d in dependencies if d.rule is not None),
+    snapshot_ids = _procedure_snapshot_ids(procedures) | _snapshot_ids(
+        dependencies, (d.rule for d in dependencies if d.rule is not None)
     )
-    fetched_at = dict(
-        SourceImport.objects.filter(outcome=SourceImport.Outcome.OK, snapshot_id__in=snapshot_ids)
-        .values_list("snapshot_id")
-        .annotate(last=Max("fetched_at"))
-    )
-    cite = CitationFactory(fetched_at)
+    cite = CitationFactory(_fetched_at(snapshot_ids))
 
     return Catalog(
         situation_slug=situation.slug,
@@ -194,30 +240,7 @@ def load_catalog(situation_slug: str) -> Catalog:
             )
             for q in questions
         },
-        procedures={
-            p.slug: ProcedureDef(
-                slug=p.slug,
-                title=p.title,
-                description=p.description,
-                agency_name=p.agency.name,
-                jurisdiction=p.jurisdiction,
-                clarifies=p.clarifies.slug if p.clarifies else None,
-                rules=tuple(_rule_def(r, cite) for r in p.rules.all()),
-                requirements=tuple(
-                    RequirementDef(r.description, cite(r)) for r in p.requirements.all()
-                ),
-                channels=tuple(
-                    ChannelDef(_choice(c.kind, CHANNEL_KINDS), c.description, c.url, cite(c))
-                    for c in p.channels.all()
-                ),
-                details=tuple(
-                    DetailDef(_choice(d.kind, DETAIL_KINDS), d.text, cite(d))
-                    for d in p.details.all()
-                ),
-                citation=cite(p),
-            )
-            for p in procedures
-        },
+        procedures={p.slug: _procedure_def(p, cite) for p in procedures},
         dependencies=tuple(
             DependencyDef(
                 before=d.before.slug,

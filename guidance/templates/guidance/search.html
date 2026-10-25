@@ -1,0 +1,29 @@
+{% extends "guidance/base.html" %}
+{% block title %}{% if form.errors %}Erro: {% endif %}Onde resolvo? - O que Fazer?{% endblock %}
+{% block content %}
+<h1>Onde resolvo?</h1>
+<p>Já sabe qual serviço procura? Busque pelo nome para ver o órgão, os canais, os requisitos e a fonte oficial.</p>
+<form method="get" class="search-form" role="search">
+  {% if form.errors %}
+  <div id="search-errors" class="errors" tabindex="-1" autofocus>
+    <p><strong>Erro:</strong> {% for error in form.q.errors %}{{ error }}{% endfor %}</p>
+  </div>
+  {% endif %}
+  <label for="id_q">{{ form.q.label }}</label>
+  <input type="search" name="q" id="id_q" value="{{ form.q.value|default:'' }}" minlength="2" maxlength="100" required{% if form.errors %} aria-describedby="search-errors" aria-invalid="true"{% endif %}>
+  <button type="submit">Buscar</button>
+</form>
+
+{% if results is not None %}
+<h2>Resultados</h2>
+{% if results %}
+<ul class="situations">
+  {% for procedure in results %}
+  <li><a href="{% url 'guidance:procedure' procedure.slug %}">{{ procedure.title }}</a> <span class="muted">{{ procedure.agency.name }}</span></li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Nenhum serviço encontrado para "{{ form.cleaned_data.q }}". Tente outra palavra ou <a href="{% url 'guidance:situation_list' %}">comece pelo que aconteceu</a>.</p>
+{% endif %}
+{% endif %}
+{% endblock %}

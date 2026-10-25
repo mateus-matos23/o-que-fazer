@@ -29,7 +29,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 3 | Motor de orientação (`guidance/engine`, Python puro: avaliação ternária, próxima pergunta, plano em camadas com Kahn; `guidance/repository.py`) | Consolidado (commits `3b957cb`, `90969f6`, `a12eaa1`) |
 | 4 | Fluxo mínimo HTTP com templates Django sem estilo e sessão Django | Consolidado (commits `ad23d39`, `c14f994`) |
 | 5 | Jornadas desligamento do trabalho e perda de documentos | Consolidado |
-| 6 | UI/UX, acessibilidade, frontend, RF18 e RF02 | Pendente |
+| 6 | UI/UX, acessibilidade, frontend e RF18 (RF02 segue pendente) | Em andamento |
 
 ## Decisões tomadas em 24/10/2026 (aprovadas pelo autor)
 
@@ -267,6 +267,30 @@ Templates Django sem CSS nem JavaScript, com HTML semântico (`fieldset` e `lege
 - Em 24/10/2026, a carga real no `oqf_dev` (`load_sources`, `fetch_sources` e `load_content`) encontrou todos os trechos nas páginas e APIs oficiais. Resultado: 18 fontes, 3 situações e 11 procedimentos.
 - O que ficou de fora por falta de trecho literal está listado no cabeçalho de cada TOML.
 
+## Fase 6 — Interface, acessibilidade e busca direta
+
+Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.md): templates Django, um CSS próprio sem JavaScript nem dependência, meta WCAG 2.2 AA com verificação própria e RF18 em versão simples.
+
+| Fatia | Escopo | Estado |
+| --- | --- | --- |
+| 6a | ADR 0004 e fonte local Atkinson Hyperlegible Next (OFL) | Consolidado (`3ef7ec8`) |
+| 6b | CSS próprio e reescrita dos sete templates do fluxo | Consolidado (`3b468bb`) |
+| 6c | Busca "Onde resolvo?" (RF18) e página de detalhe do serviço | Consolidado |
+| 6d | Verificação final de acessibilidade | Pendente |
+| 6e | Simplificação do diff da fase e documentação | Pendente |
+
+**6b — Fluxo do cidadão**
+- O link "Pular para o conteúdo" leva ao `main`. Cada tela tem um único `h1`; na pergunta, o `h1` fica dentro do `legend` para o leitor de tela anunciar a pergunta junto com as opções.
+- O progresso conta as respostas dadas ("Você já respondeu N"), sem total fixo, porque o número de perguntas depende das respostas (ADR 0002).
+- Erro de formulário: o bloco de erro fica ligado ao `fieldset` por `aria-describedby`, recebe o foco ao carregar (`autofocus` com `tabindex="-1"`, sem JavaScript) e o título da página ganha o prefixo "Erro:".
+- O resumo do plano é um roteiro numerado pelas camadas da ordenação. Etapas da mesma camada levam a nota "Podem ser feitas em qualquer ordem", que reflete o Kahn em camadas sem inventar precedência (RN08).
+- Verificação no Chromium headless, via CDP (o `verificador-ui` não tinha as ferramentas de navegador nesta sessão): só teclado, foco visível, reflow em 320 e 360 px, zoom de 200%, alvos de 24 px ou mais e contraste calculado das cores do tema. A primeira rodada achou o link de contexto com 22 px e o erro sem foco nem anúncio; os dois foram corrigidos e verificados de novo.
+
+**6c — Onde resolvo? (RF18)**
+- `GET /onde-resolvo/?q=` busca no título e na descrição dos procedimentos, sem diferenciar maiúsculas. O termo é validado no servidor (2 a 100 caracteres).
+- `GET /onde-resolvo/<slug>/` mostra órgão, requisitos, canais, custo, prazo e fonte, com o mesmo bloco do plano (`_procedure_facts.html`). A página não avalia aplicabilidade, porque não há fatos; um aviso encaminha ao modo por situação.
+- O repositório passou a montar um procedimento isolado (`load_procedure`) com a mesma consulta e a mesma conversão usadas pelo `load_catalog`.
+
 ## Limitações conhecidas
 
 - O banco não garante que o snapshot de uma importação pertence à mesma fonte da importação. Essa garantia hoje é só do código de coleta (`sources/services.py`).
@@ -281,3 +305,4 @@ Templates Django sem CSS nem JavaScript, com HTML semântico (`fieldset` e `lege
 - **Amostras HTML truncadas.** As amostras são trechos do texto da página. Afirmações fora do trecho ficam de fora do conteúdo, mesmo existindo na página real (exemplos: conta gov.br, custo dos seguros). Para ampliar a cobertura, é preciso refazer as amostras com o texto completo.
 - **Sem dependências no conteúdo.** As três jornadas têm zero dependências, porque nenhuma fonte lida estabelece precedência. A ordenação topológica só é exercida pelos testes do motor.
 - **Esfera da Caixa inferida.** A Caixa (FGTS) foi cadastrada como FEDERAL por inferência; a página não declara a esfera.
+- **Busca sensível a acentos.** A busca "Onde resolvo?" usa `icontains`: "demissao" não encontra "demissão". Com o catálogo pequeno o impacto é baixo; a alternativa é a extensão `unaccent` ou a busca textual do Postgres.

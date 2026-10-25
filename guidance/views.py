@@ -1,6 +1,8 @@
 import logging
 from dataclasses import dataclass
+from typing import Literal
 
+from django.db.models import Q
 from django.http import (
     Http404,
     HttpRequest,
@@ -12,14 +14,19 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods, require_POST
 
-from catalog.models import ServiceChannel, Situation
+from catalog.models import Procedure, ServiceChannel, Situation
 from guidance.engine.evaluation import evaluate
-from guidance.engine.model import Catalog, ChannelDef, DependencyDef, Unknown
+from guidance.engine.model import Catalog, ChannelDef, DependencyDef, ProcedureDef, Unknown
 from guidance.engine.ordering import DependencyCycleError
 from guidance.engine.plan import PlanStep, build_plan
 from guidance.engine.questions import next_question
-from guidance.forms import AnswerForm
-from guidance.repository import SituationNotFound, load_catalog
+from guidance.forms import AnswerForm, SearchForm
+from guidance.repository import (
+    ProcedureNotFound,
+    SituationNotFound,
+    load_catalog,
+    load_procedure,
+)
 from guidance.session import clear_situation, read_facts, write_answer
 
 logger = logging.getLogger(__name__)
@@ -98,12 +105,18 @@ def _step_view(catalog: Catalog, step: PlanStep) -> StepView:
         step=step,
         required_for=tuple(title(slug) for slug in step.required_for),
         after=tuple(line(d) for d in step.after),
-        channels=tuple(
-            ChannelLine(ServiceChannel.Kind(c.kind).label, c) for c in procedure.channels
-        ),
-        costs=tuple(d.text for d in procedure.details if d.kind == "COST"),
-        deadlines=tuple(d.text for d in procedure.details if d.kind == "DEADLINE"),
+        channels=_channel_lines(procedure),
+        costs=_detail_texts(procedure, "COST"),
+        deadlines=_detail_texts(procedure, "DEADLINE"),
     )
+
+
+def _channel_lines(procedure: ProcedureDef) -> tuple[ChannelLine, ...]:
+    return tuple(ChannelLine(ServiceChannel.Kind(c.kind).label, c) for c in procedure.channels)
+
+
+def _detail_texts(procedure: ProcedureDef, kind: Literal["COST", "DEADLINE"]) -> tuple[str, ...]:
+    return tuple(d.text for d in procedure.details if d.kind == kind)
 
 
 @dataclass(frozen=True, slots=True)
@@ -197,3 +210,32 @@ def restart(request: HttpRequest, slug: str) -> HttpResponse:
     _load(slug)
     clear_situation(request.session, slug)
     return _see_other(reverse("guidance:question", args=[slug]))
+
+
+def search(request: HttpRequest) -> HttpResponse:
+    form = SearchForm(request.GET if "q" in request.GET else None)
+    results = None
+    if form.is_valid():
+        # shortcut: icontains não ignora acentos ("demissao" não acha "demissão");
+        # trocar por unaccent ou pela busca textual do Postgres se o catálogo crescer.
+        term = form.cleaned_data["q"]
+        results = (
+            Procedure.objects.filter(Q(title__icontains=term) | Q(description__icontains=term))
+            .select_related("agency")
+            .order_by("title")
+        )
+    return render(request, "guidance/search.html", {"form": form, "results": results})
+
+
+def procedure_detail(request: HttpRequest, slug: str) -> HttpResponse:
+    try:
+        procedure = load_procedure(slug)
+    except ProcedureNotFound:
+        raise Http404("Serviço não encontrado") from None
+    context = {
+        "procedure": procedure,
+        "channels": _channel_lines(procedure),
+        "costs": _detail_texts(procedure, "COST"),
+        "deadlines": _detail_texts(procedure, "DEADLINE"),
+    }
+    return render(request, "guidance/procedure.html", context)

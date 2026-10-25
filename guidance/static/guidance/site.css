@@ -127,6 +127,24 @@ button.secondary, .button.secondary { background: transparent; color: var(--acti
   font-weight: 700;
 }
 
+/* Busca */
+.search-link { margin-top: 2rem; }
+.search-link a { display: inline-block; min-height: 24px; padding: 0.25rem 0; font-weight: 700; }
+.search-form label { display: block; font-weight: 700; margin-bottom: 0.5rem; }
+.search-form input {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--muted);
+  border-radius: 0.25rem;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+.situations .muted { display: block; padding: 0 0.25rem 0.75rem; margin-top: -0.5rem; }
+
 /* Pergunta */
 .progress { color: var(--muted); margin-bottom: 0.5rem; }
 fieldset { border: 0; margin: 1rem 0; padding: 0; min-width: 0; }
@@ -226,7 +244,7 @@ legend h1 { font-size: 1.66rem; margin: 0; }
   border: 1px solid var(--line);
   border-radius: 0.25rem;
 }
-.step h2 { margin-top: 0; }
+.step h1, .step h2 { margin-top: 0; }
 .step h3 { font-size: 1.0625rem; margin: 1.25rem 0 0.25rem; }
 .step ul { margin: 0 0 1rem; padding-left: 1.25rem; }
 dl { margin: 1rem 0 0; }
