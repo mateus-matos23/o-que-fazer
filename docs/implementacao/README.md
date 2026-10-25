@@ -26,7 +26,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 0 | Fundação | Consolidado (commit `e57fcbf`) |
 | 1 | Fontes e proveniência (app `sources`) | Consolidado (commits `bc4a2c0`, `8c21ca0`, `8f3c093`) |
 | 2 | Domínio normalizado, conhecimento e carregador de conteúdo (app `catalog`, comandos `load_sources`/`load_content`, jornada CPF irregular, ADR 0003) | Consolidado |
-| 3 | Motor de orientação (app `guidance`, Python puro: avaliação ternária, próxima pergunta, ordenação topológica em camadas com algoritmo de Kahn, plano explicável) | Pendente |
+| 3 | Motor de orientação (`guidance/engine`, Python puro: avaliação ternária, próxima pergunta, plano em camadas com Kahn; `guidance/repository.py`) | Consolidado (commits `3b957cb`, `90969f6`, `a12eaa1`) |
 | 4 | Fluxo mínimo HTTP com templates Django sem estilo e sessão Django | Pendente |
 | 5 | Jornadas desligamento do trabalho e perda de documentos | Pendente |
 | 6 | UI/UX, acessibilidade, frontend, RF18 e RF02 | Pendente |
@@ -130,10 +130,60 @@ Estado por fatia:
   - canais `alterar/default.asp` e `cav.receita`;
   - critério de cinco anos da DIRPF.
 
+## Fase 3 — Motor de orientação
+
+O motor fica em `guidance/engine/`, em Python puro, sem Django. Ele recebe um `Catalog` imutável e os fatos da sessão, e devolve avaliações, a próxima pergunta e o plano. Motivo: testes rápidos sem banco e separação entre o que se aplica (`evaluation.py`) e a ordem (`ordering.py`), conforme a invariante 4.
+
+| Fatia | Escopo | Estado |
+| --- | --- | --- |
+| 3a | Tipos (`model.py`), avaliação ternária (`evaluation.py`), próxima pergunta (`questions.py`) | Consolidado (`3b957cb`) |
+| 3b | Montagem do plano (`plan.py`) | Consolidado (`90969f6`) |
+| 3c | Repositório do ORM para o `Catalog` (`guidance/repository.py`) e teste de ponta a ponta da jornada CPF | Consolidado (`a12eaa1`) |
+
+**Fatos.**
+- A sessão guarda cada resposta como um conjunto de slugs de opções ou `Unknown.UNKNOWN` ("não sei").
+- Pergunta ausente significa "não respondida".
+- `validate_facts` recusa:
+  - pergunta ou opção inexistente;
+  - "não sei" em pergunta que não o aceita;
+  - pergunta de escolha única sem exatamente uma opção.
+
+**Avaliação.** Usa os conectivos E e OU de Kleene, como descrito no [ADR 0003](../arquitetura/decisoes/0003-regras-como-dados.md). Cada `Evaluation` guarda o resultado de cada regra, que é a base da explicação ao cidadão (RF19).
+
+**Próxima pergunta.**
+- A pontuação de uma pergunta conta os candidatos indeterminados que têm uma regra indeterminada citando essa pergunta.
+- Também conta as dependências condicionais indeterminadas de etapas aplicáveis.
+- Desempate por `order` e depois por `slug`.
+- Pergunta sem pontuação nunca é feita (RN02).
+- Sem perguntas pontuadas, o motor para (RN10).
+- "Não sei" conta como respondida, então a pergunta nunca se repete.
+- Motivo: um critério determinístico inspirado em ganho de informação, sem treinamento ([ADR 0002](../arquitetura/decisoes/0002-motor-baseado-em-regras.md)).
+
+**Plano.**
+- **O que entra:**
+  - os candidatos aplicáveis;
+  - os esclarecimentos das perguntas respondidas com "não sei";
+  - os pré-requisitos obrigatórios, ou condicionais com regra aplicável. Entram de forma transitiva, a menos que as próprias regras os descartem, e ficam marcados com `required_for`, que corresponde a "necessário para X".
+- **Pré-requisito fora dos candidatos:** o autor decidiu em 24/10/2026 que ele entra.
+- **Ordem:** camadas de Kahn. Um ciclo levanta erro em vez de gerar um plano parcial.
+- **Dependências recomendadas** só reordenam etapas dentro de uma mesma camada; nunca adicionam etapa (RN08).
+- **Fora do plano:** os candidatos ainda indeterminados vão para `Plan.undetermined`, para transparência.
+
+**Repositório.**
+- Monta o `Catalog` com 16 consultas fixas, qualquer que seja o tamanho do catálogo, comprovado em teste.
+- Traz todo pré-requisito alcançável; o motor decide quais arestas valem.
+- A data de coleta da citação é o `fetched_at` mais recente entre as importações OK daquele snapshot.
+
+**Verificação.**
+- O teste de ponta a ponta cobre a jornada CPF irregular com cada resposta possível, com "não sei" e sem fatos.
+- No `oqf_dev`, com as fontes reais, "suspenso" gera a etapa `regularizar-cpf-suspenso` e "não sei" gera `consultar-situacao-cpf`.
+
 ## Limitações conhecidas
 
 - O banco não garante que o snapshot de uma importação pertence à mesma fonte da importação. Essa garantia hoje é só do código de coleta (`sources/services.py`).
 - Nenhuma coleta real pela rede foi executada ainda. As fontes serão cadastradas pelo `load_sources`, da Fase 2.
 - `load_sources` recusa a troca de URL entre duas fontes já cadastradas (marcado como `shortcut:` no código). Isso será tratado se surgir um caso real.
 - A validação de `load_content` roda fora da transação de escrita. Uma coleta concorrente entre as duas etapas pode invalidar a verificação. É um risco baixo para um comando executado manualmente.
+- Uma dependência condicional cuja etapa dependente é um pré-requisito puxado (não candidato) não torna a sua pergunta elegível como próxima pergunta. Sem dependências no conteúdo atual, isso ainda não tem efeito.
+- `fetched_at` é guardado em UTC; a interface (Fase 4) precisa exibi-lo no fuso `America/Fortaleza`.
 - O conteúdo bruto completo da página HTML é guardado em `TEXT` no banco. As páginas têm até cerca de 150 KB. Não há armazenamento de arquivos brutos fora do banco.
