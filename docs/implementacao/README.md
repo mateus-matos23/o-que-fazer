@@ -321,7 +321,7 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
 
 ## Fase 7 — Conversa guiada
 
-Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 e 2 estão consolidadas, as demais seguem pendentes.
+Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 3 estão consolidadas, as demais seguem pendentes.
 
 **Motivação.** Hoje o cidadão escolhe a situação numa lista e responde uma ou duas perguntas antes do plano. O autor quer uma experiência de "conversa guiada", inspirada no Akinator, para um público com idade, escolaridade e familiaridade com tecnologia variadas. A conversa leva à situação por um funil de triagem, mostra o efeito de cada resposta no plano e termina num plano com ponto de partida. Requisitos RF21 a RF26 e regras RN02, RN14 e RN16 em [requisitos](../produto/requisitos.md).
 
@@ -330,7 +330,7 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 e 2 es
 1. **RN02 mantida.** Cada pergunta continua existindo só se a resposta puder alterar aplicabilidade, ordem ou encaminhamento. O funil de triagem entra como encaminhamento.
 2. **RF02 (texto livre) segue fora.** A direção registrada, para quando entrar, são palavras-chave determinísticas com confirmação do cidadão, sem LLM ([pendências](../pendencias.md), item 6).
 3. **Preferência de atendimento só ordena canais.** Ela nunca esconde canal nem altera aplicabilidade (RN14).
-4. **Efeito da resposta por parâmetro de URL**, sem mudar a sessão. A sessão continua guardando só as respostas.
+4. **Efeito da resposta como aviso de uso único na sessão.** Os fatos continuam sendo a única verdade; o aviso guarda só slugs e um inteiro, e some depois de mostrado. (Revisada na fatia 3: a proposta inicial era um parâmetro de URL.)
 5. **Lista de situações mantida** como link secundário, ao lado do funil.
 
 **Fatias.** Cada fatia depende da anterior estar funcional e validada.
@@ -340,7 +340,7 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 e 2 es
 | 0 | Documentação base (produto, glossário, pendências e este registro) | Consolidado |
 | 1 | Linguagem simples e dica por pergunta | Consolidado |
 | 2 | Funil de triagem, com limite de cobertura nos ramos sem jornada | Consolidado |
-| 3 | Efeito da resposta no plano | Pendente |
+| 3 | Efeito da resposta no plano | Consolidado |
 | 4 | Preferência de atendimento e ordenação dos canais | Pendente |
 | 5 | Plano com "Comece por aqui", "O que separar antes" e versão para impressão | Pendente |
 | 6 | Requisitos e canais condicionais no motor | Pendente |
@@ -364,6 +364,15 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 e 2 es
 - Motivo: o público variado (RF21, RF24) não deve precisar reconhecer o nome da situação. O funil é encaminhamento (RN02), por isso não tem fonte. Decisão em [ADR 0005](../arquitetura/decisoes/0005-funil-de-triagem.md).
 - Gates: ruff, mypy e pytest verdes (311 passed).
 - Verificação no navegador (25/10/2026, Chromium headless via CDP, `oqf_dev` com a migration 0004 e o conteúdo carregado): 41 de 41 verificações passaram — textos, ordem e destino das opções, navegação por teclado com foco visível, redirecionamento de `/comecar/inicio/`, 404 em nó inexistente, sem rolagem horizontal em 360 e 1280 px, alvos ≥ 24×24 px, contraste da dica 6,69:1 e das opções 5,95:1.
+
+**Fatia 3 — efeito da resposta.**
+
+- `answer_effect(catalog, before, after)` em `guidance/engine/effect.py` (motor puro) compara o plano de antes com o de depois, sendo "no plano" as etapas de `build_plan`: `entered` = etapas novas (na ordem do plano de depois), `left` = etapas que existiam e saíram (na ordem do catálogo), `in_play` = `len(plan.undetermined)`. Ciclo entre dependências propaga `DependencyCycleError`.
+- As views `question` e `edit_answer`, no POST válido, calculam o efeito com os fatos lidos antes e depois de gravar a resposta e o guardam na sessão (`write_effect`, `pop_effect` em `guidance/session.py`) como aviso de uso único por situação. O GET de `question` consome o aviso só ao renderizar a pergunta; o plano consome e mostra. Se o cálculo esbarrar em ciclo, nada é guardado: a view do plano já registra e mostra o erro. O bloco `_answer_effect.html` é omitido sem mudanças e sem providências em análise. Quando há `left`, ele lembra que sair do plano não significa falta de direito.
+- Leitura defensiva: formato corrompido, tipos errados ou slug fora do catálogo viram "sem aviso", sem exceção.
+- Motivo: a primeira versão comparava a avaliação "com e sem a resposta" e media aplicabilidade, não o plano. Isso mostrava "saiu" para o que nunca esteve nas etapas (indeterminado que virou não aplicável), ignorava o esclarecimento de "não sei", divergia de `plan.undetermined` (por causa dos pré-requisitos puxados) e, ao editar, comparava com "sem resposta" em vez do plano que a pessoa via. Comparar planos corrige os quatro. O aviso na sessão em vez de parâmetro de URL evita um efeito que dependa de link ou recarga: ele só vale logo após a resposta.
+- Gates: ruff, mypy e pytest verdes (341 passed).
+- Verificação no navegador (25/10/2026, Chromium headless via CDP): desligamento sem justa causa → doméstico → edição para empregado → mesma resposta regravada, e CPF com "Não sei". Os itens de "entrou" estão nas etapas, os de "saiu" estavam no plano anterior e não estão no atual, e a resposta regravada não mostra bloco. O bloco some ao recarregar. Fica dentro de `main` antes do `h1`, com contraste de 14,7:1 e 7,19:1 e sem rolagem horizontal em 360 px.
 
 ## Limitações conhecidas
 

@@ -5,11 +5,13 @@ from typing import Any
 
 from django.contrib.sessions.backends.base import SessionBase
 
+from guidance.engine.effect import AnswerEffect
 from guidance.engine.evaluation import validate_facts
 from guidance.engine.model import Answer, Catalog, Facts, Unknown
 
 logger = logging.getLogger(__name__)
 KEY = "facts"
+EFFECT_KEY = "answer_effect"
 UNKNOWN = "unknown"
 
 
@@ -67,3 +69,45 @@ def clear_situation(session: SessionBase, situation_slug: str) -> None:
     all_facts = session.get(KEY, {})
     if all_facts.pop(situation_slug, None) is not None:
         session[KEY] = all_facts
+
+
+def write_effect(session: SessionBase, situation_slug: str, effect: AnswerEffect) -> None:
+    """Aviso de uso único: só slugs e o inteiro; os fatos continuam sendo a única verdade."""
+    session[EFFECT_KEY] = {
+        **_stored_effects(session),
+        situation_slug: {
+            "entered": list(effect.entered),
+            "left": list(effect.left),
+            "in_play": effect.in_play,
+        },
+    }
+
+
+def _stored_effects(session: SessionBase) -> dict[str, Any]:
+    stored = session.get(EFFECT_KEY, {})
+    return stored if isinstance(stored, dict) else {}
+
+
+def _known_slugs(raw: Any, catalog: Catalog) -> tuple[str, ...] | None:
+    if not isinstance(raw, list):
+        return None
+    if not all(isinstance(slug, str) and slug in catalog.procedures for slug in raw):
+        return None
+    return tuple(raw)
+
+
+def pop_effect(session: SessionBase, catalog: Catalog) -> AnswerEffect | None:
+    """Lê e apaga o aviso da situação. Formato corrompido ou slug desconhecido vira None."""
+    stored = _stored_effects(session)
+    if catalog.situation_slug not in stored:
+        return None
+    raw = stored.pop(catalog.situation_slug)
+    session[EFFECT_KEY] = stored
+    if not isinstance(raw, dict):
+        return None
+    entered = _known_slugs(raw.get("entered"), catalog)
+    left = _known_slugs(raw.get("left"), catalog)
+    in_play = raw.get("in_play")
+    if entered is None or left is None or type(in_play) is not int or in_play < 0:
+        return None
+    return AnswerEffect(entered, left, in_play)

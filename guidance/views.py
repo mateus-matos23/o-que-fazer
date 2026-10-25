@@ -22,8 +22,17 @@ from catalog.models import (
     TriageChoice,
     TriageNode,
 )
+from guidance.engine.effect import answer_effect
 from guidance.engine.evaluation import evaluate
-from guidance.engine.model import Catalog, ChannelDef, DependencyDef, ProcedureDef, Unknown
+from guidance.engine.model import (
+    Answer,
+    Catalog,
+    ChannelDef,
+    DependencyDef,
+    Facts,
+    ProcedureDef,
+    Unknown,
+)
 from guidance.engine.ordering import DependencyCycleError
 from guidance.engine.plan import PlanStep, build_plan
 from guidance.engine.questions import next_question
@@ -34,7 +43,13 @@ from guidance.repository import (
     load_catalog,
     load_procedure,
 )
-from guidance.session import clear_situation, read_facts, write_answer
+from guidance.session import (
+    clear_situation,
+    pop_effect,
+    read_facts,
+    write_answer,
+    write_effect,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +65,37 @@ def _see_other(url: str) -> HttpResponseRedirect:
     response = HttpResponseRedirect(url)
     response.status_code = 303  # PRG: o navegador refaz a requisição como GET
     return response
+
+
+@dataclass(frozen=True, slots=True)
+class EffectView:
+    entered: tuple[str, ...]
+    left: tuple[str, ...]
+    in_play: int
+
+
+def _effect_view(request: HttpRequest, catalog: Catalog) -> EffectView | None:
+    """Consome o aviso de uso único; sem mudança a mostrar, não há bloco."""
+    effect = pop_effect(request.session, catalog)
+    if effect is None or not (effect.entered or effect.left or effect.in_play):
+        return None
+    return EffectView(
+        tuple(catalog.procedures[s].title for s in effect.entered),
+        tuple(catalog.procedures[s].title for s in effect.left),
+        effect.in_play,
+    )
+
+
+def _answer_and_record_effect(
+    request: HttpRequest, catalog: Catalog, before: Facts, question_slug: str, answer: Answer
+) -> None:
+    write_answer(request.session, catalog.situation_slug, question_slug, answer)
+    after = read_facts(request.session, catalog)
+    try:
+        effect = answer_effect(catalog, before, after)
+    except DependencyCycleError:
+        return  # a view do plano já registra e mostra o erro
+    write_effect(request.session, catalog.situation_slug, effect)
 
 
 @require_GET
@@ -93,14 +139,20 @@ def question(request: HttpRequest, slug: str) -> HttpResponse:
             return HttpResponseBadRequest("Pergunta inválida para esta situação.")
         form = AnswerForm(current, request.POST, facts.get(current.slug))
         if form.is_valid():
-            write_answer(request.session, slug, current.slug, form.cleaned_answer())
+            _answer_and_record_effect(request, catalog, facts, current.slug, form.cleaned_answer())
             return _see_other(reverse("guidance:question", args=[slug]))
     else:
         current = next_question(catalog, facts, evaluate(catalog, facts))
         if current is None:
-            return redirect("guidance:plan", slug=slug)
+            return redirect("guidance:plan", slug=slug)  # o plano consome o aviso
         form = AnswerForm(current, initial_answer=facts.get(current.slug))
-    context = {"catalog": catalog, "question": current, "form": form, "answer_count": len(facts)}
+    context = {
+        "catalog": catalog,
+        "question": current,
+        "form": form,
+        "answer_count": len(facts),
+        "effect": _effect_view(request, catalog) if request.method == "GET" else None,
+    }
     return render(request, "guidance/question.html", context)
 
 
@@ -188,6 +240,7 @@ def plan(request: HttpRequest, slug: str) -> HttpResponse:
         "steps": [_step_view(catalog, step) for step in result.steps],
         "uncovered": _uncovered_lines(catalog, result.uncovered),
         "undetermined": [catalog.procedures[s].title for s in result.undetermined],
+        "effect": _effect_view(request, catalog),
     }
     return render(request, "guidance/plan.html", context)
 
@@ -230,7 +283,7 @@ def edit_answer(request: HttpRequest, slug: str, question_slug: str) -> HttpResp
     if request.method == "POST":
         form = AnswerForm(current, request.POST, facts.get(current.slug))
         if form.is_valid():
-            write_answer(request.session, slug, current.slug, form.cleaned_answer())
+            _answer_and_record_effect(request, catalog, facts, current.slug, form.cleaned_answer())
             return _see_other(reverse("guidance:question", args=[slug]))  # recalcula (invariante 8)
     else:
         form = AnswerForm(current, initial_answer=facts.get(current.slug))

@@ -1,0 +1,14 @@
+{% if effect %}
+<div class="answer-effect">
+  {% if effect.entered %}
+  <p>Por causa dessa resposta, entrou no seu plano:</p>
+  <ul>{% for title in effect.entered %}<li>{{ title }}</li>{% endfor %}</ul>
+  {% endif %}
+  {% if effect.left %}
+  <p>Saiu do seu plano:</p>
+  <ul>{% for title in effect.left %}<li>{{ title }}</li>{% endfor %}</ul>
+  <p class="muted">Sair do plano não quer dizer que você não tem direito: a confirmação é sempre do órgão.</p>
+  {% endif %}
+  {% if effect.in_play %}<p>Ainda em análise: {{ effect.in_play }} providência{{ effect.in_play|pluralize:"s" }}.</p>{% endif %}
+</div>
+{% endif %}

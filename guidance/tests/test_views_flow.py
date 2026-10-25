@@ -1,12 +1,16 @@
 import logging
+import re
 from typing import Literal
 
 import pytest
 from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.test import Client
 
+from guidance.engine.effect import AnswerEffect
 from guidance.engine.model import OptionDef, QuestionDef, Unknown
 from guidance.forms import UNKNOWN_VALUE, AnswerForm
+from guidance.views import EffectView
 
 pytestmark = pytest.mark.django_db
 
@@ -129,3 +133,100 @@ def test_form_initial_answer() -> None:
     assert form["answer"].value() == ["b"]
     single = AnswerForm(_question("SINGLE", True), initial_answer=Unknown.UNKNOWN)
     assert single["answer"].value() == UNKNOWN_VALUE
+
+
+DESLIGAMENTO = "/s/desligamento-do-trabalho/"
+FORMA = "forma-de-termino"
+VINCULO = "tipo-de-vinculo"
+FGTS = "Sacar o FGTS por dispensa sem justa causa"
+LEFT_NOTE = (
+    "Sair do plano não quer dizer que você não tem direito: a confirmação é sempre do órgão."
+)
+
+
+def _answer_desligamento(client: Client, question: str, value: str) -> HttpResponse:
+    response = client.post(DESLIGAMENTO, {"question": question, "answer": value})
+    assert isinstance(response, HttpResponse)
+    return response
+
+
+def _effect_block(client: Client, url: str) -> str | None:
+    response = client.get(url)
+    assert response.status_code == 200
+    match = re.search(r'<div class="answer-effect">.*?</div>', response.text, re.S)
+    return match.group(0) if match else None
+
+
+def test_post_and_edit_redirect_without_query(loaded: dict[str, int], client: Client) -> None:
+    assert _post(client, "suspenso")["Location"] == URL
+    response = client.post(f"{URL}respostas/{QUESTION}/", {"answer": UNKNOWN_VALUE})
+    assert (response.status_code, response["Location"]) == (303, URL)
+
+
+def test_effect_on_next_question_is_shown_once(loaded: dict[str, int], client: Client) -> None:
+    _answer_desligamento(client, FORMA, "sem-justa-causa")
+    block = _effect_block(client, DESLIGAMENTO)
+    assert block is not None
+    assert "Por causa dessa resposta, entrou no seu plano:" in block
+    assert f"<li>{FGTS}</li>" in block
+    assert "Ainda em análise: 2 providências." in block
+    assert "Saiu do seu plano" not in block and LEFT_NOTE not in block
+    assert _effect_block(client, DESLIGAMENTO) is None
+
+
+def test_redirect_to_plan_keeps_effect_for_the_plan(loaded: dict[str, int], client: Client) -> None:
+    _post(client, "suspenso")
+    assert client.get(URL)["Location"] == PLAN
+    block = _effect_block(client, PLAN)
+    assert block is not None and "Regularizar o CPF suspenso" in block
+    assert _effect_block(client, PLAN) is None
+
+
+def test_undetermined_to_not_applicable_is_not_shown_as_left(
+    loaded: dict[str, int], client: Client
+) -> None:
+    _answer_desligamento(client, FORMA, "sem-justa-causa")
+    _answer_desligamento(client, VINCULO, "domestico")
+    block = _effect_block(client, f"{DESLIGAMENTO}plano/")
+    assert block is not None
+    assert "<li>Solicitar o seguro-desemprego do empregado doméstico</li>" in block
+    assert "Saiu do seu plano" not in block and LEFT_NOTE not in block
+    assert "Solicitar o seguro-desemprego</li>" not in block
+
+
+def test_editing_with_same_value_shows_no_changes(loaded: dict[str, int], client: Client) -> None:
+    _post(client, "suspenso")
+    client.post(f"{URL}respostas/{QUESTION}/", {"answer": "suspenso"})
+    assert _effect_block(client, PLAN) is None
+
+
+def test_swapping_answer_shows_departure_with_note(loaded: dict[str, int], client: Client) -> None:
+    _post(client, "suspenso")
+    client.post(f"{URL}respostas/{QUESTION}/", {"answer": UNKNOWN_VALUE})
+    block = _effect_block(client, PLAN)
+    assert block is not None
+    assert "<li>Consultar a situação cadastral do CPF</li>" in block
+    assert "Saiu do seu plano:" in block and "<li>Regularizar o CPF suspenso</li>" in block
+    assert LEFT_NOTE in block
+
+
+def test_effect_of_one_situation_does_not_show_in_another(
+    loaded: dict[str, int], client: Client
+) -> None:
+    _post(client, "suspenso")
+    assert _effect_block(client, DESLIGAMENTO) is None
+    assert _effect_block(client, PLAN) is not None
+
+
+def test_singular_providencia() -> None:
+    effect = EffectView((), (), 1)
+    html = render_to_string("guidance/_answer_effect.html", {"effect": effect})
+    assert "Ainda em análise: 1 providência." in html
+
+
+def test_no_block_without_effect(
+    loaded: dict[str, int], client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("guidance.views.answer_effect", lambda *_: AnswerEffect((), (), 0))
+    _post(client, "suspenso")
+    assert _effect_block(client, PLAN) is None

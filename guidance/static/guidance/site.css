@@ -187,6 +187,8 @@ legend h1 { font-size: 1.66rem; margin: 0; }
 
 /* Avisos */
 .disclaimer { margin: 1.5rem 0; padding-left: 0.75rem; border-left: 3px solid var(--muted); color: var(--muted); }
+.answer-effect { margin: 1rem 0; padding: 0.5rem 0.75rem; background: var(--surface); border-left: 4px solid var(--action); }
+.answer-effect p, .answer-effect ul { margin: 0.25rem 0; }
 .notice a { color: var(--notice-ink); }
 .notice h2 { font-size: 1.33rem; margin-top: 0; }
 .notice p:last-child, .notice ul:last-child { margin-bottom: 0; }
