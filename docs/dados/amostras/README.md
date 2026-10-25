@@ -69,3 +69,10 @@ Mesmo método da coleta de 10/10, com duas diferenças: o extrato de texto desca
 - **Ident-MA** (`agendamento.ssp.ma.gov.br`): sem resposta (timeout).
 - **Catálogo estadual** (`ma.gov.br/todos-os-servicos`): a lista de serviços é carregada por JavaScript; o HTML não traz os serviços.
 - **Página federal da CIN** (`gov.br/governodigital/pt-br/identidade/cin`): 200, mas sem data declarada; foi usada a página de perguntas frequentes, que declara data.
+
+### Conferência manual de 25/10/2026 (feita pelo autor no navegador)
+
+- **DETRAN-MA, ids 19272, 19281, 19279 e 19481**: no navegador, em vez do conteúdo, aparece um aviso de **defeso eleitoral**: "Em atendimento à legislação eleitoral, os conteúdos desta sessão de notícias ficarão indisponíveis de 4 de julho de 2026 até o final da eleição estadual no Maranhão" (imagem `https://www.detran.ma.gov.br/inicio/content/imagens/periodo/Capa_de_site-aviso_de_suspensao.png`, SHA-256 `c6ec3a1d11c1a4a4c6e6410bc6d9f49c02a62f0eb7b1f48645d1da7c2c1632ca`, baixada em 2026-10-25T01:00:57-03:00). A indisponibilidade é temporária: recoletar depois da eleição.
+- **Ident-MA** (`agendamento.ssp.ma.gov.br`): a página é só um formulário de agendamento (nome, nome da mãe, CPF, cidade, serviço, data). Não traz requisitos, documentos nem taxa da 2ª via da CIN. Não serve como fonte de requisitos.
+- **TSE / TRE-MA** (2ª via do título e transferência de domicílio eleitoral): o autor não localizou as páginas.
+- **Registro de nascimento em cartório** (TJMA): o autor não localizou uma página de orientação ao cidadão.

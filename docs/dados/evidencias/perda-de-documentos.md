@@ -24,7 +24,8 @@ A tabela acima registra a consulta de 10/10/2026 e fica como **Histórico**. Nov
 | CIN no MA | **Confirmada com ressalva**: [notícia SSP-MA](../amostras/html-ssp-cin-ma.md) de 12/01/2024 | Locais (Ident-MA na Rua da Palma; postos Viva/Procon) e documentos da primeira via. Custo da 2ª via e agendamento: **não informado** (Ident-MA sem resposta). |
 | 2ª via da CNH/PpD no MA | **Confirmada**: [DETRAN-MA](../amostras/html-detran-2via-cnh.md), sem data declarada | Exige Boletim de Ocorrência e RG; atendimento nas unidades do DETRAN-MA; CNH de outra UF segue outro serviço. Taxas na [tabela](../amostras/html-detran-taxas.md). |
 | 2ª via da certidão de nascimento (São Luís) | **Confirmada**: [carta de serviços](../amostras/html-sl-2via-certidao-nascimento.md), atualizada em 05/05/2026 | Requerimento eletrônico pelo SEI externo; custo e prazo "em estudo" (= não informado). Não cobre certidões de outros municípios. |
-| Título de eleitor | **Pendente**: TSE e TRE-MA seguem com HTTP 403 | Exige conferência manual no navegador. |
+| Título de eleitor | **Pendente**: TSE e TRE-MA seguem com HTTP 403; a conferência manual de 25/10/2026 também não localizou a página | Continua fora da cobertura. |
+| 2ª via da CIN no MA (requisitos e taxa) | **Pendente**: o Ident-MA só oferece formulário de agendamento (25/10/2026) | Se a 2ª via exige B.O. e quanto custa: não informado. |
 
 Consequência para a jornada: a CIN e a CNH podem sair de `out_of_coverage`, e surge a primeira **dependência obrigatória** com fonte (ocorrência → 2ª via da CNH) e uma **condicional** (certidão → CIN, se a certidão também foi perdida). A mudança no conteúdo (`content/perda-de-documentos.toml`) fica para uma fatia própria.
 

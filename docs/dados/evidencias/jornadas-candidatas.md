@@ -49,7 +49,7 @@ Hoje é a candidata com menos fontes confirmadas: as duas centrais (DETRAN e Jus
 
 | Candidata | Fontes centrais confirmadas | O que demonstra de novo |
 | --- | --- | --- |
-| Compra de veículo usado | Sim (DETRAN-MA digital, Senatran) | Dependência obrigatória e ramificação por fatos |
+| Compra de veículo usado | Parcial (DETRAN-MA digital, Senatran); páginas de balcão em defeso eleitoral até o fim da eleição estadual | Dependência obrigatória e ramificação por fatos |
 | Primeiro emprego | Sim (federais) | Reaproveitamento da jornada CPF irregular |
-| Nascimento de filho | Não (falta o registro de nascimento) | Três esferas; a cadeia de dependências é incerta |
-| Mudança de endereço | Não (DETRAN e TSE pendentes) | Pergunta de território (RF17) |
+| Nascimento de filho | Não (registro de nascimento não localizado nem na conferência manual de 25/10) | Três esferas; a cadeia de dependências é incerta |
+| Mudança de endereço | Não (DETRAN em defeso eleitoral; TSE não localizado) | Pergunta de território (RF17) |
