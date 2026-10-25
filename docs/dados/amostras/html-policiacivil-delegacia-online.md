@@ -7,6 +7,7 @@
 - SHA-256 do HTML completo baixado: `4a658f32c2dafa83cadc0ca719169e9d8033e8df9ce2ee215655696839f927c0`
 - Trecho: linhas 10 a 49 do extrato de texto do conteúdo principal (80 linhas no total), tags removidas com `html.parser`, sem reescrita. Início no trecho "O que é?" quando presente.
 
+- Complemento (2026-10-24): o parágrafo após "..." foi copiado do snapshot coletado por `fetch_sources` nessa data, porque o trecho original terminava no menu do site.
 ```text
 Página Inicial
 INSTITUCIONAL
@@ -48,4 +49,6 @@ SIGMA: POLÍTICA DE PRIVACIDADE
 SOLICITAÇÕES
 RECADASTRAMENTO DE SERVIDORES DA POLÍCIA CIVIL 2024*
 Notícias
+...
+Por meio da Delegacia Online é possível registrar ocorrências de extravio de documentos, furto simples e preservação de direito, evitando assim a necessidade de deslocamento do cidadão até uma delegacia física. O boletim de Ocorrência será enviado ao e-mail do solicitante, depois de analisado por uma equipe especializada, desde que as informações tenham sido preenchidas corretamente.
 ```

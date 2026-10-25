@@ -1,0 +1,90 @@
+# Jornada "perda de documentos". Fonte da verdade: docs/dados/evidencias/perda-de-documentos.md.
+# Fonte principal: a página HTML (declara data); a API 10424 entra só para a URL dos canais web.
+# Nas amostras HTML vale só o bloco de texto, que é truncado.
+#
+# Decisões:
+# - Pergunta "documentos-perdidos" é MULTIPLE sem "não sei": o cidadão marca o que perdeu; vazio = nenhum.
+# - CIN, CNH e título de eleitor são opções out_of_coverage: a evidência não tem fonte oficial lida
+#   (CIN: a notícia da SSP-MA trata da primeira emissão e não há amostra; CNH: DETRAN-MA 404; título:
+#   TSE/TRE-MA 403). O plano mostra o aviso de limite de cobertura.
+# - O registro na Delegacia Online é candidato SEM regra: a página trata de "extravio de documentos"
+#   em geral, então vale para qualquer escolha.
+#
+# Fora por falta de trecho literal nas amostras (a afirmação não entra; custo/prazo vira "não informado"):
+# - Delegacia Online: custo e prazo não constam da página. Domínio delegaciaonline.ssp.ma.gov.br: não
+#   confirmado (DNS), não entra.
+# - Dependência B.O. -> segunda via: nenhum trecho a sustenta; o B.O. como pré-requisito é pendência
+#   da evidência (observação 5). Nenhuma dependência criada.
+# - Esclarecimento intermediário: "não sabe o número do CPF" só tem a orientação genérica de contatar
+#   a Receita, sem canal lido; não foi criado.
+# - Conta gov.br nível prata/ouro para o canal gov.br: o trecho está fora do bloco de texto da amostra.
+# - Condição do canal "sem gov.br" (não ter declarado IR nos últimos dois anos): está no texto da página
+#   (amostra), o que resolve a observação 6 da evidência; entra na descrição do canal.
+# - Segunda via de CIN, CNH e título de eleitor: sem procedimento (sem fonte oficial lida). Valores de
+#   terceiros (R$ 45,00, R$ 61,30, R$ 44,19) e portarias do TSE não entram.
+# - Prazo do CPF: só o atendimento por e-mail tem número ("em média, 48 horas"); a API não traz prazo.
+
+[[situations]]
+slug = "perda-de-documentos"
+title = "Perdi meus documentos"
+candidates = ["segunda-via-cpf", "registrar-ocorrencia-extravio"]
+
+[[questions]]
+slug = "documentos-perdidos"
+text = "Quais documentos você perdeu?"
+kind = "MULTIPLE"
+allows_unknown = false
+situations = ["perda-de-documentos"]
+options = [
+  {slug = "cpf", label = "CPF"},
+  {slug = "cin", label = "Carteira de Identidade (RG / CIN)", out_of_coverage = true},
+  {slug = "cnh", label = "Carteira Nacional de Habilitação (CNH)", out_of_coverage = true},
+  {slug = "titulo-de-eleitor", label = "Título de eleitor", out_of_coverage = true},
+]
+
+[[procedures]]
+slug = "segunda-via-cpf"
+title = "Obter a segunda via do CPF (comprovante de inscrição)"
+description = "Cartão de CPF (comprovante de inscrição) para impressão. O cartão físico não é mais emitido; o comprovante impresso e o digital têm a mesma validade."
+agency = "receita-federal"
+jurisdiction = "FEDERAL"
+source = "govbr-obter-cartao-cpf"
+excerpt = "Obtenha o seu cartão de CPF (comprovante de inscrição) para impressão."
+requirements = [
+  {description = "Ser cidadão inscrito no Cadastro de Pessoas Físicas (CPF).", source = "govbr-obter-cartao-cpf", excerpt = "Cidadão inscrito no Cadastro de Pessoas Físicas (CPF)."},
+  {description = "Documento de identificação oficial com foto do cidadão.", source = "govbr-obter-cartao-cpf", excerpt = "Documento de Identificação oficial com foto do cidadão;"},
+  {description = "Para solicitar por e-mail: foto do cidadão ou do responsável legal segurando o documento de identificação com foto, completo e nítido.", source = "govbr-obter-cartao-cpf", excerpt = "A foto do cidadão ou do seu responsável legal, se for o caso, segurando o seu documento de identificação com foto próximo ao rosto, em que o documento apareça completo, com imagem nítida;"},
+]
+channels = [
+  {kind = "ONLINE", description = "Emitir Meu Cartão de CPF (2ª via).", url = "https://cav.receita.fazenda.gov.br/autenticacao/login/index/5090", source = "api-servicos-10424", excerpt = "[Emitir Meu Cartão de CPF (2ª via)](https://cav.receita.fazenda.gov.br/autenticacao/login/index/5090)"},
+  {kind = "ONLINE", description = "Emitir Meu Cartão de CPF (2ª via), sem gov.br, para quem não apresentou declaração de imposto de renda nos últimos dois anos.", url = "https://servicos.receita.fazenda.gov.br/Servicos/CPF/ImpressaoComprovante/ConsultaImpressao.asp", source = "govbr-obter-cartao-cpf", excerpt = "Se você não apresentou declaração de imposto de renda nos últimos dois anos"},
+  {kind = "EMAIL", description = "Atendimento por e-mail.", source = "govbr-obter-cartao-cpf", excerpt = "Atendimento por e-mail"},
+]
+details = [
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-obter-cartao-cpf", excerpt = "Este serviço é gratuito para o cidadão."},
+  {kind = "DEADLINE", text = "O atendimento por e-mail leva, em média, 48 horas.", source = "govbr-obter-cartao-cpf", excerpt = "O atendimento por e-mail leva, em média, 48 horas."},
+]
+
+# Candidato sem regra: a página trata de extravio de documentos em geral (evidência).
+[[procedures]]
+slug = "registrar-ocorrencia-extravio"
+title = "Registrar ocorrência de extravio na Delegacia Online"
+description = "Registre pela internet a ocorrência de extravio de documentos, sem ir a uma delegacia. O boletim de ocorrência é enviado ao seu e-mail depois de analisado."
+agency = "policia-civil-ma"
+jurisdiction = "MARANHAO"
+source = "policiacivil-delegacia-online"
+excerpt = "é possível registrar ocorrências de extravio de documentos, furto simples e preservação de direito, evitando assim a necessidade de deslocamento do cidadão até uma delegacia física."
+requirements = [
+  {description = "Informar um e-mail e preencher corretamente as informações: o boletim é enviado ao e-mail depois da análise.", source = "policiacivil-delegacia-online", excerpt = "O boletim de Ocorrência será enviado ao e-mail do solicitante, depois de analisado por uma equipe especializada, desde que as informações tenham sido preenchidas corretamente."},
+]
+channels = [
+  {kind = "ONLINE", description = "Delegacia Online da Polícia Civil do Maranhão.", url = "https://www.policiacivil.ma.gov.br/delegacia-online/", source = "policiacivil-delegacia-online", excerpt = "DELEGACIA ONLINE"},
+]
+
+[[rules]]
+slug = "regra-cpf-perdido"
+procedure = "segunda-via-cpf"
+explanation = "A segunda via do CPF é para quem perdeu o comprovante de inscrição no CPF."
+source = "govbr-obter-cartao-cpf"
+excerpt = "Obtenha o seu cartão de CPF (comprovante de inscrição) para impressão."
+conditions = [{question = "documentos-perdidos", operator = "ANY_OF", options = ["cpf"]}]

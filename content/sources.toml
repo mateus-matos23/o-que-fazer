@@ -142,3 +142,35 @@ url = "https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho"
 format = "HTML"
 jurisdiction = "FEDERAL"
 access_notes = "Página do catálogo gov.br; leitura sem login. Declara \"Última Modificação: 15/12/2025\". O serviço exige conta gov.br."
+
+# Jornada "perda de documentos". Origem das URLs: docs/dados/evidencias/perda-de-documentos.md
+# e cabeçalho das amostras em docs/dados/amostras/.
+
+[[agencies]]
+slug = "policia-civil-ma"
+name = "Polícia Civil do Maranhão"
+jurisdiction = "MARANHAO"
+
+[[sources]]
+slug = "govbr-obter-cartao-cpf"
+agency = "receita-federal"
+url = "https://www.gov.br/pt-br/servicos/obter-cartao-de-cpf"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do catálogo gov.br; leitura sem login. Declara \"Última Modificação: 06/08/2026\"."
+
+[[sources]]
+slug = "api-servicos-10424"
+agency = "mgi-portal-servicos"
+url = "https://servicos.gov.br/api/v1/servicos/10424"
+format = "GOVBR_API"
+jurisdiction = "FEDERAL"
+access_notes = "Ficha da API do serviço Obter Cartão de CPF (ID 10424); pública, sem credencial. Órgão competente do serviço: Receita Federal."
+
+[[sources]]
+slug = "policiacivil-delegacia-online"
+agency = "policia-civil-ma"
+url = "https://www.policiacivil.ma.gov.br/delegacia-online/"
+format = "HTML"
+jurisdiction = "MARANHAO"
+access_notes = "Página pública da Polícia Civil do MA. Só declara \"Publicado em: quinta-feira, 1 de março de 2018\"; sem data de atualização. O trecho de texto da amostra contém apenas o menu do site."

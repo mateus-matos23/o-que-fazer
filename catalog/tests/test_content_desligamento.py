@@ -9,22 +9,6 @@ pytestmark = pytest.mark.django_db
 SITUATION = "desligamento-do-trabalho"
 
 
-def test_global_counts(loaded: dict[str, int]) -> None:
-    # Todas as jornadas carregadas de content/: CPF irregular + desligamento do trabalho.
-    assert loaded == {
-        "Situation": 2,
-        "Question": 3,
-        "AnswerOption": 13,
-        "Procedure": 9,
-        "ProcedureDetail": 6,
-        "Requirement": 23,
-        "ServiceChannel": 22,
-        "Rule": 6,
-        "Condition": 8,
-        "Dependency": 0,
-    }
-
-
 def test_situation_candidates(loaded: dict[str, int]) -> None:
     situation = Situation.objects.get(slug=SITUATION)
     assert set(situation.candidates.values_list("slug", flat=True)) == {

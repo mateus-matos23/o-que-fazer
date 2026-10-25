@@ -40,6 +40,9 @@ SAMPLE_FILES = {
     "govbr-caged": "html-solicitar-vinculos-empregaticios-do-caged.md",
     "fgts-saque-dispensa": "html-fgts-saque-dispensa.md",
     "govbr-obter-carteira-de-trabalho": "html-obter-a-carteira-de-trabalho.md",
+    "govbr-obter-cartao-cpf": "html-obter-cartao-de-cpf.md",
+    "api-servicos-10424": "api-servicos-10424.json",
+    "policiacivil-delegacia-online": "html-policiacivil-delegacia-online.md",
 }
 
 
