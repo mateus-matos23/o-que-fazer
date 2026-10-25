@@ -36,3 +36,18 @@ Em caso de divergência, registrar as fontes, verificar o órgão competente, re
 ### Limite da automação
 
 Extrair uma frase de uma página não comprova que ela foi interpretada corretamente como regra. A proposta prevê revisão do conhecimento usado no motor, especialmente quando o encaminhamento envolve condições administrativas.
+
+## Implementação (Consolidado em 24/10/2026)
+
+Os passos 2, 3, 4 e 8 do pipeline já têm correspondência no código do app `sources`. Detalhes em [registro de implementação](../implementacao/README.md).
+
+| Passo | Situação no código |
+| --- | --- |
+| 2. Registrar formato, endereço, condições de acesso e data de coleta | `Source` (`url`, `format`, `access_notes`) e `SourceImport.fetched_at`. |
+| 3. Obter e preservar o conteúdo original | `fetch` e `collect` em `sources/adapters.py` obtêm o conteúdo e calculam o hash SHA-256 do corpo; `SourceSnapshot` guarda `raw_text` e, quando é JSON, `raw_json`. |
+| 4. Extrair a informação útil por adaptador | Dois adaptadores: `parse_govbr_service` (API de serviços do Gov.br, JSON) e `extract_declared_update` (página HTML, data "Última Modificação"). |
+| 8. Vincular a orientação à fonte e à versão | Existe o vínculo importação → snapshot → fonte. O vínculo com a orientação publicada depende do domínio normalizado. |
+
+A importação é feita pelo comando `fetch_sources`, e cada coleta fica registrada em `SourceImport`, com sucesso ou falha.
+
+Os passos 5 a 9 dependem da Fase 2 (domínio normalizado, conhecimento e carregador de conteúdo). Até lá, nenhuma fonte foi cadastrada no banco; o cadastro será feito pelo comando `load_sources` ([modelo físico de dados](../arquitetura/modelo-fisico-de-dados.md#carga-de-conteúdo)).

@@ -33,7 +33,7 @@ Arquivos originais maiores podem ser preservados em filesystem ou armazenamento 
 - Consulta de procedimentos e fontes.
 - Adaptadores de ingestão e revisão de conteúdo.
 
-Essas responsabilidades não exigem, por si, microserviços ou várias aplicações. A organização concreta do código ainda será definida.
+Essas responsabilidades não exigem, por si, microserviços ou várias aplicações. A organização concreta do código está descrita na subseção "Organização do código" abaixo.
 
 ### Stack confirmada
 
@@ -46,6 +46,18 @@ Essas responsabilidades não exigem, por si, microserviços ou várias aplicaç�
 | Banco de dados | PostgreSQL 18 |
 | Gerenciador de projeto e dependências | uv 0.13.0 |
 
-Continuam **pendentes**: abordagem de frontend (templates Django puros ou com biblioteca de interatividade), hospedagem, autenticação administrativa e armazenamento de arquivos brutos maiores.
+Continuam **pendentes**: abordagem de frontend (templates Django puros ou com biblioteca de interatividade), hospedagem, autenticação administrativa e armazenamento de arquivos brutos maiores (hoje o conteúdo bruto fica no banco).
+
+### Organização do código (Consolidado em 24/10/2026)
+
+Estado de cada app no [registro de implementação](../implementacao/README.md). Hoje só `sources` está em `INSTALLED_APPS` (`config/settings.py`).
+
+| App | Conteúdo | Estado |
+| --- | --- | --- |
+| `sources` | Fonte, Importação, Versão de fonte e Órgão; adaptadores de coleta e comando `fetch_sources`. | Implementado |
+| `catalog` | Procedimento, Requisito, Canal, Dependência, Situação, Pergunta, Opção, Regra, Condição e o carregador de conteúdo (comando `load_content`, a partir de arquivos TOML em `content/`). | Em andamento |
+| `guidance` | Motor de orientação em Python puro (avaliação ternária, próxima pergunta, ordenação em camadas, plano) e fluxo HTTP. | Pendente |
+
+Os termos seguem o [glossário](../../CONTEXT.md).
 
 Preferências e stacks discutidas em outros projetos do autor não são automaticamente decisões deste TCC.

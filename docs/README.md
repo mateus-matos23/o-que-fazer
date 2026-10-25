@@ -19,7 +19,7 @@ Documentação de concepção e modelagem do sistema. Originada da consolidaçã
 **Uso básico:** sem cadastro obrigatório e com minimização de dados pessoais.  
 **Avaliação prevista:** comparação com busca convencional, com indicadores de eficácia, esforço e percepção.  
 **Estado acadêmico documentado:** introdução e referencial teórico, com revisão de estilo discutida.  
-**Próximos marcos:** concluir especificação e fontes, implementar, avaliar e escrever os capítulos restantes.
+**Próximos marcos:** a implementação do núcleo começou (Fases 0 e 1 concluídas em 24/10/2026; ver [registro de implementação](implementacao/README.md)); concluir a especificação e o restante do protótipo, avaliar e escrever os capítulos restantes.
 
 ## Mapa
 
@@ -32,6 +32,7 @@ Documentação de concepção e modelagem do sistema. Originada da consolidaçã
 | [produto/interface-e-acessibilidade.md](produto/interface-e-acessibilidade.md) | Princípios de interação, telas, estrutura do plano e acessibilidade. |
 | [arquitetura/visao-tecnica.md](arquitetura/visao-tecnica.md) | Stack, camadas de informação e componentes lógicos. |
 | [arquitetura/modelo-de-dominio.md](arquitetura/modelo-de-dominio.md) | Entidades e relações conceituais. |
+| [arquitetura/modelo-fisico-de-dados.md](arquitetura/modelo-fisico-de-dados.md) | Tabelas do `catalog`, citação com trecho verificado e carga de conteúdo. |
 | [arquitetura/motor-de-orientacao.md](arquitetura/motor-de-orientacao.md) | Aplicabilidade ternária, próxima pergunta, ordenação topológica e explicabilidade. |
 | [arquitetura/decisoes/](arquitetura/decisoes/) | Registros de decisões de arquitetura (ADR). |
 | [dados/fontes-oficiais.md](dados/fontes-oficiais.md) | Prova de viabilidade, serviços analisados, formatos e autenticação. |
@@ -41,6 +42,7 @@ Documentação de concepção e modelagem do sistema. Originada da consolidaçã
 | [academico/referencial-teorico.md](academico/referencial-teorico.md) | Eixos teóricos, ressalvas e inventário de referências. |
 | [academico/normalizacao-e-estilo.md](academico/normalizacao-e-estilo.md) | Normas UNDB/ABNT e diretrizes editoriais. |
 | [academico/historico.md](academico/historico.md) | Linha do tempo da concepção e base documental. |
+| [implementacao/README.md](implementacao/README.md) | Registro de implementação: fases, estado e decisões tomadas. |
 | [pendencias.md](pendencias.md) | Riscos, entregáveis e decisões em aberto. |
 
 ## Como utilizar esta documentação
@@ -57,4 +59,5 @@ Os estados utilizados são:
 | Proposto | Foi apresentado durante a elaboração, mas não há confirmação suficiente de adoção definitiva ou implementação. |
 | Histórico | Representa uma formulação anterior ou uma etapa já discutida. |
 | Futuro | Possibilidade de expansão além do protótipo delimitado. |
+| Em andamento | Implementação iniciada e ainda não concluída (usado no [registro de implementação](implementacao/README.md)). |
 | Pendente | Depende de definição, confirmação, documentação ou avaliação. |
