@@ -197,3 +197,47 @@ def test_recommended_is_marked_as_suggestion() -> None:
         },
     )
     assert "Faça depois de:" in html and "a (sugestão)" in html
+
+
+def _block(html: str, heading_id: str) -> str:
+    match = re.search(
+        rf'<section class="[^"]*" aria-labelledby="{heading_id}">(.*?)</section>', html, re.S
+    )
+    assert match, heading_id
+    return match.group(1)
+
+
+def test_start_here_lists_first_layer_of_real_journey(
+    loaded: dict[str, int], client: Client
+) -> None:
+    perda = "/s/perda-de-documentos/"
+    response = client.post(
+        perda, {"question": "documentos-perdidos", "answer": ["cpf", "cin", "cnh"]}
+    )
+    assert response.status_code == 303
+    start = _block(_html(client, perda + "plano/"), "comece-por-aqui")
+    assert "Pode começar por qualquer uma destas:" in start
+    assert '<a href="#etapa-registrar-ocorrencia-extravio">' in start
+    assert '<a href="#etapa-segunda-via-cin">' in start
+    assert '<a href="#etapa-segunda-via-cpf">' in start
+    assert "#etapa-segunda-via-cnh" not in start  # depende do B.O. (camada 2)
+
+
+def test_start_here_single_step_in_real_journey(loaded: dict[str, int], client: Client) -> None:
+    _answer(client, "suspenso")
+    start = _block(_html(client, PLAN), "comece-por-aqui")
+    assert '<p><a href="#etapa-regularizar-cpf-suspenso">' in start
+    assert "qualquer uma destas" not in start
+
+
+def test_prepare_has_one_group_per_step_with_requirements(
+    loaded: dict[str, int], client: Client
+) -> None:
+    perda = "/s/perda-de-documentos/"
+    client.post(perda, {"question": "documentos-perdidos", "answer": ["cpf", "cin", "cnh"]})
+    prepare = _block(_html(client, perda + "plano/"), "o-que-separar-antes")
+    assert prepare.count("<h3>") == 4  # um grupo por etapa, na ordem do plano
+    assert prepare.index("Solicitar a Carteira de Identidade") < prepare.index(
+        "Solicitar a segunda via da CNH"
+    )
+    assert "RG atual, caso possua." in prepare

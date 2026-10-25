@@ -249,6 +249,19 @@ dt { font-weight: 700; margin-top: 1rem; }
 dd { margin: 0; }
 .not-informed { color: var(--muted); }
 
+/* Comece por aqui (primeira camada do plano) */
+.start-here {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border: 2px solid var(--action);
+  border-radius: 0.25rem;
+}
+.start-here h2 { font-size: 1.33rem; margin-top: 0; }
+.start-here p, .start-here ul { margin: 0 0 0.5rem; }
+.start-here ul { padding-left: 1.25rem; }
+.start-here a { font-weight: 700; }
+
 /* Revisão */
 .answers { list-style: none; margin: 1.5rem 0 0; padding: 0; border-top: 1px solid var(--line); max-width: none; }
 .answers li { padding: 1rem 0.25rem; border-bottom: 1px solid var(--line); max-width: none; }
@@ -264,15 +277,6 @@ dd { margin: 0; }
   .answer-form > button { width: auto; min-width: 12rem; }
 }
 
-@media print {
-  body { background: #FFFFFF; font-size: 12pt; }
-  .skip-link, .site-header, .site-footer, .actions, button, .context-link { display: none !important; }
-  .step { break-inside: avoid; border-color: #000000; }
-  .route > li { break-inside: avoid; }
-  a { color: #000000; }
-  a[href^="http"]::after { content: " (" attr(href) ")"; overflow-wrap: anywhere; }
-}
-
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -280,4 +284,20 @@ dd { margin: 0; }
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* Impressão: sem fundos, sem controles; a URL externa segue o link */
+@media print {
+  *, *::before, *::after {
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+  }
+  body { background: #FFFFFF !important; font-size: 12pt; }
+  .skip-link, .site-header, .site-footer, .actions, button, form, .context-link,
+  p.channel-preference, .print-hint, .edit-answer, .answer-effect { display: none !important; }
+  .step, .notice, .start-here { break-inside: avoid; }
+  .route > li { break-inside: avoid; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; overflow-wrap: anywhere; }
 }

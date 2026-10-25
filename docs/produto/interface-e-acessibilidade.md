@@ -46,7 +46,7 @@ Proposto (Fase 7, 25/10/2026): regras de redação para perguntas e opções, pe
 
 Cada etapa deve apresentar título, explicação curta, motivo de aplicabilidade, órgão, canais, requisitos, dependências e fonte. Custos e prazos aparecem quando disponíveis. A ordem deve tornar visíveis os pré-requisitos e as etapas independentes.
 
-Proposto (Fase 7, 25/10/2026): o plano começa por "Comece por aqui", que indica por onde começar. Em seguida vem "O que separar antes", agrupado por etapa e sem mesclar requisitos parecidos de procedimentos diferentes. O plano também tem versão para impressão.
+Consolidado (Fase 7, 25/10/2026): o plano começa por "Comece por aqui", que indica por onde começar. Em seguida vem "O que separar antes", agrupado por etapa e sem mesclar requisitos parecidos de procedimentos diferentes. O plano também tem versão para impressão.
 
 ### Direção visual discutida
 

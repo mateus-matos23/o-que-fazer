@@ -321,7 +321,7 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
 
 ## Fase 7 — Conversa guiada
 
-Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 4 estão consolidadas, as demais seguem pendentes.
+Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 5 estão consolidadas, as demais seguem pendentes.
 
 **Motivação.** Hoje o cidadão escolhe a situação numa lista e responde uma ou duas perguntas antes do plano. O autor quer uma experiência de "conversa guiada", inspirada no Akinator, para um público com idade, escolaridade e familiaridade com tecnologia variadas. A conversa leva à situação por um funil de triagem, mostra o efeito de cada resposta no plano e termina num plano com ponto de partida. Requisitos RF21 a RF26 e regras RN02, RN14 e RN16 em [requisitos](../produto/requisitos.md).
 
@@ -342,7 +342,7 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 4 es
 | 2 | Funil de triagem, com limite de cobertura nos ramos sem jornada | Consolidado |
 | 3 | Efeito da resposta no plano | Consolidado |
 | 4 | Preferência de atendimento e ordenação dos canais | Consolidado |
-| 5 | Plano com "Comece por aqui", "O que separar antes" e versão para impressão | Pendente |
+| 5 | Plano com "Comece por aqui", "O que separar antes" e versão para impressão | Consolidado |
 | 6 | Requisitos e canais condicionais no motor | Pendente |
 | 7 | Perguntas novas com fonte: primeira solicitação do seguro-desemprego; declaração de IR nos últimos dois anos para o canal "sem gov.br" do CPF | Pendente |
 | 8 | "Não sei" com como descobrir (pesquisa) | Pendente |
@@ -381,6 +381,15 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 4 es
 - Motivo: RN14 e RF23. A preferência não é Fato nem `Question`: não passa por regras, não altera aplicabilidade nem a ordem das etapas (RN08). A busca "Onde resolvo?" não muda. O aviso de efeito da fatia 3 continua sendo consumido só por `plan` ou pela pergunta, não pela página de preferência.
 - Gates: ruff, mypy e pytest verdes (364 passed).
 - Verificação no navegador (25/10/2026, Chromium headless via CDP): a última pergunta leva à página de preferência e depois ao plano, com o efeito da resposta preservado. Por telefone e pessoalmente põem os canais do tipo preferido primeiro e mostram o aviso nas etapas sem esse tipo. Tanto faz mantém a ordem de "Onde resolvo?". O número de canais por etapa é o mesmo em toda preferência (10 no total). A preferência vale para outra situação, e a CPF foi direto ao plano. Foco visível, contraste ≥ 5,95:1 e sem rolagem horizontal em 360 px. Etapa sem nenhum canal não apareceu no conteúdo real (coberta por teste).
+
+**Fatia 5 — plano com "comece por aqui".**
+
+- Cartão "Comece por aqui" logo abaixo da preferência de atendimento, com a etapa ou as etapas da camada 1. A seção "O que separar antes" vem depois do Resumo, com um grupo por etapa que tem requisitos, na ordem do plano, sem mesclar nem remover repetidos. Os requisitos seguem dentro de cada etapa (RF12).
+- Impressão por `@media print` no fim de `guidance/static/guidance/site.css`: esconde cabeçalho, controles, preferência e links de editar, e imprime a URL dos links externos. A linha "Para guardar este plano, use a opção de imprimir do navegador." fica escondida na impressão. Sem botão e sem JavaScript.
+- `_plan_context` em `guidance/views.py` reúne o contexto do plano (etapas, camada 1, requisitos, limite de cobertura e indeterminados); a view e os testes usam a mesma função. O motor não mudou.
+- Motivo: RF26. O cidadão precisa saber por onde começar e o que reunir antes de sair. Agrupar por etapa preserva a origem de cada requisito: requisitos parecidos de procedimentos diferentes não são unificados (glossário).
+- Gates: ruff format, ruff check, mypy e pytest verdes (376 passed; eram 364 na fatia 4). `git diff --check` limpo.
+- Verificação no navegador (25/10/2026, Chromium headless via CDP): "Comece por aqui" com três etapas em perda de documentos (CPF, CIN e CNH; a CNH fica fora do cartão porque depende do B.O.) e com uma etapa em CPF suspenso; "O que separar antes" com 4 grupos na ordem do plano e sem mesclar; na impressão emulada, cabeçalho, rodapé, formulários, preferência e dica de impressão escondidos, URL dos 7 links externos impressa, texto preto sobre branco; sem rolagem horizontal em 360 px; contraste mínimo de 6,41:1; foco visível nos links do cartão. O aviso de efeito e o link "Alterar essa resposta" não estavam na página verificada; a regra de impressão deles é coberta pelo teste da folha de estilo.
 
 ## Limitações conhecidas
 

@@ -5,12 +5,27 @@
 {% include "guidance/_answer_effect.html" %}
 <h1>Seu plano</h1>
 <p class="disclaimer">Este sistema é apenas orientativo. Ele não executa serviços nem confirma direitos; confira sempre na fonte oficial.</p>
+<p class="muted print-hint">Para guardar este plano, use a opção de imprimir do navegador.</p>
 
 <p class="channel-preference">
   {% if preference and preference.kinds %}Canais ordenados pela sua preferência: {{ preference.label }}.
   <a href="{% url 'guidance:channel_preference' catalog.situation_slug %}">Mudar</a>
   {% else %}<a href="{% url 'guidance:channel_preference' catalog.situation_slug %}">Escolher como prefere ser atendido</a>{% endif %}
 </p>
+
+{% if start_steps %}
+<section class="start-here" aria-labelledby="comece-por-aqui">
+  <h2 id="comece-por-aqui">Comece por aqui</h2>
+  {% if start_steps|length == 1 %}
+  <p><a href="#etapa-{{ start_steps.0.step.procedure.slug }}">{{ start_steps.0.step.procedure.title }}</a></p>
+  {% else %}
+  <p>Pode começar por qualquer uma destas:</p>
+  <ul>
+    {% for item in start_steps %}<li><a href="#etapa-{{ item.step.procedure.slug }}">{{ item.step.procedure.title }}</a></li>{% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endif %}
 
 {% if uncovered %}
 <section id="limite-de-cobertura" class="notice">
@@ -41,6 +56,18 @@
   </ol>
 </nav>
 
+{% if requirement_steps %}
+<section class="prepare" aria-labelledby="o-que-separar-antes">
+  <h2 id="o-que-separar-antes">O que separar antes</h2>
+  {% for item in requirement_steps %}
+  <h3>{{ item.step.procedure.title }}</h3>
+  <ul>
+    {% for requirement in item.step.procedure.requirements %}<li>{{ requirement.description }}</li>{% endfor %}
+  </ul>
+  {% endfor %}
+</section>
+{% endif %}
+
 {% for item in steps %}
 {% with step=item.step procedure=item.step.procedure %}
 <article id="etapa-{{ procedure.slug }}" class="step" data-slug="{{ procedure.slug }}">
@@ -56,7 +83,7 @@
   {% endif %}
   {% if step.clarifies %}
   <p>Você respondeu "Não sei" para: {{ step.clarifies.text }} Descubra a resposta e volte para continuar.
-    <a href="{% url 'guidance:edit_answer' catalog.situation_slug step.clarifies.slug %}">Alterar essa resposta</a></p>
+    <a class="edit-answer" href="{% url 'guidance:edit_answer' catalog.situation_slug step.clarifies.slug %}">Alterar essa resposta</a></p>
   {% endif %}
   {% if item.required_for %}
   <p>Necessária antes de: {{ item.required_for|join:", " }}</p>

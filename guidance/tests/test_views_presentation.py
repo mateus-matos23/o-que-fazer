@@ -6,10 +6,11 @@ from django.contrib.staticfiles import finders
 from django.template.loader import render_to_string
 from django.test import Client
 
+from guidance.engine.model import Catalog, Facts, ProcedureDef, RequirementDef
 from guidance.engine.plan import build_plan
 from guidance.forms import AnswerForm
 from guidance.tests import factories as f
-from guidance.views import _step_view
+from guidance.views import _plan_context
 
 pytestmark = pytest.mark.django_db
 
@@ -22,6 +23,12 @@ def _html(client: Client, url: str) -> str:
     return client.get(url).content.decode()
 
 
+def _render_plan(catalog: Catalog, facts: Facts | None = None) -> str:
+    plan = build_plan(catalog, facts or {})
+    context = {"catalog": catalog, "plan": plan, **_plan_context(catalog, plan, None)}
+    return render_to_string("guidance/plan.html", context)
+
+
 def _plan_html() -> str:
     always = f.rule("r")
     catalog = f.catalog(
@@ -29,16 +36,7 @@ def _plan_html() -> str:
         (f.procedure("a", always), f.procedure("b", always), f.procedure("c", always)),
         dependencies=(f.dep("a", "b"), f.dep("a", "c")),
     )
-    plan = build_plan(catalog, {})
-    return render_to_string(
-        "guidance/plan.html",
-        {
-            "catalog": catalog,
-            "plan": plan,
-            "steps": [_step_view(catalog, s) for s in plan.steps],
-            "undetermined": [],
-        },
-    )
+    return _render_plan(catalog)
 
 
 @pytest.mark.parametrize("url", ["/", URL, URL + "respostas/"])
@@ -108,3 +106,110 @@ def test_route_groups_steps_by_layer_and_notes_only_parallel_groups() -> None:
     assert "</span>1</span>" in first and 'href="#etapa-a"' in first and NOTE not in first
     assert "</span>2</span>" in second and NOTE in second
     assert 'href="#etapa-b"' in second and 'href="#etapa-c"' in second
+
+
+def _procedure(slug: str, *requirements: str) -> ProcedureDef:
+    procedure = f.procedure(slug, f.rule("r"))
+    return replace(
+        procedure,
+        requirements=tuple(RequirementDef(text, f.CITATION) for text in requirements),
+    )
+
+
+def _section(html: str, heading_id: str) -> str:
+    match = re.search(
+        rf'<section class="[^"]*" aria-labelledby="{heading_id}">(.*?)</section>', html, re.S
+    )
+    assert match, heading_id
+    return match.group(1)
+
+
+def test_start_here_with_single_first_step_links_it() -> None:
+    catalog = f.catalog((), (_procedure("a"), _procedure("b")), dependencies=(f.dep("a", "b"),))
+    html = _render_plan(catalog)
+    start = _section(html, "comece-por-aqui")
+    assert '<h2 id="comece-por-aqui">Comece por aqui</h2>' in start
+    assert '<a href="#etapa-a">a</a>' in start
+    assert "qualquer uma destas" not in html
+
+
+def test_start_here_lists_every_first_layer_step() -> None:
+    catalog = f.catalog(
+        (), (_procedure("a"), _procedure("b"), _procedure("c")), dependencies=(f.dep("a", "c"),)
+    )
+    start = _section(_render_plan(catalog), "comece-por-aqui")
+    assert "Pode começar por qualquer uma destas:" in start
+    assert '<a href="#etapa-a">a</a>' in start and '<a href="#etapa-b">b</a>' in start
+    assert "#etapa-c" not in start
+
+
+def test_start_here_absent_without_steps() -> None:
+    catalog = f.catalog((), (f.procedure("p"),), candidates=())
+    html = _render_plan(catalog)
+    assert "Nenhuma providência" in html
+    assert "Comece por aqui" not in html and "start-here" not in html
+
+
+def test_prepare_groups_requirements_by_step_in_order() -> None:
+    catalog = f.catalog(
+        (),
+        (_procedure("a", "Documento A1", "Documento A2"), _procedure("b", "Documento B")),
+        dependencies=(f.dep("a", "b"),),
+    )
+    prepare = _section(_render_plan(catalog), "o-que-separar-antes")
+    assert (
+        prepare.index("<h3>a</h3>") < prepare.index("Documento A1") < prepare.index("Documento A2")
+    )
+    assert (
+        prepare.index("Documento A2") < prepare.index("<h3>b</h3>") < prepare.index("Documento B")
+    )
+    assert "Documento A1" in prepare and "Documento B" in prepare
+
+
+def test_identical_requirement_is_not_merged_across_steps() -> None:
+    catalog = f.catalog(
+        (),
+        (_procedure("a", "RG original"), _procedure("b", "RG original")),
+        dependencies=(f.dep("a", "b"),),
+    )
+    html = _render_plan(catalog)
+    prepare = _section(html, "o-que-separar-antes")
+    assert prepare.count("<li>RG original</li>") == 2
+    assert prepare.count("<h3>") == 2
+    assert html.count("<li>RG original</li>") == 4  # também segue na etapa (RF12)
+
+
+def test_step_without_requirement_stays_out_of_prepare() -> None:
+    catalog = f.catalog(
+        (), (_procedure("a", "Documento"), _procedure("b")), dependencies=(f.dep("a", "b"),)
+    )
+    prepare = _section(_render_plan(catalog), "o-que-separar-antes")
+    assert "<h3>a</h3>" in prepare and "<h3>b</h3>" not in prepare
+
+
+def test_prepare_absent_without_requirements() -> None:
+    catalog = f.catalog((), (_procedure("a"), _procedure("b")), dependencies=(f.dep("a", "b"),))
+    html = _render_plan(catalog)
+    assert "O que separar antes" not in html and "prepare" not in html
+
+
+def test_print_hint_is_plain_text_without_script() -> None:
+    html = _plan_html()
+    assert "Para guardar este plano, use a opção de imprimir do navegador." in html
+    assert "<script" not in html and "onclick" not in html
+
+
+def test_stylesheet_has_print_rules() -> None:
+    css = _stylesheet()
+    assert "@media print" in css
+    print_block = css.split("@media print", 1)[1]
+    assert "p.channel-preference" in print_block and ".edit-answer" in print_block
+    assert ".answer-effect" in print_block
+    assert 'a[href^="http"]::after' in print_block and "break-inside: avoid" in print_block
+
+
+def _stylesheet() -> str:
+    path = finders.find("guidance/site.css")
+    assert isinstance(path, str)
+    with open(path, encoding="utf-8") as handle:
+        return handle.read()

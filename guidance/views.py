@@ -35,7 +35,7 @@ from guidance.engine.model import (
     Unknown,
 )
 from guidance.engine.ordering import DependencyCycleError
-from guidance.engine.plan import PlanStep, build_plan
+from guidance.engine.plan import Plan, PlanStep, build_plan
 from guidance.engine.questions import next_question
 from guidance.forms import AnswerForm, ChannelPreferenceForm, SearchForm
 from guidance.repository import (
@@ -267,12 +267,23 @@ def plan(request: HttpRequest, slug: str) -> HttpResponse:
         "catalog": catalog,
         "plan": result,
         "preference": preference,
-        "steps": [_step_view(catalog, step, preference) for step in result.steps],
-        "uncovered": _uncovered_lines(catalog, result.uncovered),
-        "undetermined": [catalog.procedures[s].title for s in result.undetermined],
+        **_plan_context(catalog, result, preference),
         "effect": _effect_view(request, catalog),
     }
     return render(request, "guidance/plan.html", context)
+
+
+def _plan_context(
+    catalog: Catalog, result: Plan, preference: ChannelPreference | None
+) -> dict[str, object]:
+    steps = [_step_view(catalog, step, preference) for step in result.steps]
+    return {
+        "steps": steps,
+        "start_steps": [s for s in steps if s.step.layer == 1],
+        "requirement_steps": [s for s in steps if s.step.procedure.requirements],
+        "uncovered": _uncovered_lines(catalog, result.uncovered),
+        "undetermined": [catalog.procedures[s].title for s in result.undetermined],
+    }
 
 
 @dataclass(frozen=True, slots=True)
