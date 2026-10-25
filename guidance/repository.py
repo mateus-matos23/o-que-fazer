@@ -180,11 +180,11 @@ def _procedure_def(p: Procedure, cite: CitationFactory) -> ProcedureDef:
 
 def load_procedure(slug: str) -> ProcedureDef:
     """Um procedimento isolado, para a busca direta (RF18): sem situação nem fatos."""
-    procedures = list(_procedures().filter(slug=slug))
-    if not procedures:
+    procedure = _procedures().filter(slug=slug).first()
+    if procedure is None:
         raise ProcedureNotFound(slug)
-    cite = CitationFactory(_fetched_at(_procedure_snapshot_ids(procedures)))
-    return _procedure_def(procedures[0], cite)
+    cite = CitationFactory(_fetched_at(_procedure_snapshot_ids([procedure])))
+    return _procedure_def(procedure, cite)
 
 
 def _snapshot_ids(*groups: Iterable[CitedRow]) -> set[int]:

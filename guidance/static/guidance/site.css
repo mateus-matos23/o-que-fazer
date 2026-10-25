@@ -95,7 +95,7 @@ a:hover { text-decoration-thickness: 3px; }
 
 .muted { color: var(--muted); }
 .context-link { margin: 0.5rem 0 0; }
-.context-link a { display: inline-block; min-height: 24px; padding: 0.25rem 0; }
+.context-link a, .search-link a { display: inline-block; min-height: 24px; padding: 0.25rem 0; }
 
 /* Botões e links de ação */
 .button, button {
@@ -129,7 +129,7 @@ button.secondary, .button.secondary { background: transparent; color: var(--acti
 
 /* Busca */
 .search-link { margin-top: 2rem; }
-.search-link a { display: inline-block; min-height: 24px; padding: 0.25rem 0; font-weight: 700; }
+.search-link a { font-weight: 700; }
 .search-form label { display: block; font-weight: 700; margin-bottom: 0.5rem; }
 .search-form input {
   display: block;
@@ -171,20 +171,8 @@ legend h1 { font-size: 1.66rem; margin: 0; }
 }
 .has-unknown #id_answer > div:last-child { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--muted); }
 .unknown { margin-top: 1.5rem; }
-.errors {
-  margin: 0 0 1rem;
-  padding: 0.75rem 1rem;
-  background: var(--notice-bg);
-  color: var(--notice-ink);
-  border: 2px solid var(--notice-border);
-  border-radius: 0.25rem;
-}
-.errors p { margin: 0 0 0.5rem; }
-.errors ul { margin: 0; padding-left: 1.25rem; font-weight: 700; }
-
-/* Avisos */
-.disclaimer { margin: 1.5rem 0; padding-left: 0.75rem; border-left: 3px solid var(--muted); color: var(--muted); }
-.notice {
+/* Erros e avisos */
+.errors, .notice {
   margin: 1.5rem 0;
   padding: 0.75rem 1rem;
   background: var(--notice-bg);
@@ -192,6 +180,12 @@ legend h1 { font-size: 1.66rem; margin: 0; }
   border: 2px solid var(--notice-border);
   border-radius: 0.25rem;
 }
+.errors { margin: 0 0 1rem; }
+.errors p { margin: 0 0 0.5rem; }
+.errors ul { margin: 0; padding-left: 1.25rem; font-weight: 700; }
+
+/* Avisos */
+.disclaimer { margin: 1.5rem 0; padding-left: 0.75rem; border-left: 3px solid var(--muted); color: var(--muted); }
 .notice a { color: var(--notice-ink); }
 .notice h2 { font-size: 1.33rem; margin-top: 0; }
 .notice p:last-child, .notice ul:last-child { margin-bottom: 0; }
@@ -250,7 +244,6 @@ legend h1 { font-size: 1.66rem; margin: 0; }
 dl { margin: 1rem 0 0; }
 dt { font-weight: 700; margin-top: 1rem; }
 dd { margin: 0; }
-dd ul { margin: 0; padding-left: 1.25rem; }
 .not-informed { color: var(--muted); }
 
 /* Revisão */

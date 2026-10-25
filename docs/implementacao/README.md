@@ -29,7 +29,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 3 | Motor de orientação (`guidance/engine`, Python puro: avaliação ternária, próxima pergunta, plano em camadas com Kahn; `guidance/repository.py`) | Consolidado (commits `3b957cb`, `90969f6`, `a12eaa1`) |
 | 4 | Fluxo mínimo HTTP com templates Django sem estilo e sessão Django | Consolidado (commits `ad23d39`, `c14f994`) |
 | 5 | Jornadas desligamento do trabalho e perda de documentos | Consolidado |
-| 6 | UI/UX, acessibilidade, frontend e RF18 (RF02 segue pendente) | Em andamento |
+| 6 | UI/UX, acessibilidade, frontend e RF18 (RF02 segue pendente) | Consolidado |
 
 ## Decisões tomadas em 24/10/2026 (aprovadas pelo autor)
 
@@ -275,9 +275,9 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
 | --- | --- | --- |
 | 6a | ADR 0004 e fonte local Atkinson Hyperlegible Next (OFL) | Consolidado (`3ef7ec8`) |
 | 6b | CSS próprio e reescrita dos sete templates do fluxo | Consolidado (`3b468bb`) |
-| 6c | Busca "Onde resolvo?" (RF18) e página de detalhe do serviço | Consolidado |
-| 6d | Verificação final de acessibilidade | Consolidado |
-| 6e | Simplificação do diff da fase e documentação | Pendente |
+| 6c | Busca "Onde resolvo?" (RF18) e página de detalhe do serviço | Consolidado (`00076a0`) |
+| 6d | Verificação final de acessibilidade | Consolidado (`f50d663`) |
+| 6e | Simplificação do diff da fase e documentação | Consolidado |
 
 **6b — Fluxo do cidadão**
 - O link "Pular para o conteúdo" leva ao `main`. Cada tela tem um único `h1`; na pergunta, o `h1` fica dentro do `legend` para o leitor de tela anunciar a pergunta junto com as opções.
@@ -297,6 +297,14 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
 - Critérios: um `h1` e títulos sem salto; `header`, `main` e `footer`; nenhuma rolagem horizontal; alvos não inline com 24 px ou mais (WCAG 2.5.8); contraste de 4,5:1 ou mais nas amostras de texto, link, botão, aviso e rodapé; nenhum erro no console.
 - Resultado: as 30 combinações passaram.
 - Não verificado: leitor de tela real (NVDA, TalkBack, VoiceOver), Firefox e Safari, impressão. A verificação não substitui uma ferramenta como o axe-core nem um teste com pessoas usuárias.
+
+**6e — Simplificação**
+- Uma revisão de reuso, simplificação, eficiência e altitude sobre o diff da fase. Foram aplicadas: a remoção de uma regra CSS que nunca valia (`dd ul`), a fusão das regras repetidas de `.errors` e `.notice` e dos links de 24 px, e o uso de `.first()` em `load_procedure`. O visual não mudou; a varredura da 6d foi refeita e passou.
+- Não aplicadas, para debate:
+  - limitar o número de resultados da busca, que muda o comportamento visível;
+  - a página de detalhe pré-busca as regras sem usá-las (cerca de 4 consultas a mais), porque reaproveita a conversão do `load_catalog`;
+  - o bloco de erro repetido entre busca e pergunta (dois usos);
+  - o contexto repetido entre `question` e `edit_answer`, que é anterior à fase.
 
 ## Limitações conhecidas
 
