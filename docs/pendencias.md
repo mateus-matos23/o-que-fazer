@@ -43,12 +43,12 @@
 2. URLs, exemplos e evidências reproduzíveis da prova de viabilidade. Em andamento: [matriz de evidências](dados/evidencias/README.md) das 3 jornadas (10/10/2026); amostras brutas coletadas em [amostras](dados/amostras/README.md). As fontes estaduais de perda de documentos ficaram fora do recorte do protótipo.
 3. Critérios e frequência de atualização e resolução de divergências.
 4. Modelo físico de dados e persistência das sessões. Resolvido para fontes e catálogo (apps `sources` e `catalog`, ver [modelo físico](arquitetura/modelo-fisico-de-dados.md) e [registro de implementação](implementacao/README.md)); sessão do cidadão na sessão do Django, sem tabela própria e com expiração de 2 horas (decisão de 24/10/2026).
-5. ~~Stack de backend e acesso a dados~~ — resolvido: Django 6.1.2 + PostgreSQL 18 ([ADR 0001](arquitetura/decisoes/0001-stack.md)). Frontend e hospedagem continuam pendentes.
-6. Estratégia de interpretação de texto livre.
+5. ~~Stack de backend e acesso a dados~~ — resolvido: Django 6.1.2 + PostgreSQL 18 ([ADR 0001](arquitetura/decisoes/0001-stack.md)). Frontend resolvido em 24/10/2026: templates Django com CSS próprio, sem JavaScript ([ADR 0004](arquitetura/decisoes/0004-frontend-e-acessibilidade.md)). Hospedagem continua pendente.
+6. Estratégia de interpretação de texto livre. Segue pendente: o RF02 ficou fora da Fase 6 ([ADR 0004](arquitetura/decisoes/0004-frontend-e-acessibilidade.md)).
 7. Critério de seleção de perguntas, desempate e encerramento. Direção decidida (critério determinístico sobre as regras, sem ML) no [ADR 0002](arquitetura/decisoes/0002-motor-baseado-em-regras.md); pesos, desempate e parada seguem pendentes.
 8. ~~Representação concreta das regras e das dependências~~ — resolvido: regras e dependências como dados citados, carregados de TOML ([ADR 0003](arquitetura/decisoes/0003-regras-como-dados.md)).
 9. Forma de manutenção do conteúdo e necessidade de interface administrativa. Decidido em 24/10/2026: arquivos TOML versionados + comando de carga; admin somente leitura.
-10. Procedimentos e nível pretendido de verificação de acessibilidade.
+10. Procedimentos e nível pretendido de verificação de acessibilidade. Decidido em 24/10/2026: meta WCAG 2.2 AA com verificação própria (testes de HTML e verificação no navegador), registrada no [registro de implementação](implementacao/README.md). Não é certificação; leitor de tela real, Firefox, Safari e impressão ainda não foram verificados.
 11. Amostra, instrumentos e protocolo da avaliação comparativa.
 12. Cronograma com datas e critérios de conclusão de cada etapa.
 13. Conferência final das referências e da normalização institucional.

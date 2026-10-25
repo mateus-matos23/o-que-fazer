@@ -39,13 +39,13 @@ Cada etapa deve apresentar título, explicação curta, motivo de aplicabilidade
 
 Interface clara, pouco carregada, com espaço em branco, tipografia legível, cards grandes, ícones simples e destaque para a ação principal. A aparência deve transmitir confiança, neutralidade e acolhimento, com atenção prioritária ao smartphone.
 
-Não foram confirmados uma identidade visual final, uma paleta específica ou um sistema de componentes para este TCC.
+Proposto (24/10/2026): paleta própria em verde-petróleo sobre fundo claro, que não imita o gov.br, e a fonte Atkinson Hyperlegible Next, servida localmente. Os tokens e os contrastes estão no topo de `guidance/static/guidance/site.css` ([ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.md)). Não há sistema de componentes; uma identidade visual final não foi confirmada.
 
 ### Acessibilidade
 
 Considerar contraste, redimensionamento de texto, alvos de interação adequados, navegação por teclado, rótulos compreensíveis, leitores de tela e informação que não dependa somente de cor ou ícone.
 
-As WCAG 2.2 foram incorporadas como referência conceitual no referencial. O nível de conformidade pretendido e os procedimentos de verificação ainda precisam ser definidos; não há certificação de acessibilidade registrada.
+As WCAG 2.2 foram incorporadas como referência conceitual no referencial. Consolidado (24/10/2026): a meta é WCAG 2.2 nível AA, com verificação própria ([ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.md)). O resultado está no [registro de implementação](../implementacao/README.md). Não há certificação de acessibilidade, e o uso com leitor de tela real ainda não foi verificado.
 
 ## Direção para prototipação visual
 

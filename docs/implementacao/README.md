@@ -276,7 +276,7 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
 | 6a | ADR 0004 e fonte local Atkinson Hyperlegible Next (OFL) | Consolidado (`3ef7ec8`) |
 | 6b | CSS próprio e reescrita dos sete templates do fluxo | Consolidado (`3b468bb`) |
 | 6c | Busca "Onde resolvo?" (RF18) e página de detalhe do serviço | Consolidado |
-| 6d | Verificação final de acessibilidade | Pendente |
+| 6d | Verificação final de acessibilidade | Consolidado |
 | 6e | Simplificação do diff da fase e documentação | Pendente |
 
 **6b — Fluxo do cidadão**
@@ -290,6 +290,13 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
 - `GET /onde-resolvo/?q=` busca no título e na descrição dos procedimentos, sem diferenciar maiúsculas. O termo é validado no servidor (2 a 100 caracteres).
 - `GET /onde-resolvo/<slug>/` mostra órgão, requisitos, canais, custo, prazo e fonte, com o mesmo bloco do plano (`_procedure_facts.html`). A página não avalia aplicabilidade, porque não há fatos; um aviso encaminha ao modo por situação.
 - O repositório passou a montar um procedimento isolado (`load_procedure`) com a mesma consulta e a mesma conversão usadas pelo `load_catalog`.
+
+**6d — Verificação final (24/10/2026)**
+- Varredura automatizada própria (script CDP no Chromium headless) em 10 telas: home, busca vazia, com resultado e com erro, detalhe do serviço, duas perguntas e os planos das três jornadas ("não sei" no CPF; sem justa causa e doméstico; perda do CPF).
+- Cada tela foi vista em 320 px, 1280 px e 640 px (equivalente a 1280 px com zoom de 200%).
+- Critérios: um `h1` e títulos sem salto; `header`, `main` e `footer`; nenhuma rolagem horizontal; alvos não inline com 24 px ou mais (WCAG 2.5.8); contraste de 4,5:1 ou mais nas amostras de texto, link, botão, aviso e rodapé; nenhum erro no console.
+- Resultado: as 30 combinações passaram.
+- Não verificado: leitor de tela real (NVDA, TalkBack, VoiceOver), Firefox e Safari, impressão. A verificação não substitui uma ferramenta como o axe-core nem um teste com pessoas usuárias.
 
 ## Limitações conhecidas
 
