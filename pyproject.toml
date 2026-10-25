@@ -28,6 +28,8 @@ extend-exclude = [".agents", ".claude", "docs"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "DJ", "SIM", "RUF"]
+# Meta e migrations do Django usam listas como atributo de classe por convenção.
+ignore = ["RUF012"]
 
 [tool.mypy]
 strict = true
