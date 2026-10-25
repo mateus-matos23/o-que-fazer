@@ -267,7 +267,8 @@ Templates Django sem CSS nem JavaScript, com HTML semântico (`fieldset` e `lege
 - Dependência MANDATORY `registrar-ocorrencia-extravio` → `segunda-via-cnh`. A CIN não depende do B.O.: nenhuma fonte lida exige.
 - Adiado: certidão como etapa antes da CIN. A única fonte é um serviço da SEMCAS com requisitos vagos e a via normal (cartório) não tem fonte. A certidão fica como requisito.
 - Amostras novas: `html-govbr-cin-faq.md` (unificada; a `html-govbr-cin-faq-emissao.md` saiu), `html-ssp-cin-ma.md`, `html-detran-2via-cnh.md`, `html-detran-taxas.md`.
-- Não verificado: carga contra as páginas ao vivo no `oqf_dev` (os testes conferem os trechos nas amostras). As páginas de balcão do DETRAN estão em defeso eleitoral; a de 2ª via da CNH respondeu com texto em 24/10/2026.
+- Carga real em 25/10/2026 no `oqf_dev`: `fetch_sources` coletou as 4 fontes novas e `load_content` encontrou todos os trechos nas páginas ao vivo (13 procedimentos, 1 dependência).
+- Navegador (Chromium headless via CDP, 320 px e 1280 px): com CPF, CIN, CNH e título, o plano traz o B.O. antes da CNH, mostra "Faça depois de" na CNH, o custo de R$ 90,00 e o aviso de limite de cobertura; sem rolagem horizontal, um `h1` e nenhum erro no console. Só a CNH: dois passos, sem aviso de cobertura.
 
 **Verificação**
 - 253 testes:
