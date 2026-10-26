@@ -507,6 +507,12 @@ Uma revisão externa sugeriu frameworks (govbr-ds, Bootstrap, Tailwind, HTMX com
   - script de terceiro só entra se for oficial e opcional, carregado por ação do cidadão.
 
   Motivo: a proibição rejeitava pelo mesmo argumento ferramentas sem ganho e ferramentas com ganho real de acessibilidade. Ficaram rejeitados govbr-ds, Bootstrap, Tailwind, HTMX com Alpine.js e widget-tweaks. O axe-core foi aceito no dev, e o VLibras ficou em estudo.
+- **11b — Varredura com axe-core.** Entrou a dependência de dev `axe-core` (Node; `package.json` só com ferramentas de dev), aprovada e instalada pelo autor. O `scripts/a11y-scan.mjs` abre o Chromium headless e fala CDP pelo WebSocket nativo do Node 24, sem outra dependência. O script visita:
+  - início, duas triagens, "fora da cobertura", busca e um procedimento;
+  - a lista de situações e a primeira pergunta enviada sem resposta, para ver o estado de erro;
+  - uma jornada por situação, respondendo a primeira opção até o plano e depois a revisão.
+
+  Em cada página, roda o axe com as tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` e `wcag22aa`. Antes de começar, confirma que o axe aponta uma imagem sem `alt` injetada, para a varredura não passar em branco. Roda sob demanda (`npm run a11y`), fora dos gates, porque precisa de servidor e conteúdo carregado. Resultado de 26/10/2026 no `oqf_dev`: 21 páginas, nenhuma violação. O axe não substitui a verificação manual: teclado, zoom, leitor de tela e alvos de 44 px continuam fora do que ele mede.
 
 ## Limitações conhecidas
 

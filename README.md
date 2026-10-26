@@ -55,6 +55,8 @@ Os testes usam o banco `oqf_test`, criado e destruído pelo pytest-django. Eles 
 
 A cobertura fica fora dos gates. Para medir, rode `uv run --env-file .env pytest --cov`; a configuração está em `[tool.coverage]` no `pyproject.toml`.
 
+A varredura de acessibilidade também fica fora dos gates. Ela usa o axe-core (dependência de dev em Node) e roda contra o servidor local, com o conteúdo carregado. Na primeira vez, rode `npm install`. Depois, com o `runserver` no ar, rode `npm run a11y`; para outra base, use `npm run a11y -- http://host:porta`. O Chromium vem de `CHROME_BIN` ou do cache do Playwright. O script percorre as páginas e uma jornada por situação até o plano e sai com erro se houver violação WCAG 2.x A ou AA.
+
 ## Estrutura
 
 | Pasta | Conteúdo |

@@ -16,3 +16,6 @@ staticfiles/
 .env
 .env.production
 .coverage
+
+# Ferramentas de dev em Node
+node_modules/

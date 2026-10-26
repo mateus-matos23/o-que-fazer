@@ -1,0 +1,12 @@
+{
+  "name": "o-que-fazer-dev-tools",
+  "private": true,
+  "description": "Ferramentas de desenvolvimento em Node (varredura de acessibilidade). Não fazem parte da aplicação.",
+  "type": "module",
+  "scripts": {
+    "a11y": "node scripts/a11y-scan.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "^4.14.0"
+  }
+}
