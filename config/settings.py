@@ -58,6 +58,8 @@ DATABASES = {
         "PASSWORD": os.environ["POSTGRES_PASSWORD"],
         "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+        # Neon (produção) exige "require"; local mantém o padrão do driver.
+        "OPTIONS": {"sslmode": os.environ.get("POSTGRES_SSLMODE", "prefer")},
         # Banco de teste separado do de desenvolvimento; criado e destruído pelo pytest-django.
         "TEST": {"NAME": os.environ.get("POSTGRES_TEST_DB", "oqf_test")},
     }
