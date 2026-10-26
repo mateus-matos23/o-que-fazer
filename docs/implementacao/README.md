@@ -32,7 +32,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 6 | UI/UX, acessibilidade, frontend e RF18 (RF02 segue pendente) | Consolidado |
 | 7 | Conversa guiada: funil de triagem, efeito da resposta, preferência de atendimento e plano com ponto de partida (RF21 a RF26) | Consolidado (25/10/2026) |
 | 8 | Hospedagem: Dockerfile, gunicorn, WhiteNoise e deploy no Render com Neon (ADR 0006) | Consolidado (26/10/2026, commits `de7d221`, `94f9ec7`) |
-| 9 | Redesenho visual "azulejo": paleta, triagem ilustrada, etapas da conversa e plano como linha do tempo | Em andamento (26/10/2026) |
+| 9 | Redesenho visual "azulejo": paleta, triagem ilustrada, etapas da conversa e plano como linha do tempo | Consolidado (26/10/2026) |
 
 ## Decisões tomadas em 24/10/2026 (aprovadas pelo autor)
 
@@ -464,6 +464,11 @@ A direção visual vem das fachadas de São Luís: fundo cor de cal, azulejo azu
 - **9d — Plano.** O topo (aviso orientativo, dica de impressão e preferência) ficou num bloco compacto (`plan-intro`). O resumo virou uma linha do tempo com números em ladrilho cobalto, linha tracejada e cada passo num cartão.
   - "O que separar antes" usa marcador de ladrilho na tela e caixa de conferir só na impressão: na tela, uma caixa vazia pareceria um checkbox que não responde.
   - As etapas mostram "Passo N" como selo e ícones decorativos por seção (órgão, requisitos, canais, custo, prazo e fonte), também na página do serviço. Os ícones entram por máscara CSS a partir de `static/guidance/icons/` (Lucide, ISC), na ordem dos `dt` de `_procedure_facts.html`, sem mudar o HTML.
+- **9e — Demais telas.** Só CSS, sem mudar o HTML: as listas de situações (lista completa e fora da cobertura) e os resultados da busca viram cartões no mesmo estilo da triagem, com o órgão sob o título. Campo e botão da busca ficam na mesma linha e com a mesma altura. As respostas da revisão viraram cartões. O detalhe do serviço, a preferência e a página de erro já herdavam os componentes das fatias anteriores.
+- **Verificação de acessibilidade (26/10/2026).** Feita com Chromium headless via CDP em todas as rotas.
+  - Passou: ordem de Tab e foco visível na triagem e na pergunta; nenhuma rolagem horizontal a 360 px nem a 200% de zoom; contraste de texto ≥ 6,35:1; ícones com `aria-hidden`; alvos ≥ 24 px, exceto links dentro de frases, que a SC 2.5.8 dispensa.
+  - Corrigido: a borda das opções de resposta (`--line`, 1,36:1) não delimitava o alvo clicável com o contraste que a SC 1.4.11 pede. Passou a usar `--line-strong` (#8A7752, 4,34:1 sobre branco).
+  - Não verificado: sobreposição visual no zoom e foco por teclado nas demais rotas.
 
 ## Limitações conhecidas
 

@@ -16,6 +16,8 @@
  *   --notice-border #8A5A00 sobre --notice-bg ... 5,27:1
  *   --line #E2D6BC sobre --bg ................... 1,36:1   (só decorativo: bordas de cartão e linha do
  *     roteiro; nenhuma informação ou controle depende dele. Estado marcado usa --ink, 12,86:1)
+ *   --line-strong #8A7752 sobre #FFFFFF ......... 4,34:1   (borda das opções de resposta, que delimita
+ *     o alvo clicável: SC 1.4.11 pede 3:1; sobre --bg 4,10:1)
  *   --sun #F2B33D e azulejo.svg ................. decorativos; nunca carregam texto ou estado
  */
 @font-face {
@@ -42,6 +44,7 @@
   --action-deep: #08433C;
   --muted: #4F5B60;
   --line: #E2D6BC;
+  --line-strong: #8A7752;
   --sun: #F2B33D;
   --tile: #2A5D8F;
   --radius: 0.75rem;
@@ -140,13 +143,21 @@ button.secondary:hover, .button.secondary:hover { background: var(--soft); }
 .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
 .actions form { margin: 0; }
 
-/* Home */
-.situations { list-style: none; margin: 1.5rem 0 0; padding: 0; border-top: 1px solid var(--line); max-width: none; }
-.situations li { border-bottom: 1px solid var(--line); max-width: none; }
+/* Listas de situações e resultados da busca: cartões no mesmo vidrado da triagem */
+.situations { list-style: none; margin: 1.5rem 0 0; padding: 0; max-width: none; display: grid; gap: 0.625rem; }
+.situations li {
+  max-width: none;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-bottom-width: 5px;
+  border-radius: 1rem;
+}
+.situations li:has(a:hover) { border-color: var(--action); }
+.situations li:not(:has(a)) { padding: 0.875rem 1rem; }
 .situations a {
   display: block;
   min-height: 48px;
-  padding: 0.875rem 0.25rem;
+  padding: 0.875rem 1rem;
   font-weight: 700;
 }
 
@@ -195,12 +206,15 @@ button.secondary:hover, .button.secondary:hover { background: var(--soft); }
 /* Busca */
 .search-link { margin-top: 2rem; }
 .search-link a { font-weight: 700; }
+.search-form { display: grid; grid-template-columns: 1fr auto; gap: 0 0.75rem; }
+.search-form > .errors, .search-form label { grid-column: 1 / -1; }
 .search-form label { display: block; font-weight: 700; margin-bottom: 0.5rem; }
 .search-form input {
   display: block;
   width: 100%;
-  min-height: 48px;
-  margin-bottom: 0.75rem;
+  min-width: 0;
+  min-height: 52px;
+  margin: 0;
   padding: 0.5rem 0.75rem;
   border: 2px solid var(--muted);
   border-radius: var(--radius);
@@ -208,7 +222,7 @@ button.secondary:hover, .button.secondary:hover { background: var(--soft); }
   color: var(--ink);
   font: inherit;
 }
-.situations .muted { display: block; padding: 0 0.25rem 0.75rem; margin-top: -0.5rem; }
+.situations .muted { display: block; padding: 0 1rem 0.875rem; margin-top: -0.5rem; }
 
 /* Etapas da conversa: o estado vem do texto (negrito, ✓) e do aria-current, não só da cor. */
 .journey-steps {
@@ -242,7 +256,7 @@ legend h1 { font-size: 1.66rem; margin: 0; }
   margin-bottom: 0.5rem;
   padding: 0.75rem 1rem;
   background: var(--surface);
-  border: 2px solid var(--line);
+  border: 2px solid var(--line-strong);
   border-radius: var(--radius);
   cursor: pointer;
 }
@@ -409,8 +423,8 @@ dd { margin: 0; }
 .start-here a { font-weight: 700; }
 
 /* Revisão */
-.answers { list-style: none; margin: 1.5rem 0 0; padding: 0; border-top: 1px solid var(--line); max-width: none; }
-.answers li { padding: 1rem 0.25rem; border-bottom: 1px solid var(--line); max-width: none; }
+.answers { list-style: none; margin: 1.5rem 0 0; padding: 0; max-width: none; display: grid; gap: 0.625rem; }
+.answers li { padding: 0.875rem 1rem 0.375rem; background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius); max-width: none; }
 .answers p { margin: 0 0 0.25rem; }
 .answers p:nth-child(2) { font-weight: 700; }
 .answers a { display: inline-block; min-height: 40px; padding: 0.5rem 0; }
