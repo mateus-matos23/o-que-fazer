@@ -12,14 +12,14 @@ def test_global_counts(loaded: dict[str, int]) -> None:
     # CPF irregular + desligamento do trabalho + perda de documentos.
     assert loaded == {
         "Situation": 3,
-        "Question": 4,
-        "AnswerOption": 17,
+        "Question": 6,
+        "AnswerOption": 22,
         "Procedure": 13,
         "ProcedureDetail": 9,
         "Requirement": 33,
         "ServiceChannel": 30,
-        "Rule": 9,
-        "Condition": 11,
+        "Rule": 13,
+        "Condition": 15,
         "Dependency": 1,
         "TriageNode": 3,
         "TriageChoice": 12,

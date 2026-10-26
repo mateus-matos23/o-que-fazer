@@ -42,6 +42,7 @@ Perguntas discutidas:
 
 - Foi perda, furto, roubo ou a pessoa não tem certeza?
 - Quais documentos estavam envolvidos?
+- (Protótipo) Se o CPF está entre eles: entregou declaração de imposto de renda nos últimos dois anos? A resposta decide se o canal "sem gov.br" aparece.
 - Existe acesso a alguma versão digital ou a outro documento relevante?
 - Qual localização importa para o atendimento?
 - Há outro detalhe que realmente altere o procedimento?
@@ -62,7 +63,7 @@ Quando a resposta for “não sei”, a plataforma orienta primeiro a descobrir 
 
 **Entrada:** “Fui demitido”.
 
-Perguntas candidatas tratam da forma de término do contrato, do vínculo e da data, quando esses fatos alteram as orientações. O plano pode envolver consulta a procedimentos trabalhistas e benefícios, conforme o caso documentado.
+Perguntas candidatas tratam da forma de término do contrato, do vínculo e da data, quando esses fatos alteram as orientações. O plano pode envolver consulta a procedimentos trabalhistas e benefícios, conforme o caso documentado. No protótipo, depois de forma de término e vínculo, o seguro-desemprego aplicável pergunta se é a primeira, a segunda ou a terceira solicitação ou mais, para mostrar só a carência correspondente.
 
 A plataforma não presume que todo desligamento gera direito a seguro-desemprego, saque ou outro benefício. Os critérios devem estar representados em regras verificadas e a confirmação final é oficial.
 

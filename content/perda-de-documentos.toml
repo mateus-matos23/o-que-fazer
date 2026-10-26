@@ -23,7 +23,8 @@
 #   a Receita, sem canal lido; não foi criado.
 # - Conta gov.br nível prata/ouro para o canal gov.br: o trecho está fora do bloco de texto da amostra.
 # - Condição do canal "sem gov.br" (não ter declarado IR nos últimos dois anos): está no texto da página
-#   (amostra), o que resolve a observação 6 da evidência; entra na descrição do canal.
+#   (amostra), o que resolve a observação 6 da evidência; entra na descrição do canal e também é regra
+#   (pergunta "declarou-imposto-de-renda"): "sim" esconde o canal, "não sei" o mostra marcado.
 # - Segunda via do título de eleitor: sem procedimento (sem fonte oficial lida). Valores de terceiros
 #   (R$ 45,00, R$ 61,30, R$ 44,19) e portarias do TSE não entram; da CNH vale só a tabela do DETRAN-MA.
 # - Prazo do CPF: só o atendimento por e-mail tem número ("em média, 48 horas"); a API não traz prazo.
@@ -47,6 +48,19 @@ options = [
   {slug = "titulo-de-eleitor", label = "Título de eleitor", out_of_coverage = true},
 ]
 
+[[questions]]
+slug = "declarou-imposto-de-renda"
+text = "Você entregou declaração de imposto de renda nos últimos dois anos?"
+help = "Pense nas declarações de imposto de renda que você entregou à Receita Federal. Se não lembrar, escolha \"Não sei\"."
+kind = "SINGLE"
+allows_unknown = true
+order = 1
+situations = ["perda-de-documentos"]
+options = [
+  {slug = "sim", label = "Sim, entreguei"},
+  {slug = "nao", label = "Não entreguei"},
+]
+
 [[procedures]]
 slug = "segunda-via-cpf"
 title = "Obter a segunda via do CPF (comprovante de inscrição)"
@@ -62,7 +76,7 @@ requirements = [
 ]
 channels = [
   {kind = "ONLINE", description = "Emitir Meu Cartão de CPF (2ª via).", url = "https://cav.receita.fazenda.gov.br/autenticacao/login/index/5090", source = "api-servicos-10424", excerpt = "[Emitir Meu Cartão de CPF (2ª via)](https://cav.receita.fazenda.gov.br/autenticacao/login/index/5090)"},
-  {kind = "ONLINE", description = "Emitir Meu Cartão de CPF (2ª via), sem gov.br, para quem não apresentou declaração de imposto de renda nos últimos dois anos.", url = "https://servicos.receita.fazenda.gov.br/Servicos/CPF/ImpressaoComprovante/ConsultaImpressao.asp", source = "govbr-obter-cartao-cpf", excerpt = "Se você não apresentou declaração de imposto de renda nos últimos dois anos"},
+  {kind = "ONLINE", description = "Emitir Meu Cartão de CPF (2ª via), sem gov.br, para quem não apresentou declaração de imposto de renda nos últimos dois anos.", url = "https://servicos.receita.fazenda.gov.br/Servicos/CPF/ImpressaoComprovante/ConsultaImpressao.asp", source = "govbr-obter-cartao-cpf", excerpt = "Se você não apresentou declaração de imposto de renda nos últimos dois anos", rule = "regra-cpf-sem-declaracao-ir"},
   {kind = "EMAIL", description = "Atendimento por e-mail.", source = "govbr-obter-cartao-cpf", excerpt = "Atendimento por e-mail"},
 ]
 details = [
@@ -155,3 +169,10 @@ after = "segunda-via-cnh"
 kind = "MANDATORY"
 source = "detran-2via-cnh"
 excerpt = "Boletim de Ocorrência;"
+
+[[rules]]
+slug = "regra-cpf-sem-declaracao-ir"
+explanation = "Vale se você não entregou declaração de imposto de renda nos últimos dois anos."
+source = "govbr-obter-cartao-cpf"
+excerpt = "Se você não apresentou declaração de imposto de renda nos últimos dois anos"
+conditions = [{question = "declarou-imposto-de-renda", operator = "ANY_OF", options = ["nao"]}]

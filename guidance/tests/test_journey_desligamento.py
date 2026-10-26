@@ -16,6 +16,7 @@ pytestmark = pytest.mark.django_db
 SLUG = "desligamento-do-trabalho"
 FORMA = "forma-de-termino"
 VINCULO = "tipo-de-vinculo"
+VEZES = "vezes-seguro-desemprego"
 SEGURO = "seguro-desemprego"
 DOMESTICO = "seguro-desemprego-domestico"
 FGTS = "saque-fgts-dispensa"
@@ -24,8 +25,12 @@ CAGED = "extrato-vinculos-caged"
 UNKNOWN = Unknown.UNKNOWN
 
 
-def _facts(forma: str | Unknown | None, vinculo: str | Unknown | None = None) -> Facts:
-    raw = {FORMA: forma, VINCULO: vinculo}
+def _facts(
+    forma: str | Unknown | None,
+    vinculo: str | Unknown | None = None,
+    vezes: str | Unknown | None = None,
+) -> Facts:
+    raw = {FORMA: forma, VINCULO: vinculo, VEZES: vezes}
     return {q: v if isinstance(v, Unknown) else frozenset({v}) for q, v in raw.items() if v}
 
 
@@ -40,7 +45,7 @@ def catalog(loaded: dict[str, int]) -> Catalog:
 
 # (forma, vínculo, no plano, indeterminados fora do plano, próxima pergunta, fora de cobertura)
 CASES = [
-    ("sem-justa-causa", "empregado", {SEGURO, FGTS, CTPS, CAGED}, set(), None, ()),
+    ("sem-justa-causa", "empregado", {SEGURO, FGTS, CTPS, CAGED}, set(), VEZES, ()),
     ("sem-justa-causa", "domestico", {DOMESTICO, FGTS, CTPS, CAGED}, set(), None, ()),
     ("pedido-de-demissao", None, {CTPS, CAGED}, set(), None, ()),
     ("justa-causa", None, {CTPS, CAGED}, set(), None, ()),
@@ -126,3 +131,67 @@ def test_http_unknown_vinculo_keeps_seguros_out_of_plan(
     plan = client.get(f"/s/{SLUG}/plano/").content.decode()
     assert f'data-slug="{FGTS}"' in plan
     assert f'data-slug="{SEGURO}"' not in plan
+
+
+PRIMEIRA = "Primeira solicitação"
+SEGUNDA = "Segunda solicitação"
+DEMAIS = "Demais solicitações"
+
+
+def _carencia(catalog: Catalog, vezes: str | Unknown | None) -> dict[str, Tri]:
+    step = next(
+        s
+        for s in build_plan(catalog, _facts("sem-justa-causa", "empregado", vezes)).steps
+        if s.procedure.slug == SEGURO
+    )
+    return {
+        label: tri
+        for r, tri in step.requirements
+        for label in (PRIMEIRA, SEGUNDA, DEMAIS)
+        if r.description.startswith(label)
+    }
+
+
+@pytest.mark.parametrize(
+    ("vezes", "shown"),
+    [
+        ("primeira", {PRIMEIRA: Tri.APPLICABLE}),
+        ("segunda", {SEGUNDA: Tri.APPLICABLE}),
+        ("terceira-ou-mais", {DEMAIS: Tri.APPLICABLE}),
+        (UNKNOWN, dict.fromkeys((PRIMEIRA, SEGUNDA, DEMAIS), Tri.UNDETERMINED)),
+        (None, dict.fromkeys((PRIMEIRA, SEGUNDA, DEMAIS), Tri.UNDETERMINED)),
+    ],
+)
+def test_carencia_requirement_follows_number_of_requests(
+    catalog: Catalog, vezes: str | Unknown | None, shown: dict[str, Tri]
+) -> None:
+    assert _carencia(catalog, vezes) == shown
+
+
+def test_requests_question_only_when_seguro_is_applicable(catalog: Catalog) -> None:
+    for facts in (
+        _facts("pedido-de-demissao", "empregado"),
+        _facts("sem-justa-causa", "domestico"),
+        _facts("sem-justa-causa", UNKNOWN),
+        _facts(UNKNOWN, "empregado"),
+    ):
+        question = next_question(catalog, facts, evaluate(catalog, facts))
+        assert question is None or question.slug != VEZES
+
+
+def test_requests_question_comes_after_form_and_vinculo(catalog: Catalog) -> None:
+    order = []
+    facts: Facts = {}
+    for answer in ("sem-justa-causa", "empregado"):
+        question = next_question(catalog, facts, evaluate(catalog, facts))
+        assert question is not None
+        order.append(question.slug)
+        facts = {**facts, question.slug: frozenset({answer})}
+    question = next_question(catalog, facts, evaluate(catalog, facts))
+    assert order == [FORMA, VINCULO]
+    assert question is not None and question.slug == VEZES
+
+
+def test_changing_requests_answer_recomputes_requirements(catalog: Catalog) -> None:
+    assert _carencia(catalog, "primeira") == {PRIMEIRA: Tri.APPLICABLE}
+    assert _carencia(catalog, "segunda") == {SEGUNDA: Tri.APPLICABLE}

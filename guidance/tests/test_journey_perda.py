@@ -4,14 +4,17 @@ import pytest
 from django.http import HttpResponse
 from django.test import Client
 
-from guidance.engine.model import Catalog, Facts
+from guidance.engine.evaluation import evaluate
+from guidance.engine.model import Catalog, Facts, Tri, Unknown
 from guidance.engine.plan import Plan, build_plan
+from guidance.engine.questions import next_question
 from guidance.repository import load_catalog
 
 pytestmark = pytest.mark.django_db
 
 SLUG = "perda-de-documentos"
 QUESTION = "documentos-perdidos"
+IR = "declarou-imposto-de-renda"
 CPF = "segunda-via-cpf"
 BO = "registrar-ocorrencia-extravio"
 CIN = "segunda-via-cin"
@@ -80,7 +83,47 @@ def test_http_flow_shows_coverage_warning(loaded: dict[str, int], client: Client
     answer = ["cpf", "cnh", "titulo-de-eleitor"]
     response = client.post(f"/s/{SLUG}/", {"question": QUESTION, "answer": answer})
     assert isinstance(response, HttpResponse) and response.status_code == 303
+    client.post(f"/s/{SLUG}/", {"question": IR, "answer": "sim"})
     html = client.get(f"/s/{SLUG}/plano/").content.decode()
     assert all(f'data-slug="{slug}"' in html for slug in (CPF, BO, CNH))
     assert "Limite de cobertura" in html
     assert "Título de eleitor" in html
+
+
+def _cpf_channels(catalog: Catalog, ir: str | Unknown | None) -> list[tuple[str, Tri]]:
+    facts: dict[str, frozenset[str] | Unknown] = {QUESTION: frozenset({"cpf"})}
+    if ir is not None:
+        facts[IR] = ir if isinstance(ir, Unknown) else frozenset({ir})
+    step = next(s for s in build_plan(catalog, facts).steps if s.procedure.slug == CPF)
+    return [(c.description, tri) for c, tri in step.channels]
+
+
+@pytest.mark.parametrize(
+    ("ir", "without_govbr"),
+    [("sim", None), ("nao", Tri.APPLICABLE), (Unknown.UNKNOWN, Tri.UNDETERMINED)],
+)
+def test_channel_without_govbr_follows_income_tax_answer(
+    catalog: Catalog, ir: str | Unknown, without_govbr: Tri | None
+) -> None:
+    channels = _cpf_channels(catalog, ir)
+    found = [tri for description, tri in channels if "sem gov.br" in description]
+    assert found == ([] if without_govbr is None else [without_govbr])
+    assert any(
+        tri is Tri.APPLICABLE and "sem gov.br" not in d for d, tri in channels
+    )  # gov.br fica
+
+
+def test_income_tax_question_only_when_cpf_is_applicable(catalog: Catalog) -> None:
+    def asked(*chosen: str) -> str | None:
+        facts = _facts(*chosen)
+        question = next_question(catalog, facts, evaluate(catalog, facts))
+        return question.slug if question else None
+
+    assert asked("cpf") == IR
+    assert asked("cnh", "cin") is None
+    assert asked() is None
+
+
+def test_changing_income_tax_answer_recomputes_channels(catalog: Catalog) -> None:
+    assert not any("sem gov.br" in d for d, _ in _cpf_channels(catalog, "sim"))
+    assert any("sem gov.br" in d for d, _ in _cpf_channels(catalog, "nao"))

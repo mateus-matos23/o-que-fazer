@@ -398,7 +398,15 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 5 es
 - Repositório: regra, condições e citação dos itens vêm no prefetch (constante, até 6 consultas a mais, só quando há item com regra). Telas: o plano usa os itens visíveis (inclusive em "O que separar antes" e na ordenação por preferência); item indeterminado traz "Pode valer para você:" em texto, estilo `.maybe`; se todos os itens somem, aparece "Nenhum dos itens da fonte vale para o que você informou." em vez de "Não informado". Em "Onde resolvo?" os itens com regra aparecem marcados.
 - Motivo: RF25 e RN03/RN11. Um requisito ou canal que só vale para parte dos casos não deve aparecer para quem já sabe que não é o seu, nem sumir para quem ainda não sabe. Esta fatia não altera `content/*.toml`; as perguntas que usam o recurso vêm na fatia 7.
 - Gates: ruff format, ruff check, mypy e pytest verdes (404 passed; eram 376 na fatia 5). `git diff --check` limpo.
-- Verificação no navegador: junto da fatia 7, que traz o primeiro conteúdo condicional.
+- Verificação no navegador: feita junto da fatia 7, que traz o primeiro conteúdo condicional (ver abaixo).
+
+**Fatia 7 — perguntas novas com fonte já coletada.**
+
+- Desligamento: pergunta `vezes-seguro-desemprego` (primeira, segunda, terceira ou mais; "Não sei" permitido; `order = 1`) e três regras sem `procedure` (`regra-carencia-primeira`, `-segunda`, `-demais`), uma por requisito de carência do `seguro-desemprego`, citando o mesmo trecho do requisito. Perda: pergunta `declarou-imposto-de-renda` (sim, não; "Não sei" permitido; `order = 1`), ligada à situação que carrega `segunda-via-cpf`, e a regra `regra-cpf-sem-declaracao-ir` no canal "sem gov.br" do CPF. Comentário do topo do TOML da perda atualizado.
+- Motivo: primeiro conteúdo real a usar requisitos e canais condicionais (RF25). Quem já sabe a quantas vezes pediu o seguro, ou se declarou IR, deixa de ver itens que não são seus; quem não sabe vê todos, marcados (RN03). A pergunta só é feita quando o procedimento é aplicável (RN02). A ajuda das perguntas não afirma regra nem prazo (RN16). Nenhuma alteração em motor, carregador, models ou views.
+- Testes: contagens globais (Question 6, AnswerOption 22, Rule 13, Condition 15), um ramo por opção mais "não sei", pergunta só com procedimento aplicável, ordem determinística e recálculo ao mudar a resposta. Testes de fluxo HTTP que iam direto ao plano da perda passaram a responder a pergunta de IR.
+- Gates: ruff format, ruff check, mypy e pytest verdes (417 passed; eram 404). `git diff --check` limpo.
+- Verificação no navegador (25/10/2026, Chromium headless via CDP, conteúdo carregado no `oqf_dev`): no desligamento, a pergunta das vezes aparece só com o seguro aplicável (nunca com pedido de demissão); "primeira" e "segunda" mostram só a carência correspondente, sem marca; "Não sei" mostra as 3 com "Pode valer para você:" (contraste 9,89:1, visível na impressão); alterar a resposta recalcula o plano. Na perda, a pergunta de IR só aparece com CPF; "Sim" esconde o canal "sem gov.br", "Não" o mostra sem marca e "Não sei" o mostra marcado. Em "Onde resolvo?", os itens condicionais aparecem marcados. Sem rolagem horizontal em 360 px; sem erros de console ou de rede.
 
 ## Limitações conhecidas
 

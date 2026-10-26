@@ -215,6 +215,7 @@ def test_start_here_lists_first_layer_of_real_journey(
         perda, {"question": "documentos-perdidos", "answer": ["cpf", "cin", "cnh"]}
     )
     assert response.status_code == 303
+    client.post(perda, {"question": "declarou-imposto-de-renda", "answer": "sim"})
     start = _block(_html(client, perda + "plano/"), "comece-por-aqui")
     assert "Pode começar por qualquer uma destas:" in start
     assert '<a href="#etapa-registrar-ocorrencia-extravio">' in start
@@ -235,6 +236,7 @@ def test_prepare_has_one_group_per_step_with_requirements(
 ) -> None:
     perda = "/s/perda-de-documentos/"
     client.post(perda, {"question": "documentos-perdidos", "answer": ["cpf", "cin", "cnh"]})
+    client.post(perda, {"question": "declarou-imposto-de-renda", "answer": "sim"})
     prepare = _block(_html(client, perda + "plano/"), "o-que-separar-antes")
     assert prepare.count("<h3>") == 4  # um grupo por etapa, na ordem do plano
     assert prepare.index("Solicitar a Carteira de Identidade") < prepare.index(

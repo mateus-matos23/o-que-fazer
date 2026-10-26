@@ -106,7 +106,7 @@ Rodapé: "Copyright © 2026 DETRAN MA - Simulado, Multas, IPVA..."
 - Canais: web "Emitir Meu Cartão de CPF (2ª via)"; web "sem gov.br" ("Emitir Meu Cartão de CPF (2ªvia) Sem Gov.br"); e-mail ("Atendimento por e-mail").
 - Custo: "Este serviço é gratuito para o cidadão."
 - Prazo: não informado.
-- Observação de fonte de busca (não lida na página, não confirmada): o canal "sem gov.br" vale para quem não apresentou declaração de IR nos últimos dois anos.
+- Condição do canal "sem gov.br": a página traz "Se você não apresentou declaração de imposto de renda nos últimos dois anos" (confirmado em 24/10/2026). Fatia 7: o canal virou condicional pela regra `regra-cpf-sem-declaracao-ir` (pergunta `declarou-imposto-de-renda`, opção `nao`), com esse trecho como citação. "Sim" esconde o canal; "Não sei" ou sem resposta o mostra marcado "Pode valer para você". O canal gov.br não muda.
 
 **Amostra**
 ```

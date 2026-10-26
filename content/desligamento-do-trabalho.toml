@@ -73,6 +73,20 @@ options = [
   {slug = "domestico", label = "Empregado doméstico"},
 ]
 
+[[questions]]
+slug = "vezes-seguro-desemprego"
+text = "É a primeira vez que você pede o seguro-desemprego?"
+help = "Se não lembrar, escolha \"Não sei\"."
+kind = "SINGLE"
+allows_unknown = true
+order = 1
+situations = ["desligamento-do-trabalho"]
+options = [
+  {slug = "primeira", label = "Sim, é a primeira vez"},
+  {slug = "segunda", label = "Não, é a segunda vez"},
+  {slug = "terceira-ou-mais", label = "Não, já pedi duas vezes ou mais"},
+]
+
 [[procedures]]
 slug = "seguro-desemprego"
 title = "Solicitar o seguro-desemprego"
@@ -83,9 +97,9 @@ source = "govbr-seguro-desemprego"
 excerpt = "Trabalhadores formais que foram demitidos involuntariamente (sem justa causa) e que:"
 requirements = [
   {description = "Não ter renda própria suficiente para a manutenção sua e da sua família.", source = "govbr-seguro-desemprego", excerpt = "não possuem renda própria que seja suficiente à sua manutenção e de sua família."},
-  {description = "Primeira solicitação: ter recebido salários de pelo menos 12 meses nos últimos 18 meses anteriores à dispensa.", source = "govbr-seguro-desemprego", excerpt = "pelo menos 12 meses nos últimos 18 meses imediatamente anteriores à data de dispensa, quando da primeira solicitação"},
-  {description = "Segunda solicitação: ter recebido salários de pelo menos 9 meses nos últimos 12 meses anteriores à dispensa.", source = "govbr-seguro-desemprego", excerpt = "pelo menos 9 meses nos últimos 12 meses imediatamente anteriores à data de dispensa, quando da segunda solicitação"},
-  {description = "Demais solicitações: ter recebido salários em cada um dos 6 meses anteriores à dispensa.", source = "govbr-seguro-desemprego", excerpt = "cada um dos 6 meses imediatamente anteriores à data de dispensa, quando das demais solicitações"},
+  {description = "Primeira solicitação: ter recebido salários de pelo menos 12 meses nos últimos 18 meses anteriores à dispensa.", source = "govbr-seguro-desemprego", excerpt = "pelo menos 12 meses nos últimos 18 meses imediatamente anteriores à data de dispensa, quando da primeira solicitação", rule = "regra-carencia-primeira"},
+  {description = "Segunda solicitação: ter recebido salários de pelo menos 9 meses nos últimos 12 meses anteriores à dispensa.", source = "govbr-seguro-desemprego", excerpt = "pelo menos 9 meses nos últimos 12 meses imediatamente anteriores à data de dispensa, quando da segunda solicitação", rule = "regra-carencia-segunda"},
+  {description = "Demais solicitações: ter recebido salários em cada um dos 6 meses anteriores à dispensa.", source = "govbr-seguro-desemprego", excerpt = "cada um dos 6 meses imediatamente anteriores à data de dispensa, quando das demais solicitações", rule = "regra-carencia-demais"},
   {description = "Não receber benefício previdenciário de prestação continuada (exceto auxílio-acidente, auxílio suplementar e abono de permanência em serviço).", source = "govbr-seguro-desemprego", excerpt = "não recebem qualquer benefício previdenciário de prestação continuada, com exceção do auxílio-acidente, do auxílio suplementar e do abono de permanência em serviço."},
   {description = "Documento do Requerimento do Seguro-Desemprego, entregue pelo empregador na dispensa.", source = "govbr-seguro-desemprego", excerpt = "Documento do Requerimento do Seguro-Desemprego (você recebe do empregador este documento no momento que é dispensado sem justa causa)"},
   {description = "Número do CPF.", source = "govbr-seguro-desemprego", excerpt = "Número do CPF"},
@@ -214,3 +228,24 @@ explanation = "O saque do FGTS por dispensa é para o trabalhador demitido sem j
 source = "fgts-saque-dispensa"
 excerpt = "O trabalhador demitido sem justa causa pode realizar o saque do saldo da sua conta do FGTS."
 conditions = [{question = "forma-de-termino", operator = "ANY_OF", options = ["sem-justa-causa"]}]
+
+[[rules]]
+slug = "regra-carencia-primeira"
+explanation = "Vale se esta for a sua primeira solicitação do seguro-desemprego."
+source = "govbr-seguro-desemprego"
+excerpt = "pelo menos 12 meses nos últimos 18 meses imediatamente anteriores à data de dispensa, quando da primeira solicitação"
+conditions = [{question = "vezes-seguro-desemprego", operator = "ANY_OF", options = ["primeira"]}]
+
+[[rules]]
+slug = "regra-carencia-segunda"
+explanation = "Vale se esta for a sua segunda solicitação do seguro-desemprego."
+source = "govbr-seguro-desemprego"
+excerpt = "pelo menos 9 meses nos últimos 12 meses imediatamente anteriores à data de dispensa, quando da segunda solicitação"
+conditions = [{question = "vezes-seguro-desemprego", operator = "ANY_OF", options = ["segunda"]}]
+
+[[rules]]
+slug = "regra-carencia-demais"
+explanation = "Vale se você já pediu o seguro-desemprego duas vezes ou mais."
+source = "govbr-seguro-desemprego"
+excerpt = "cada um dos 6 meses imediatamente anteriores à data de dispensa, quando das demais solicitações"
+conditions = [{question = "vezes-seguro-desemprego", operator = "ANY_OF", options = ["terceira-ou-mais"]}]

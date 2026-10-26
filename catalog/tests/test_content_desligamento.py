@@ -25,6 +25,7 @@ def test_questions_allow_unknown(loaded: dict[str, int]) -> None:
     assert {q.slug: q.allows_unknown for q in questions} == {
         "forma-de-termino": True,
         "tipo-de-vinculo": True,
+        "vezes-seguro-desemprego": True,
     }
 
 
