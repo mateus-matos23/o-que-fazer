@@ -40,7 +40,7 @@ Uma jornada pode reunir vários serviços. Quantidade de jornadas e quantidade d
 
 Perguntas discutidas:
 
-- Foi perda, furto, roubo ou a pessoa não tem certeza?
+- Foi perda, furto, roubo ou a pessoa não tem certeza? **Pendente (fatia 9, 25/10/2026): fora do protótipo.** Nenhuma fonte oficial lida muda requisito, taxa, canal ou ordem conforme a causa (a 2ª via da CNH trata extravio, furto, roubo e dano do mesmo modo), então a pergunta não altera o plano e não passa na RN02. Reavaliar se uma fonte oficial mostrar que roubo não é registrável na Delegacia Online ([evidência](../dados/evidencias/perda-de-documentos.md#perda--furtoroubo-fatia-9-25102026), [pendências](../pendencias.md), item 16).
 - Quais documentos estavam envolvidos?
 - (Protótipo) Se o CPF está entre eles: entregou declaração de imposto de renda nos últimos dois anos? A resposta decide se o canal "sem gov.br" aparece.
 - Existe acesso a alguma versão digital ou a outro documento relevante?
@@ -101,7 +101,7 @@ Essas situações compõem a visão de expansão. Não devem ser apresentadas co
 
 | Caso | Comportamento esperado |
 | --- | --- |
-| Perda, furto ou roubo | Diferenciar quando a distinção altera procedimentos. |
+| Perda, furto ou roubo | Diferenciar quando a distinção altera procedimentos. Estado: **Pendente**. Em 25/10/2026 nenhuma fonte lida distingue os casos; o plano trata todos como "perdi" (a pergunta ficou fora por não passar na RN02). Ponto aberto: a Delegacia Online lista "extravio" e "furto simples", sem mencionar roubo. |
 | Vários documentos envolvidos | Combinar providências sem repetir etapas comuns. |
 | Falta de um documento exigido | Identificar a obtenção do requisito e avaliar a dependência. |
 | CPF irregular sem situação conhecida | Orientar consulta intermediária e permitir retorno. |

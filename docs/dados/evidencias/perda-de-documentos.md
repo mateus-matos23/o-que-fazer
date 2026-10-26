@@ -29,6 +29,66 @@ A tabela acima registra a consulta de 10/10/2026 e fica como **Histórico**. Nov
 
 Consequência para a jornada: a CIN e a CNH podem sair de `out_of_coverage`, e surge a primeira **dependência obrigatória** com fonte (ocorrência → 2ª via da CNH) e uma **condicional** (certidão → CIN, se a certidão também foi perdida). Aplicado em 25/10/2026 na fatia 5c: CIN e CNH saíram de `out_of_coverage` e a dependência obrigatória ocorrência → 2ª via da CNH entrou. A condicional certidão → CIN foi **adiada**: a única fonte da certidão é o serviço da SEMCAS, com requisitos vagos, e o cartório não tem fonte; a certidão fica como requisito da CIN.
 
+## Perda × furto/roubo (fatia 9, 25/10/2026)
+
+Estado: **Consolidado** como pesquisa; a pergunta "foi perda, furto ou roubo?" **não entra** na jornada. Pergunta: alguma fonte oficial da jornada trata perda, furto e roubo de forma diferente (requisito, taxa, canal, ordem)? Pela RN02, só nesse caso a pergunta existiria. Coleta de 25/10/2026 por `curl` (leitura; nada gravado no banco), texto extraído da página sem reescrita. Os trechos abaixo são literais. A data de coleta não é a data de vigência.
+
+### Delegacia Online (Polícia Civil do MA)
+
+Fonte: https://www.policiacivil.ma.gov.br/delegacia-online/ (HTTP 200; espelho com o mesmo texto em https://www.ssp.ma.gov.br/delegacia-online/, HTTP 200). Data declarada: "Publicado em: quinta-feira, 1 de março de 2018" (a página é uma notícia de lançamento; sem data de atualização).
+
+- "Por meio da Delegacia Online é possível registrar ocorrências de extravio de documentos, furto simples e preservação de direito, evitando assim a necessidade de deslocamento do cidadão até uma delegacia física."
+- "Na Delegacia Online, o cidadão pode registrar alguns tipos de ocorrências que ao acessar a ferramenta vai mostrar ao cidadão, vai poder registrar ocorrência de preservação de direito; questão de extravio de documentos e de furto simples."
+- "O cidadão ao invés de se deslocar até uma unidade policial, para fazer os registros de ocorrências aqueles que não envolvem violência, ameaça, eles podem fazer de casa"
+
+O que diz: o canal online cobre extravio e "furto simples". O que **não** diz: a palavra "roubo" não aparece na página (só numa manchete de notícia sem relação); "furto simples" não é definido (furto qualificado fica sem menção); a página não afirma que roubo ou furto com violência exigem a delegacia física. Isso só se deduziria da frase "não envolvem violência, ameaça", e essa dedução não está no texto. O sistema descrito é de 2018 ("o próximo a ser entregue será o Boletim de Ocorrência"). O endereço da ferramenta citado na página (https://delegaciaonline.ssp.ma.gov.br/) não resolve no DNS em 25/10/2026, então o formulário atual, com as opções que oferece hoje, não foi lido.
+
+Conclusão: **não confirmado**. Há indício de que roubo (violência) não seria registrável online, mas sem trecho que o afirme; a distinção não pode virar regra nem pergunta.
+
+### DETRAN-MA: 2ª via da CNH/PpD
+
+Fonte: https://www.detran.ma.gov.br/inicio/paginas/Pagina.xhtml?id=19297 (HTTP 200; sem data declarada) e tabela https://www.detran.ma.gov.br/inicio/paginas/Taxas.xhtml (HTTP 200).
+
+- "É o processo de uma nova emissão de uma Carteira Nacional de Habilitação (CNH) ou Permissão para Dirigir (PpD), em casos de extravio, furto, roubo ou danificação do documento original."
+- Documentos necessários, uma única lista para todos os casos: "Boletim de Ocorrência;" e "RG (original e cópia)." Requisito: "Pagamento da taxa de serviço."
+- Taxas: "Segunda Via CNH R$ 90.00" e "Segunda Via P.D R$ 75.00". Os valores variam pelo tipo de documento (CNH ou PpD), não pela causa.
+
+O que diz: os quatro casos (extravio, furto, roubo, dano) são tratados como o mesmo serviço, com a mesma lista de documentos, o mesmo canal ("Nas unidades de atendimento do Detran-MA.") e a mesma taxa. O que não diz: nenhuma exceção ao B.O. para algum dos casos; nenhuma taxa por causa.
+
+Conclusão: **não distingue**. O B.O. continua obrigatório em qualquer causa (dependência já existente).
+
+### Ident-MA / SSP-MA / gov.br: 2ª via da CIN
+
+Fontes: https://www.gov.br/governodigital/pt-br/identidade/cin/perguntas-frequentes-sobre-a-cin (HTTP 200; "Atualizado em 16/07/2026 17h13") e https://www.ssp.ma.gov.br/governo-passa-a-emitir-nova-carteira-de-identidade-nacional-em-todo-o-maranhao/ (HTTP 200; notícia de 12/01/2024).
+
+- "A segunda via do documento poderá ser emitida pelo Órgãos de Identificação Civil de qualquer uma das Unidades Federativas do país."
+- "Para a solicitar a Carteira de Identidade Nacional será preciso levar certidão de nascimento ou de casamento (original ou cópia) e o RG atual – caso possua"
+
+O que diz: uma só regra para a 2ª via, sem menção a causa. O que não diz: as duas páginas não contêm as palavras "perda", "extravio", "furto", "roubo" nem "boletim" no contexto da 2ª via; B.O. e taxa da 2ª via do Ident-MA seguem "não informado". A notícia da Secom sobre a 2ª via da CIN "após caso de perda" (https://www.gov.br/secom/pt-br/acompanhe-a-secom/noticias/2026/02/saiba-como-solicitar-a-2a-via-da-cin-apos-caso-de-perda) **não abriu**: redireciona para login (HTTP 302). O domínio do Ident-MA (ident.ssp.ma.gov.br, endereço tentado por mim, não um link oficial encontrado) não resolveu; https://www.ssp.ma.gov.br/ident/ respondeu 404 e a busca do site da SSP não trouxe página da 2ª via.
+
+Conclusão: **não confirmado** (a fonte é silenciosa; a Secom, que poderia dizer algo sobre perda, não abriu).
+
+### Receita Federal: 2ª via do CPF
+
+Fonte: https://www.gov.br/pt-br/servicos/obter-cartao-de-cpf (HTTP 200; "Última Modificação: 06/08/2026").
+
+- "Obtenha o seu cartão de CPF (comprovante de inscrição) para impressão." Custo: "Este serviço é gratuito para o cidadão."
+
+O que diz: o comprovante é emitido do mesmo modo, sem condição de causa. O que não diz: a página não contém "perda", "extravio", "furto" nem "roubo". O canal "sem gov.br" depende de IR, não da causa.
+
+Conclusão: **não distingue**.
+
+### Conclusão da fatia
+
+| Procedimento | Distingue perda × furto × roubo? |
+| --- | --- |
+| Registrar ocorrência (Delegacia Online) | Não confirmado: lista "extravio" e "furto simples"; "roubo" ausente; indício só por "não envolvem violência, ameaça" |
+| 2ª via da CNH (DETRAN-MA) | Não distingue: extravio, furto, roubo e dano têm o mesmo B.O., documentos, canal e taxa |
+| 2ª via da CIN (Ident-MA) | Não confirmado: fonte silenciosa; Secom não abriu |
+| 2ª via do CPF (Receita) | Não distingue |
+
+Nenhuma fonte lida muda requisito, taxa, canal ou ordem conforme a causa. Pela RN02, a pergunta não entra. Ponto aberto: se roubo (ou furto qualificado) não puder ser registrado na Delegacia Online, a etapa "Registrar ocorrência de extravio" não serviria a quem sofreu roubo, e o plano da CNH teria de apontar a delegacia física. Isso só pode ser afirmado com fonte que o diga (formulário atual da Delegacia Online ou resposta da Polícia Civil).
+
 ## Catálogo Gov.br e API de serviços (verificação técnica)
 
 Esta seção registra o que foi efetivamente testado. Ela não é um serviço de jornada, mas define o formato de coleta possível. Ver a subseção "API de serviços do Gov.br" abaixo.

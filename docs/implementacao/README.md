@@ -321,7 +321,7 @@ Decisões no [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.m
 
 ## Fase 7 — Conversa guiada
 
-Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 5 estão consolidadas, as demais seguem pendentes.
+Proposta aprovada pelo autor em 25/10/2026. Estado: Consolidado; as fatias 0 a 9 foram entregues (a 9 só como pesquisa; a pergunta perda × furto/roubo não entrou).
 
 **Motivação.** Hoje o cidadão escolhe a situação numa lista e responde uma ou duas perguntas antes do plano. O autor quer uma experiência de "conversa guiada", inspirada no Akinator, para um público com idade, escolaridade e familiaridade com tecnologia variadas. A conversa leva à situação por um funil de triagem, mostra o efeito de cada resposta no plano e termina num plano com ponto de partida. Requisitos RF21 a RF26 e regras RN02, RN14 e RN16 em [requisitos](../produto/requisitos.md).
 
@@ -343,10 +343,10 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 5 es
 | 3 | Efeito da resposta no plano | Consolidado |
 | 4 | Preferência de atendimento e ordenação dos canais | Consolidado |
 | 5 | Plano com "Comece por aqui", "O que separar antes" e versão para impressão | Consolidado |
-| 6 | Requisitos e canais condicionais no motor | Pendente |
-| 7 | Perguntas novas com fonte: primeira solicitação do seguro-desemprego; declaração de IR nos últimos dois anos para o canal "sem gov.br" do CPF | Pendente |
-| 8 | "Não sei" com como descobrir (pesquisa) | Pendente |
-| 9 | Pesquisa perda × furto/roubo | Pendente |
+| 6 | Requisitos e canais condicionais no motor | Consolidado |
+| 7 | Perguntas novas com fonte: primeira solicitação do seguro-desemprego; declaração de IR nos últimos dois anos para o canal "sem gov.br" do CPF | Consolidado |
+| 8 | "Não sei" com como descobrir (pesquisa) | Consolidado (esclarecimento só para a declaração de IR; as outras 3 perguntas ficam na pendência 15) |
+| 9 | Pesquisa perda × furto/roubo | Consolidado (pesquisa; a pergunta não entra) |
 
 **Fatia 1 — linguagem simples e dica.**
 
@@ -415,6 +415,14 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Proposto; as fatias 1 a 5 es
 - Testes: contagens globais (Procedure 14, ProcedureDetail 11, Requirement 35, ServiceChannel 32); etapa presente com `clarifies` preenchido em "não sei", ausente em "sim", "não" e sem a pergunta respondida, e ausente quando o CPF sai dos documentos com IR "não sei"; teste de motor do esclarecimento que some quando o procedimento deixa de se aplicar; único esclarecimento da situação.
 - Gates: ruff format, ruff check, mypy e pytest verdes (423 passed; eram 417). `git diff --check` limpo.
 - Verificação no navegador (25/10/2026, Chromium headless via CDP): CPF e "Não sei" no IR mostram a etapa de consulta, com canais, requisitos, custo, prazo, fonte e "Alterar essa resposta"; trocar para "Sim", responder "Não" ou tirar o CPF da lista remove a etapa; 360 px sem overflow; console sem erros.
+
+**Fatia 9 — pesquisa perda × furto/roubo (25/10/2026).**
+
+- Só pesquisa e documentação; nenhum código, TOML ou teste foi alterado. Conferidas as páginas atuais da Delegacia Online (Polícia Civil e espelho na SSP-MA), da 2ª via da CNH e da tabela de taxas (DETRAN-MA), das perguntas frequentes da CIN e da notícia da SSP-MA, e do cartão de CPF (gov.br). Trechos literais e conclusão por procedimento em [evidências](../dados/evidencias/perda-de-documentos.md#perda--furtoroubo-fatia-9-25102026).
+- Resultado: o DETRAN-MA trata "extravio, furto, roubo ou danificação" como o mesmo serviço (mesmo B.O., RG, canal e taxa; o valor varia entre CNH, R$ 90,00, e PpD, R$ 75,00, não pela causa). CPF e CIN não mencionam a causa. A Delegacia Online lista "extravio de documentos" e "furto simples" e não cita roubo; o indício de que roubo não seria registrável online vem só da frase "não envolvem violência, ameaça" e não está confirmado.
+- Estado: a pergunta "foi perda, furto ou roubo?" **não entra** (Pendente em [jornadas](../produto/jornadas.md) e em [pendências](../pendencias.md), item 16). Motivo: nenhuma fonte muda o plano conforme a causa, então a pergunta violaria a RN02. Gatilho para reavaliar: fonte oficial dizendo que roubo não é registrável na Delegacia Online.
+- Não abriram: https://delegaciaonline.ssp.ma.gov.br/ e ident.ssp.ma.gov.br (DNS não resolve; o segundo foi endereço tentado, não link encontrado); notícia da Secom sobre a 2ª via da CIN após perda (redireciona para login); https://www.ssp.ma.gov.br/ident/ (404). A Delegacia Online é uma notícia de 2018 e o formulário atual não foi lido.
+- Gates não rodados: a fatia não muda código. `git diff --check` limpo.
 
 ## Limitações conhecidas
 
