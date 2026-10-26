@@ -1,5 +1,7 @@
 {% extends "guidance/base.html" %}
 {% block title %}Suas respostas - O que Fazer?{% endblock %}
+{# Sem VLibras: o texto clicado aqui seria uma resposta do cidadão (ADR 0008). #}
+{% block libras %}{% endblock %}
 {% block content %}
 <p class="context-link"><a href="{% url 'guidance:question' catalog.situation_slug %}">{{ catalog.situation_title }}</a></p>
 <h1>Suas respostas</h1>

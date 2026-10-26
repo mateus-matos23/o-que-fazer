@@ -533,7 +533,35 @@ Uma revisão externa sugeriu frameworks (govbr-ds, Bootstrap, Tailwind, HTMX com
   - Traduzir envia só o texto clicado (`{"text": ...}`) para `traducao2.vlibras.gov.br` e baixa os sinais de `dicionario2.vlibras.gov.br`, cerca de 267 KB por frase. Não houve analytics.
   - O botão abre pelo teclado, mas mede 40 px. A tradução por teclado não foi verificada.
 
-  A proposta é um botão próprio que só carrega o script por ação do cidadão, fora de "Rever respostas". Nada foi implementado; aguarda decisão do autor.
+  A proposta é um botão próprio que só carrega o script por ação do cidadão, fora de "Rever respostas". Implementado na 11e.
+- **11e — VLibras a pedido.** O autor escolheu o endereço oficial sem SRI, a exclusão só de "Rever respostas" e um botão flutuante como o oficial ([ADR 0008](../arquitetura/decisoes/0008-vlibras.md), Consolidado).
+  - `_libras.html` entra pelo bloco `libras` de `base.html`, e `review.html` o sobrescreve com um bloco vazio.
+  - O bloco vem com `hidden`. O botão "Libras" abre um popover nativo com o aviso de tamanho e de envio do texto, e com "Abrir o VLibras" e "Agora não".
+  - `libras.js` (módulo, sem dependência) injeta o plugin só nesse clique. Depois, espera o `initBtn`, aumenta o botão oficial para 44 px, abre o widget e põe o foco no painel. A falha ou a espera acima de 15 s viram mensagem em `role="status"`.
+  - Antes do código, uma página descartável confirmou a injeção sob demanda, a abertura direta, o foco perdido e o ajuste de 44 px. A verificação revelou que o `overflow-wrap` do `body` vazava para a shadow root do widget; os hosts voltam a `overflow-wrap: normal`.
+
+  Os testes cobrem:
+  - o bloco escondido e o script local em seis páginas;
+  - a ausência de ambos em "Rever respostas";
+  - nenhuma página renderizada citando `vlibras.gov.br`;
+  - a regra de impressão.
+
+  Verificação no Chromium headless via CDP (26/10/2026, `oqf_dev`):
+  - sem JavaScript, o bloco fica escondido;
+  - com JavaScript e sem clique, nenhuma requisição externa;
+  - Tab chega ao botão, Enter abre o popover, Esc fecha e devolve o foco;
+  - "Abrir o VLibras" carrega o widget e põe o foco no menu do painel;
+  - fechado o widget, o botão oficial fica com 44×44 px;
+  - com `vlibras.gov.br` bloqueado, a mensagem de erro aparece e uma nova tentativa não duplica o script;
+  - "Rever respostas" fica sem bloco, sem script e sem requisição externa;
+  - a 320 e 360 px, nenhuma rolagem horizontal;
+  - na impressão, o bloco fica escondido.
+
+  O `npm run a11y` passou: 21 páginas, nenhuma violação.
+
+  Limitações:
+  - a 320 px, o botão (74×48 px) cobre parte do texto à direita, como o oficial;
+  - a tradução por teclado e o uso em celular real, Firefox e Safari não foram verificados.
 
 ## Limitações conhecidas
 

@@ -1,0 +1,12 @@
+{% load static %}<aside id="libras" class="libras" aria-label="Tradução para Libras" hidden>
+  <button type="button" class="libras-toggle" popovertarget="libras-panel">Libras</button>
+  <div id="libras-panel" class="libras-panel" popover>
+    <p>O VLibras, do governo federal, traduz o texto desta página para Libras. Ao abrir, ele baixa cerca de 20 MB, e o texto em que você clicar é enviado ao serviço.</p>
+    <div class="actions">
+      <button type="button" id="libras-open">Abrir o VLibras</button>
+      <button type="button" class="secondary" popovertarget="libras-panel" popovertargetaction="hide">Agora não</button>
+    </div>
+    <p id="libras-status" role="status"></p>
+  </div>
+</aside>
+<script type="module" src="{% static 'guidance/libras.js' %}"></script>

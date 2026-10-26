@@ -429,6 +429,33 @@ dd { margin: 0; }
 .answers p:nth-child(2) { font-weight: 700; }
 .answers a { display: inline-flex; align-items: center; min-height: 44px; }
 
+/* Libras: botão flutuante à direita, no lugar do botão oficial do VLibras, que o substitui (ADR 0008). */
+:root { --vlibras-btn-focus-visible-outline: 3px solid var(--ink); }
+.libras-toggle {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  padding: 0.5rem 0.75rem;
+  border-right-width: 0;
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+.libras-panel {
+  max-width: min(26rem, calc(100vw - 2rem));
+  padding: 1.25rem;
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+}
+.libras-panel::backdrop { background: rgb(32 48 58 / 0.45); }
+.libras-panel .actions { margin-top: 1rem; }
+.libras-panel #libras-status { margin: 0.75rem 0 0; }
+.libras-panel #libras-status:empty { display: none; }
+/* O overflow-wrap do body é herdado pela shadow root do widget e quebrava o título "VLibras". */
+#vlibras-access-wrapper, #vlibras-app-root { overflow-wrap: normal; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
@@ -455,7 +482,7 @@ dd { margin: 0; }
     border-color: #000000 !important;
   }
   body { background: #FFFFFF !important; font-size: 12pt; }
-  .skip-link, .site-header, .site-footer, .actions, button, form, .context-link,
+  .skip-link, .site-header, .site-footer, .actions, button, form, .context-link, .libras,
   p.channel-preference, .print-hint, .edit-answer, .answer-effect { display: none !important; }
   .step, .notice, .start-here { break-inside: avoid; }
   .prepare li::before { top: 0.2em; width: 1rem; height: 1rem; border: 2px solid #000000; }

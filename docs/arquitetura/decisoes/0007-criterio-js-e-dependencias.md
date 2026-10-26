@@ -36,7 +36,7 @@ O item 1 da ADR 0004 passa a seguir este critério:
 | HTMX com Alpine.js | Rejeitada | Cada troca parcial exige gerenciar foco e `aria-live`. As páginas são leves e o CSS fica em cache, então o ganho de não recarregar é pequeno. |
 | django-widget-tweaks ou crispy-forms | Rejeitada | Ganho nulo. Os poucos formulários já são renderizados com `fieldset`, `legend` e erros associados. |
 | axe-core (só no dev) | Aceita (Fase 11b) | A verificação manual pode deixar omissões passar. O pacote não chega ao cidadão (ponto 3). |
-| VLibras | Em estudo (Fase 11d) | O ganho real é atender quem tem Libras como primeira língua. Antes de decidir, é preciso medir o peso, os domínios contatados e o que é enviado (ponto 4). |
+| VLibras | Aceita (Fase 11e) | O ganho real é atender quem tem Libras como primeira língua. Medido na Fase 11d e carregado só a pedido do cidadão, fora de "Rever respostas" ([ADR 0008](0008-vlibras.md)). |
 
 ## Consequências
 

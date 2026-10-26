@@ -196,7 +196,38 @@ def test_prepare_absent_without_requirements() -> None:
 def test_print_hint_is_plain_text_without_script() -> None:
     html = _plan_html()
     assert "Para guardar este plano, use a opção de imprimir do navegador." in html
-    assert "<script" not in html and "onclick" not in html
+    assert re.findall(r"<script[^>]*>", html) == [LIBRAS_SCRIPT] and "onclick" not in html
+
+
+LIBRAS_SCRIPT = '<script type="module" src="/static/guidance/libras.js">'
+
+
+@pytest.mark.parametrize(
+    "url", ["/", "/situacoes/", URL, URL + "plano/", "/onde-resolvo/?q=cpf", "/fora-da-cobertura/"]
+)
+def test_libras_button_is_hidden_until_script_and_loads_nothing_external(
+    loaded: dict[str, int], client: Client, url: str
+) -> None:
+    if url.endswith("plano/"):  # o plano exige uma resposta
+        client.post(URL, {"question": QUESTION, "answer": "suspenso"})
+    response = client.get(url)
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert '<aside id="libras" class="libras" aria-label="Tradução para Libras" hidden>' in html
+    assert LIBRAS_SCRIPT in html
+    assert "vlibras.gov.br" not in html  # o endereço externo só existe no script, usado a pedido
+
+
+def test_review_has_no_libras(loaded: dict[str, int], client: Client) -> None:
+    html = _html(client, URL + "respostas/")
+    assert 'id="libras"' not in html and "libras.js" not in html
+
+
+def test_libras_script_is_served_locally_and_loads_the_official_plugin() -> None:
+    path = finders.find("guidance/libras.js")
+    assert isinstance(path, str)
+    with open(path, encoding="utf-8") as handle:
+        assert '"https://vlibras.gov.br/app/vlibras-plugin.js"' in handle.read()
 
 
 def test_stylesheet_has_print_rules() -> None:
@@ -204,6 +235,7 @@ def test_stylesheet_has_print_rules() -> None:
     assert "@media print" in css
     print_block = css.split("@media print", 1)[1]
     assert "p.channel-preference" in print_block and ".edit-answer" in print_block
+    assert ".libras," in print_block
     assert ".answer-effect" in print_block
     assert 'a[href^="http"]::after' in print_block and "break-inside: avoid" in print_block
 

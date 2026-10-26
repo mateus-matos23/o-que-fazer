@@ -60,6 +60,8 @@ Considerar contraste, redimensionamento de texto, alvos de interação adequados
 
 As WCAG 2.2 foram incorporadas como referência conceitual no referencial. Consolidado (24/10/2026): a meta é WCAG 2.2 nível AA, com verificação própria ([ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.md)). O resultado está no [registro de implementação](../implementacao/README.md). Não há certificação de acessibilidade, e o uso com leitor de tela real ainda não foi verificado.
 
+Consolidado (26/10/2026): o botão "Libras" oferece a tradução do VLibras, do governo federal. O widget só é carregado quando o cidadão confirma, depois de ver o aviso de tamanho e de envio do texto. O botão não aparece em "Rever respostas" nem sem JavaScript ([ADR 0008](../arquitetura/decisoes/0008-vlibras.md)).
+
 ## Direção para prototipação visual
 
 O primeiro Markdown foi produzido para gerar uma amostra em V0, Lovable, Base44 ou ferramenta semelhante. O objetivo era visualizar a experiência antes de aprofundar a implementação.
