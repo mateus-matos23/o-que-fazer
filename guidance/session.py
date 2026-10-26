@@ -25,11 +25,20 @@ def _parse(raw: Any) -> Answer:
     raise ValueError("formato inesperado")
 
 
+def _stored_facts(session: SessionBase) -> dict[str, Any]:
+    stored = session.get(KEY, {})
+    return stored if isinstance(stored, dict) else {}
+
+
+def _situation_facts(all_facts: dict[str, Any], situation_slug: str) -> dict[str, Any]:
+    stored = all_facts.get(situation_slug, {})
+    return stored if isinstance(stored, dict) else {}
+
+
 def read_facts(session: SessionBase, catalog: Catalog) -> Facts:
     """Descarta (com log) respostas inválidas no catálogo atual; a pergunta volta a ser feita."""
-    stored = session.get(KEY, {}).get(catalog.situation_slug, {})
-    if not isinstance(stored, dict):
-        stored = {}
+    all_facts = _stored_facts(session)
+    stored = _situation_facts(all_facts, catalog.situation_slug)
     facts: dict[str, Answer] = {}
     for question_slug, raw in stored.items():
         try:
@@ -45,7 +54,7 @@ def read_facts(session: SessionBase, catalog: Catalog) -> Facts:
             continue
         facts[question_slug] = answer
     if len(facts) != len(stored):
-        session[KEY] = {**session.get(KEY, {}), catalog.situation_slug: _serialize(facts)}
+        session[KEY] = {**all_facts, catalog.situation_slug: _serialize(facts)}
     return facts
 
 
@@ -59,8 +68,8 @@ def _serialize(facts: Facts) -> dict[str, Any]:
 def write_answer(
     session: SessionBase, situation_slug: str, question_slug: str, answer: Answer
 ) -> None:
-    all_facts = session.get(KEY, {})
-    current = all_facts.get(situation_slug, {})
+    all_facts = _stored_facts(session)
+    current = _situation_facts(all_facts, situation_slug)
     current[question_slug] = UNKNOWN if isinstance(answer, Unknown) else sorted(answer)
     all_facts[situation_slug] = current
     session[KEY] = all_facts
@@ -68,7 +77,7 @@ def write_answer(
 
 
 def clear_situation(session: SessionBase, situation_slug: str) -> None:
-    all_facts = session.get(KEY, {})
+    all_facts = _stored_facts(session)
     if all_facts.pop(situation_slug, None) is not None:
         session[KEY] = all_facts
 
