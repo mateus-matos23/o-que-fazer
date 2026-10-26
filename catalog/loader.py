@@ -352,19 +352,37 @@ def _structure_problems(content: Content) -> list[str]:
     ):
         problems += _duplicates([(r.file, r.slug) for r in records], table)
 
-    agencies = set(Agency.objects.values_list("slug", flat=True))
     procedures = {p.slug for p in content.procedures}
     questions = {q.slug: q for q in content.questions}
     situations = {s.slug for s in content.situations}
     rules = {r.slug: r for r in content.rules}
-    options = {q.slug: {slug for slug, _ in q.options} for q in content.questions}
 
+    problems += _situation_problems(content, procedures)
+    problems += _question_problems(content, situations)
+    problems += _procedure_problems(content, questions, rules)
+    problems += _rule_problems(content, procedures, questions)
+    problems += _dependency_problems(content, procedures, rules)
+    if content.triage:
+        problems += _triage_problems(content, situations)
+    problems += _situation_question_problems(content, rules, questions)
+    return problems + _cycle_problems(content, procedures)
+
+
+def _situation_problems(content: Content, procedures: set[str]) -> list[str]:
+    """Candidatos apontam para procedimentos existentes."""
+    problems: list[str] = []
     for s in content.situations:
         problems += [
             f"{s.file}: {s.slug}: procedimento inexistente em candidates: {c}"
             for c in s.candidates
             if c not in procedures
         ]
+    return problems
+
+
+def _question_problems(content: Content, situations: set[str]) -> list[str]:
+    """Situações existentes e opções únicas, fora dos slugs reservados."""
+    problems: list[str] = []
     for q in content.questions:
         problems += [
             f"{q.file}: {q.slug}: situação inexistente: {s}"
@@ -382,6 +400,15 @@ def _structure_problems(content: Content) -> list[str]:
             for slug in slugs
             if slug in RESERVED_OPTION_SLUGS
         ]
+    return problems
+
+
+def _procedure_problems(
+    content: Content, questions: dict[str, QuestionRecord], rules: dict[str, RuleRecord]
+) -> list[str]:
+    """Órgão, `clarifies`, regras dos itens e detalhes sem repetição."""
+    problems: list[str] = []
+    agencies = set(Agency.objects.values_list("slug", flat=True))
     for p in content.procedures:
         if p.agency not in agencies:
             problems.append(f"{p.file}: {p.slug}: órgão inexistente: {p.agency}")
@@ -404,7 +431,15 @@ def _structure_problems(content: Content) -> list[str]:
         problems += [
             f"{p.file}: {p.slug}: detalhe duplicado: {kind}" for kind, n in kinds.items() if n > 1
         ]
+    return problems
 
+
+def _rule_problems(
+    content: Content, procedures: set[str], questions: dict[str, QuestionRecord]
+) -> list[str]:
+    """Procedimento, uso e condições de cada regra."""
+    problems: list[str] = []
+    options = {q.slug: {slug for slug, _ in q.options} for q in content.questions}
     used_by_dependency = {d.rule for d in content.dependencies if d.rule is not None}
     used_by_item = {
         i.rule for p in content.procedures for i in (*p.requirements, *p.channels) if i.rule
@@ -430,7 +465,14 @@ def _structure_problems(content: Content) -> list[str]:
                 for o in c.options
                 if o not in options[c.question]
             ]
+    return problems
 
+
+def _dependency_problems(
+    content: Content, procedures: set[str], rules: dict[str, RuleRecord]
+) -> list[str]:
+    """Extremos existentes, pares únicos e regra só em dependência CONDITIONAL."""
+    problems: list[str] = []
     seen: set[tuple[str, str]] = set()
     for d in content.dependencies:
         for end in (d.before, d.after):
@@ -447,10 +489,7 @@ def _structure_problems(content: Content) -> list[str]:
             problems.append(f"{d.file}: {d.label}: rule só é permitida em dependência CONDITIONAL")
         if d.rule is not None:
             problems += _rule_ref_problems(f"{d.file}: {d.label}", d.rule, rules)
-    if content.triage:
-        problems += _triage_problems(content, situations)
-    problems += _situation_question_problems(content, rules, questions)
-    return problems + _cycle_problems(content, procedures)
+    return problems
 
 
 def _rule_ref_problems(where: str, rule_slug: str, rules: dict[str, RuleRecord]) -> list[str]:
