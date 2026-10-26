@@ -1,3 +1,4 @@
+import http.client
 import io
 import urllib.error
 from datetime import date
@@ -96,6 +97,20 @@ def test_collect_network_error_has_no_status() -> None:
     with (
         mock.patch("urllib.request.urlopen", side_effect=TimeoutError("timed out")),
         pytest.raises(CollectError) as info,
+    ):
+        collect(_source(Source.Format.HTML))
+    assert info.value.http_status is None
+
+
+@pytest.mark.parametrize(
+    "error", [ConnectionResetError("reset"), http.client.IncompleteRead(b"parcial")]
+)
+def test_collect_error_while_reading_body_is_a_network_error(error: Exception) -> None:
+    response = _response(b"")
+    response.read.side_effect = error
+    with (
+        mock.patch("urllib.request.urlopen", return_value=response),
+        pytest.raises(CollectError, match="falha de rede") as info,
     ):
         collect(_source(Source.Format.HTML))
     assert info.value.http_status is None

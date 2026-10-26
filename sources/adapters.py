@@ -1,6 +1,7 @@
 """Coleta e extração por formato de fonte. Não toca no banco: o command `fetch_sources` persiste."""
 
 import hashlib
+import http.client
 import json
 import re
 import urllib.error
@@ -42,8 +43,10 @@ def fetch(url: str) -> tuple[int, bytes]:
             status: int = response.status
     except urllib.error.HTTPError as exc:
         raise CollectError(f"HTTP {exc.code}", http_status=exc.code) from exc
-    except (urllib.error.URLError, TimeoutError) as exc:
-        raise CollectError(f"falha de rede: {exc}") from exc
+    except (OSError, http.client.HTTPException) as exc:
+        # URLError e TimeoutError são OSError; a leitura do corpo ainda pode levantar
+        # ConnectionResetError ou IncompleteRead, que escapariam e abortariam o lote.
+        raise CollectError(f"falha de rede: {exc!r}") from exc
     if len(body) > MAX_BYTES:
         raise CollectError(f"resposta maior que {MAX_BYTES} bytes", http_status=status)
     return status, body
