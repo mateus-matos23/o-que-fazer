@@ -10,7 +10,7 @@ from django.test import Client
 from guidance.engine.effect import AnswerEffect
 from guidance.engine.model import OptionDef, QuestionDef, Unknown
 from guidance.forms import UNKNOWN_VALUE, AnswerForm
-from guidance.views import EffectView
+from guidance.presentation import EffectView
 
 pytestmark = pytest.mark.django_db
 

@@ -11,13 +11,13 @@ from django.test import Client
 from guidance.engine.channels import PREFERENCES, lacks_preferred, order_channels
 from guidance.engine.model import ChannelDef, Tri
 from guidance.engine.plan import build_plan
+from guidance.presentation import step_view
 from guidance.session import (
     PREFERENCE_KEY,
     read_channel_preference,
     write_channel_preference,
 )
 from guidance.tests.factories import CITATION, catalog, procedure
-from guidance.views import _step_view
 
 pytestmark = pytest.mark.django_db
 
@@ -227,10 +227,10 @@ def test_step_view_orders_and_warns_without_preferred_channel() -> None:
     )
     cat = catalog((), (proc,))
     step = build_plan(cat, {}).steps[0]
-    view = _step_view(cat, step, PREFERENCES["internet"])
+    view = step_view(cat, step, PREFERENCES["internet"])
     assert [line.channel.description for line in view.channels] == ["o", "t"]
     assert view.channel_notice == ""
-    presencial = _step_view(cat, step, PREFERENCES["presencial"])
+    presencial = step_view(cat, step, PREFERENCES["presencial"])
     assert [line.channel.description for line in presencial.channels] == ["t", "o"]
     assert presencial.channel_notice == PREFERENCES["presencial"].missing_notice
-    assert _step_view(cat, step).channel_notice == ""
+    assert step_view(cat, step).channel_notice == ""

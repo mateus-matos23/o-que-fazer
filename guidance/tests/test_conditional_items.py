@@ -20,9 +20,9 @@ from guidance.engine.model import (
 )
 from guidance.engine.plan import build_plan
 from guidance.engine.questions import next_question
+from guidance.presentation import plan_context
 from guidance.repository import clear_catalog_cache, load_catalog, load_procedure
 from guidance.tests import factories as f
-from guidance.views import _plan_context
 
 UNKNOWN = Unknown.UNKNOWN
 YES: Facts = {"q": frozenset({"a"})}
@@ -211,7 +211,7 @@ def test_repository_item_without_rule_is_none(loaded: dict[str, int]) -> None:
 
 def _render(catalog: Catalog, facts: Facts) -> str:
     plan = build_plan(catalog, facts)
-    context = {"catalog": catalog, "plan": plan, **_plan_context(catalog, plan, None)}
+    context = {"catalog": catalog, "plan": plan, **plan_context(catalog, plan, None)}
     return render_to_string("guidance/plan.html", context)
 
 
@@ -255,11 +255,11 @@ def test_procedure_without_items_still_says_not_informed() -> None:
 
 def test_hidden_channel_does_not_trigger_preference_notice() -> None:
     from guidance.engine.channels import PREFERENCES
-    from guidance.views import _step_view
+    from guidance.presentation import step_view
 
     cat = f.catalog(QUESTIONS, (_proc("p", (), (_chan("C", WHEN_Q),)),))
     step = build_plan(cat, NO).steps[0]
-    view = _step_view(cat, step, PREFERENCES["telefone"])
+    view = step_view(cat, step, PREFERENCES["telefone"])
     assert view.channels == () and view.channel_notice == ""
 
 

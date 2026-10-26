@@ -12,9 +12,9 @@ from guidance.engine.model import Catalog
 from guidance.engine.ordering import DependencyCycleError
 from guidance.engine.plan import build_plan
 from guidance.forms import UNKNOWN_VALUE
+from guidance.presentation import step_view, uncovered_lines
 from guidance.repository import clear_catalog_cache
 from guidance.tests import factories as f
-from guidance.views import _step_view, _uncovered_lines
 from sources.models import SourceImport
 
 pytestmark = pytest.mark.django_db
@@ -98,7 +98,7 @@ def test_uncovered_warning_shows_without_steps() -> None:
             "catalog": catalog,
             "plan": plan,
             "steps": [],
-            "uncovered": _uncovered_lines(catalog, plan.uncovered),
+            "uncovered": uncovered_lines(catalog, plan.uncovered),
             "undetermined": [],
         },
     )
@@ -194,7 +194,7 @@ def test_recommended_is_marked_as_suggestion() -> None:
         {
             "catalog": catalog,
             "plan": plan,
-            "steps": [_step_view(catalog, s) for s in plan.steps],
+            "steps": [step_view(catalog, s) for s in plan.steps],
             "undetermined": [],
         },
     )

@@ -9,8 +9,8 @@ from django.test import Client
 from guidance.engine.model import Catalog, Facts, ProcedureDef, RequirementDef
 from guidance.engine.plan import build_plan
 from guidance.forms import AnswerForm
+from guidance.presentation import plan_context
 from guidance.tests import factories as f
-from guidance.views import _plan_context
 
 pytestmark = pytest.mark.django_db
 
@@ -25,7 +25,7 @@ def _html(client: Client, url: str) -> str:
 
 def _render_plan(catalog: Catalog, facts: Facts | None = None) -> str:
     plan = build_plan(catalog, facts or {})
-    context = {"catalog": catalog, "plan": plan, **_plan_context(catalog, plan, None)}
+    context = {"catalog": catalog, "plan": plan, **plan_context(catalog, plan, None)}
     return render_to_string("guidance/plan.html", context)
 
 
