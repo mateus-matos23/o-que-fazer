@@ -20,7 +20,8 @@ Planos gratuitos mudam com frequência. Os limites abaixo não foram reverificad
    - `POSTGRES_HOST`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` e `POSTGRES_SSLMODE=require`, usando o host direto do Neon (sem `-pooler`);
    - `DJANGO_BEHIND_PROXY=1`, que ativa `SECURE_PROXY_SSL_HEADER`. Sem ele, o CSRF rejeita os POSTs atrás do proxy TLS do Render.
      - Revisto em 26/10/2026: a mesma variável liga também `SECURE_SSL_REDIRECT`, cookies de sessão e CSRF com `Secure` e HSTS de 1 hora com `includeSubDomains`. O valor curto e a ausência de preload existem porque o HSTS é difícil de reverter no navegador. O preload também exige domínio próprio, e o aviso `security.W021` fica silenciado por isso. O Render já redireciona para HTTPS e aceita resposta 3xx no health check.
-6. **Migrations** rodam no início de cada instância (`CMD`: `migrate --noinput` e depois gunicorn).
+6. **Migrations** rodam no início de cada instância (`CMD`: `migrate --noinput`, `clearsessions` e depois gunicorn).
+   - Revisto em 26/10/2026: `clearsessions` apaga do banco as sessões expiradas. Sem ele, o cookie expirava em 2 horas, mas as respostas do cidadão continuavam na tabela `django_session` por tempo indefinido. O plano gratuito não tem cron. A limpeza aproveita o cold start, que acontece depois de cerca de 15 minutos sem acesso.
 7. **Conteúdo** é carregado manualmente, da máquina do mantenedor, contra o banco de produção, na ordem `load_sources content/sources.toml` → `fetch_sources` → `load_content content`. A ordem importa porque `load_content` verifica cada trecho citado contra o snapshot coletado.
 
 ## Alternativas descartadas
@@ -35,6 +36,7 @@ Planos gratuitos mudam com frequência. Os limites abaixo não foram reverificad
 
 - **Cold start.** O plano gratuito do Render dorme após cerca de 15 minutos sem acesso; o primeiro acesso seguinte leva cerca de 1 minuto e roda `migrate` de novo. Isso deve ser avisado a quem avalia o protótipo.
 - **Atalho (`shortcut:`).** `migrate` no start é seguro com uma única instância. Com mais de uma réplica, deve virar um comando de release.
+- **Atalho (`shortcut:`).** `clearsessions` só roda quando a instância acorda. Uma sessão expirada pode ficar no banco enquanto o serviço continua recebendo acessos. Se o serviço ficar sempre ligado, a limpeza deve ir para um cron job.
 - **Conteúdo fora do deploy.** Publicar o código não atualiza o catálogo; mudanças em `content/` exigem repetir `load_content` (e `fetch_sources`, se houver fonte nova) contra produção. O plano exibe a data de coleta desta carga, distinta da data de vigência (RN12).
 - **Região (revisto em 26/10/2026).** Aplicação e banco ficam na mesma região, Virginia nos dois. Com o Render em Oregon e o Neon em São Paulo, cada resposta somava cerca de 50 idas e voltas entre continentes, o que dava segundos de espera. O Django reusa a conexão entre requests (`CONN_MAX_AGE=60`, com `CONN_HEALTH_CHECKS` para quando o Neon escala para zero). Nenhum dos dois provedores muda a região de um serviço existente; mudar exige criar outro e recarregar o conteúdo.
 - **Segredos.** `.env.production` está no `.gitignore` e no `.dockerignore`; as variáveis do Render são configuradas no painel.

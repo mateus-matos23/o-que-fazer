@@ -23,4 +23,6 @@ COPY --from=builder --chown=app:app /app /app
 USER app
 EXPOSE 8000
 # shortcut: migrate no start de cada instância; com mais de uma réplica, mover para um release command.
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi --bind 0.0.0.0:${PORT:-8000}"]
+# shortcut: clearsessions só roda quando a instância acorda (o plano gratuito dorme após ~15 min sem
+# acesso); se o serviço ficar sempre ligado, agendar em um cron job.
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py clearsessions && gunicorn config.wsgi --bind 0.0.0.0:${PORT:-8000}"]
