@@ -31,6 +31,7 @@ O público é o cidadão, em grande parte usando smartphone e conexões instáve
 5. **Identidade visual:**
    - Paleta própria, que não imita a do gov.br, para o site não se passar por portal oficial.
    - O plano é apresentado como um roteiro em sequência, e as etapas da mesma camada aparecem como independentes.
+   - Revisto em 26/10/2026 (Fase 9): a paleta passou a vir das fachadas e dos azulejos de São Luís (cal, cobalto, ocre e verde-petróleo). As restrições desta ADR não mudaram.
 
 ## Alternativas consideradas
 

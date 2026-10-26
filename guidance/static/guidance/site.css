@@ -1,17 +1,22 @@
 /*
  * Contraste calculado (WCAG 2.x, luminância relativa). Mínimo AA: 4,5:1 texto, 3:1 componentes e foco.
- *   --ink #1F2A2E sobre --bg #F5F7F6 ............ 13,66:1
- *   --ink sobre superfície #FFFFFF .............. 14,70:1  (também o contorno de foco)
- *   --action #0F6B5C sobre --bg ................. 5,95:1   (links)
- *   --action sobre #FFFFFF ...................... 6,41:1
- *   #FFFFFF sobre --action (botão primário) ..... 6,41:1
- *   --action sobre --notice-bg .................. 5,85:1   (link dentro do aviso)
- *   --muted #4A5A5F sobre --bg .................. 6,69:1
- *   --muted sobre #FFFFFF ....................... 7,19:1
- *   --notice-ink #5C3D00 sobre --notice-bg ...... 9,03:1
- *   --notice-border #8A5A00 sobre --notice-bg ... 5,41:1
- *   --line #C9D3D1 sobre --bg ................... 1,42:1   (só decorativo: separadores e linha do
- *     roteiro; nenhuma informação ou controle depende dele. Estado marcado usa --ink, 13,66:1)
+ * Paleta das fachadas de São Luís (cal, azulejo, ocre); não imita a do gov.br (ADR 0004).
+ *   --ink #20303A sobre --bg #FFF8EA ............ 12,86:1
+ *   --ink sobre superfície #FFFFFF .............. 13,59:1  (também o contorno de foco)
+ *   --ink sobre --soft #E6F1EE .................. 11,77:1  (opção marcada, "Comece por aqui")
+ *   --action #0D6157 sobre --bg ................. 6,94:1   (links)
+ *   --action sobre #FFFFFF ...................... 7,33:1
+ *   --action sobre --soft ....................... 6,35:1
+ *   #FFFFFF sobre --action (botão primário) ..... 7,33:1
+ *   #FFFFFF sobre --tile #2A5D8F (número) ....... 6,86:1
+ *   --action sobre --notice-bg .................. 6,51:1   (link dentro do aviso)
+ *   --muted #4F5B60 sobre --bg .................. 6,63:1
+ *   --muted sobre #FFFFFF ....................... 7,01:1
+ *   --notice-ink #5C3D00 sobre --notice-bg ...... 8,79:1
+ *   --notice-border #8A5A00 sobre --notice-bg ... 5,27:1
+ *   --line #E2D6BC sobre --bg ................... 1,36:1   (só decorativo: bordas de cartão e linha do
+ *     roteiro; nenhuma informação ou controle depende dele. Estado marcado usa --ink, 12,86:1)
+ *   --sun #F2B33D e azulejo.svg ................. decorativos; nunca carregam texto ou estado
  */
 @font-face {
   font-family: "Atkinson Hyperlegible Next";
@@ -29,13 +34,18 @@
 }
 
 :root {
-  --bg: #F5F7F6;
+  --bg: #FFF8EA;
   --surface: #FFFFFF;
-  --ink: #1F2A2E;
-  --action: #0F6B5C;
-  --muted: #4A5A5F;
-  --line: #C9D3D1;
-  --notice-bg: #FFF4D6;
+  --soft: #E6F1EE;
+  --ink: #20303A;
+  --action: #0D6157;
+  --action-deep: #08433C;
+  --muted: #4F5B60;
+  --line: #E2D6BC;
+  --sun: #F2B33D;
+  --tile: #2A5D8F;
+  --radius: 0.75rem;
+  --notice-bg: #FFF1C7;
   --notice-ink: #5C3D00;
   --notice-border: #8A5A00;
 }
@@ -81,16 +91,25 @@ a:hover { text-decoration-thickness: 3px; }
 }
 .skip-link:focus { top: 0.5rem; }
 
-.site-header { border-bottom: 1px solid var(--line); }
-.site-header a {
-  display: inline-block;
-  padding: 0.75rem 0;
+/* Faixa de azulejo: o único ornamento do site; o resto fica quieto. */
+.site-header {
+  padding-top: 1.25rem;
+  background: url("azulejo.svg") top left / 1.25rem 1.25rem repeat-x, var(--surface);
+  border-bottom: 3px solid var(--tile);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
   min-height: 48px;
+  padding: 0.625rem 0;
   color: var(--ink);
+  font-size: 1.25rem;
   font-weight: 700;
   text-decoration: none;
 }
-.site-footer { border-top: 1px solid var(--line); color: var(--muted); padding-top: 1rem; padding-bottom: 2rem; }
+.brand img { border-radius: 0.375rem; box-shadow: 0 0 0 2px var(--tile); }
+.site-footer { border-top: 1px solid var(--line); color: var(--muted); padding-top: 1.25rem; padding-bottom: 2rem; }
 .site-footer p { margin: 0; }
 
 .muted { color: var(--muted); }
@@ -102,8 +121,9 @@ a:hover { text-decoration-thickness: 3px; }
   display: inline-block;
   min-height: 48px;
   padding: 0.75rem 1.5rem;
-  border: 2px solid var(--action);
-  border-radius: 0.25rem;
+  border: 2px solid var(--action-deep);
+  border-bottom-width: 4px;
+  border-radius: var(--radius);
   background: var(--action);
   color: #FFFFFF;
   font: inherit;
@@ -112,7 +132,10 @@ a:hover { text-decoration-thickness: 3px; }
   text-decoration: none;
   cursor: pointer;
 }
-button.secondary, .button.secondary { background: transparent; color: var(--action); }
+button:hover, .button:hover { background: var(--action-deep); }
+button:active, .button:active { border-bottom-width: 2px; margin-top: 2px; }
+button.secondary, .button.secondary { background: var(--surface); color: var(--action); border-color: var(--action); }
+button.secondary:hover, .button.secondary:hover { background: var(--soft); }
 .answer-form > button { width: 100%; }
 .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
 .actions form { margin: 0; }
@@ -138,7 +161,7 @@ button.secondary, .button.secondary { background: transparent; color: var(--acti
   margin-bottom: 0.75rem;
   padding: 0.5rem 0.75rem;
   border: 2px solid var(--muted);
-  border-radius: 0.25rem;
+  border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink);
   font: inherit;
@@ -160,14 +183,16 @@ legend h1 { font-size: 1.66rem; margin: 0; }
   margin-bottom: 0.5rem;
   padding: 0.75rem 1rem;
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 0.25rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
   cursor: pointer;
 }
+.choices label:hover, .choice:hover { border-color: var(--action); }
 .choices input, .choice input { width: 1.5rem; height: 1.5rem; flex: none; margin: 0; accent-color: var(--action); }
 .choices label:has(input:checked), .choice:has(input:checked) {
   border: 3px solid var(--ink);
-  padding: calc(0.75rem - 2px) calc(1rem - 2px);
+  padding: calc(0.75rem - 1px) calc(1rem - 1px);
+  background: var(--soft);
   font-weight: 700;
 }
 .has-unknown #id_answer > div:last-child { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--muted); }
@@ -179,7 +204,7 @@ legend h1 { font-size: 1.66rem; margin: 0; }
   background: var(--notice-bg);
   color: var(--notice-ink);
   border: 2px solid var(--notice-border);
-  border-radius: 0.25rem;
+  border-radius: var(--radius);
 }
 .errors { margin: 0 0 1rem; }
 .errors p { margin: 0 0 0.5rem; }
@@ -187,7 +212,7 @@ legend h1 { font-size: 1.66rem; margin: 0; }
 
 /* Avisos */
 .disclaimer { margin: 1.5rem 0; padding-left: 0.75rem; border-left: 3px solid var(--muted); color: var(--muted); }
-.answer-effect { margin: 1rem 0; padding: 0.5rem 0.75rem; background: var(--surface); border-left: 4px solid var(--action); }
+.answer-effect { margin: 1rem 0; padding: 0.625rem 1rem; background: var(--soft); border-left: 4px solid var(--action); border-radius: 0 var(--radius) var(--radius) 0; }
 .answer-effect p, .answer-effect ul { margin: 0.25rem 0; }
 .notice a { color: var(--notice-ink); }
 .notice h2 { font-size: 1.33rem; margin-top: 0; }
@@ -223,9 +248,9 @@ legend h1 { font-size: 1.66rem; margin: 0; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ink);
+  background: var(--tile);
   color: #FFFFFF;
-  border-radius: 50%;
+  border-radius: 0.5rem;
   font-weight: 700;
 }
 .route-items { list-style: none; margin: 0; padding: 0; }
@@ -238,8 +263,9 @@ legend h1 { font-size: 1.66rem; margin: 0; }
   margin: 1.5rem 0;
   padding: 1rem;
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 0.25rem;
+  border: 2px solid var(--line);
+  border-bottom-width: 5px;
+  border-radius: 1rem;
 }
 .step h1, .step h2 { margin-top: 0; }
 .step h3 { font-size: 1.0625rem; margin: 1.25rem 0 0.25rem; }
@@ -254,9 +280,10 @@ dd { margin: 0; }
 .start-here {
   margin: 1.5rem 0;
   padding: 0.75rem 1rem;
-  background: var(--surface);
+  background: var(--soft);
   border: 2px solid var(--action);
-  border-radius: 0.25rem;
+  border-bottom-width: 5px;
+  border-radius: 1rem;
 }
 .start-here h2 { font-size: 1.33rem; margin-top: 0; }
 .start-here p, .start-here ul { margin: 0 0 0.5rem; }

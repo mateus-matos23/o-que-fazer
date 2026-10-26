@@ -32,6 +32,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 6 | UI/UX, acessibilidade, frontend e RF18 (RF02 segue pendente) | Consolidado |
 | 7 | Conversa guiada: funil de triagem, efeito da resposta, preferência de atendimento e plano com ponto de partida (RF21 a RF26) | Consolidado (25/10/2026) |
 | 8 | Hospedagem: Dockerfile, gunicorn, WhiteNoise e deploy no Render com Neon (ADR 0006) | Consolidado (26/10/2026, commits `de7d221`, `94f9ec7`) |
+| 9 | Redesenho visual "azulejo": paleta, triagem ilustrada, etapas da conversa e plano como linha do tempo | Em andamento (26/10/2026) |
 
 ## Decisões tomadas em 24/10/2026 (aprovadas pelo autor)
 
@@ -441,6 +442,14 @@ Decisão e alternativas em [ADR 0006](../arquitetura/decisoes/0006-hospedagem-e-
   - Pendente: carga do conteúdo no banco novo, jornada completa no Render novo e medição de antes e depois.
 - **Gates da 8b:** ruff, mypy, 426 testes e `git diff --check` verdes. A imagem foi validada localmente (estáticos com 200; `migrate` falha de forma explícita sem banco).
 - **Não verificado:** jornada completa até o plano em produção (CSRF atrás do proxy), limites atuais dos planos gratuitos, backup e monitoramento do banco.
+
+## Fase 9 — Redesenho visual
+
+Motivo: o autor achou a interface simples demais e pouco convidativa para o cidadão. As restrições da [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.md) continuam: CSS próprio, sem build, sem JS obrigatório e meta WCAG 2.2 AA.
+
+A direção visual vem das fachadas de São Luís: fundo cor de cal, azulejo azul-cobalto com ocre e verde-petróleo nas ações. Só a faixa de azulejo do cabeçalho é ornamento; o resto da interface fica sóbrio. Os cartões usam borda sólida com a base mais grossa, como o vidrado de um ladrilho, no lugar de sombra.
+
+- **9a — Paleta e base.** Novos tokens em `site.css`, com a tabela de contraste recalculada: o menor par de texto é 6,35:1 e o botão primário tem 7,33:1. O cabeçalho ganhou a faixa e a marca (`azulejo.svg`, desenho próprio e decorativo, com `alt=""`). Botões, opções, avisos e etapas receberam raio maior e borda com base mais grossa. A opção marcada usa fundo `--soft` e borda `--ink`.
 
 ## Limitações conhecidas
 
