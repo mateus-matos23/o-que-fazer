@@ -5,6 +5,7 @@
 {% include "guidance/_journey_steps.html" with current="plan" %}
 {% include "guidance/_answer_effect.html" %}
 <h1>Seu plano</h1>
+<div class="plan-intro">
 <p class="disclaimer">Este sistema é apenas orientativo. Ele não executa serviços nem confirma direitos; confira sempre na fonte oficial.</p>
 <p class="muted print-hint">Para guardar este plano, use a opção de imprimir do navegador.</p>
 
@@ -13,6 +14,7 @@
   <a href="{% url 'guidance:channel_preference' catalog.situation_slug %}">Mudar</a>
   {% else %}<a href="{% url 'guidance:channel_preference' catalog.situation_slug %}">Escolher como prefere ser atendido</a>{% endif %}
 </p>
+</div>
 
 {% if start_steps %}
 <section class="start-here" aria-labelledby="comece-por-aqui">
@@ -72,8 +74,8 @@
 {% for item in steps %}
 {% with step=item.step procedure=item.step.procedure %}
 <article id="etapa-{{ procedure.slug }}" class="step" data-slug="{{ procedure.slug }}">
+  <p class="step-layer">Passo {{ step.layer }}</p>
   <h2>{{ procedure.title }}</h2>
-  <p class="muted">Passo {{ step.layer }}</p>
   <p>{{ procedure.description }}</p>
 
   {% if step.reasons %}

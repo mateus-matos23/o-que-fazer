@@ -277,45 +277,75 @@ legend h1 { font-size: 1.66rem; margin: 0; }
 .notice h2 { font-size: 1.33rem; margin-top: 0; }
 .notice p:last-child, .notice ul:last-child { margin-bottom: 0; }
 
+/* Plano: abertura compacta */
+.plan-intro { font-size: 0.9375rem; }
+.plan-intro p { margin-bottom: 0.5rem; }
+.plan-intro .disclaimer { margin: 0 0 0.75rem; }
+
 /* Roteiro (resumo do plano) */
 .route { list-style: none; margin: 1.5rem 0 0; padding: 0; max-width: none; }
 .route > li {
   position: relative;
   max-width: none;
-  padding: 0 0 1.5rem 3.25rem;
+  padding: 0 0 1.25rem 3.75rem;
 }
 .route > li::before {
   content: "";
   position: absolute;
-  left: 1.125rem;
+  left: 1.3125rem;
   top: 0;
   bottom: 0;
-  width: 3px;
-  background: var(--line);
+  width: 0;
+  border-left: 3px dashed var(--tile);
 }
-.route > li:first-child::before { top: 1.125rem; }
+.route > li:first-child::before { top: 1.375rem; }
 .route > li:last-child { padding-bottom: 0; }
-.route > li:last-child::before { bottom: auto; height: 1.125rem; }
+.route > li:last-child::before { bottom: auto; height: 1.375rem; }
 .route > li:only-child::before { display: none; }
 .route-number {
   position: absolute;
   left: 0;
   top: 0;
   z-index: 1;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--tile);
   color: #FFFFFF;
-  border-radius: 0.5rem;
+  border-radius: 0.625rem;
+  box-shadow: 0 0 0 3px var(--bg);
+  font-size: 1.25rem;
   font-weight: 700;
 }
-.route-items { list-style: none; margin: 0; padding: 0; }
+.route-items {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+}
 .route-items li { margin: 0; }
 .route-items a { display: inline-block; min-height: 40px; padding: 0.35rem 0; font-weight: 700; }
-.route-note { margin: 0; color: var(--muted); }
+.route-note { margin: 0.375rem 0 0; color: var(--muted); font-size: 0.9375rem; }
+
+/* O que separar antes: marcador de ladrilho na tela; caixa de conferir só na impressão,
+   porque na tela uma caixa vazia parece um checkbox que não responde. */
+.prepare h3 { font-size: 1.125rem; margin: 1.5rem 0 0.5rem; }
+.prepare ul { list-style: none; margin: 0 0 1rem; padding: 0; }
+.prepare li { position: relative; margin: 0 0 0.5rem; padding-left: 1.75rem; }
+.prepare li::before {
+  content: "";
+  position: absolute;
+  left: 0.125rem;
+  top: 0.45em;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 0.2rem;
+  background: var(--sun);
+}
 
 /* Etapas */
 .step {
@@ -327,11 +357,40 @@ legend h1 { font-size: 1.66rem; margin: 0; }
   border-radius: 1rem;
 }
 .step h1, .step h2 { margin-top: 0; }
+.step-layer {
+  display: inline-block;
+  margin: 0 0 0.5rem;
+  padding: 0.125rem 0.625rem;
+  border-radius: 0.5rem;
+  background: var(--tile);
+  color: #FFFFFF;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
 .step h3 { font-size: 1.0625rem; margin: 1.25rem 0 0.25rem; }
 .step ul { margin: 0 0 1rem; padding-left: 1.25rem; }
 dl { margin: 1rem 0 0; }
 dt { font-weight: 700; margin-top: 1rem; }
 dd { margin: 0; }
+.facts { border-top: 2px solid var(--line); padding-top: 0.25rem; }
+.facts dt { display: flex; align-items: center; gap: 0.5rem; }
+.facts dd { padding-left: 1.75rem; }
+.facts dd ul { padding-left: 1.25rem; }
+/* Ícone decorativo por seção, na ordem de _procedure_facts.html. */
+.facts dt::before {
+  content: "";
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--action);
+  mask: var(--icon) center / contain no-repeat;
+}
+.facts dt:nth-of-type(1) { --icon: url("icons/agency.svg"); }
+.facts dt:nth-of-type(2) { --icon: url("icons/requirements.svg"); }
+.facts dt:nth-of-type(3) { --icon: url("icons/channels.svg"); }
+.facts dt:nth-of-type(4) { --icon: url("icons/cost.svg"); }
+.facts dt:nth-of-type(5) { --icon: url("icons/deadline.svg"); }
+.facts dt:nth-of-type(6) { --icon: url("icons/source.svg"); }
 .not-informed { color: var(--muted); }
 .maybe { font-weight: 700; color: var(--notice-ink); }
 
@@ -385,6 +444,7 @@ dd { margin: 0; }
   .skip-link, .site-header, .site-footer, .actions, button, form, .context-link,
   p.channel-preference, .print-hint, .edit-answer, .answer-effect { display: none !important; }
   .step, .notice, .start-here { break-inside: avoid; }
+  .prepare li::before { top: 0.2em; width: 1rem; height: 1rem; border: 2px solid #000000; }
   .route > li { break-inside: avoid; }
   a[href^="http"]::after { content: " (" attr(href) ")"; overflow-wrap: anywhere; }
 }

@@ -461,6 +461,9 @@ A direção visual vem das fachadas de São Luís: fundo cor de cal, azulejo azu
   - Não há barra percentual porque o total de perguntas é adaptativo, e um "3 de 7" seria falso.
   - O estado não depende só da cor: a etapa atual tem `aria-current="step"` e negrito, e as concluídas têm ✓ e o texto oculto "(concluída)".
   - No plano, "Atendimento" só aparece como concluída se houver preferência escolhida.
+- **9d — Plano.** O topo (aviso orientativo, dica de impressão e preferência) ficou num bloco compacto (`plan-intro`). O resumo virou uma linha do tempo com números em ladrilho cobalto, linha tracejada e cada passo num cartão.
+  - "O que separar antes" usa marcador de ladrilho na tela e caixa de conferir só na impressão: na tela, uma caixa vazia pareceria um checkbox que não responde.
+  - As etapas mostram "Passo N" como selo e ícones decorativos por seção (órgão, requisitos, canais, custo, prazo e fonte), também na página do serviço. Os ícones entram por máscara CSS a partir de `static/guidance/icons/` (Lucide, ISC), na ordem dos `dt` de `_procedure_facts.html`, sem mudar o HTML.
 
 ## Limitações conhecidas
 
