@@ -18,7 +18,7 @@
 
 ### Linguagem simples
 
-Proposto (Fase 7, 25/10/2026): regras de redação para perguntas e opções, pensadas para públicos com idade, escolaridade e familiaridade com tecnologia variadas.
+Consolidado (Fase 7, 25/10/2026): regras de redação para perguntas e opções, pensadas para públicos com idade, escolaridade e familiaridade com tecnologia variadas.
 
 - Frases curtas.
 - Opções na primeira pessoa, descrevendo o que aconteceu com o cidadão: "A empresa me mandou embora".

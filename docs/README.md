@@ -19,7 +19,7 @@ Documentação de concepção e modelagem do sistema. Originada da consolidaçã
 **Uso básico:** sem cadastro obrigatório e com minimização de dados pessoais.  
 **Avaliação prevista:** comparação com busca convencional, com indicadores de eficácia, esforço e percepção.  
 **Estado acadêmico documentado:** introdução e referencial teórico, com revisão de estilo discutida.  
-**Próximos marcos:** a implementação do núcleo começou (Fases 0 a 6 concluídas; Fase 7, conversa guiada, proposta em 25/10/2026; ver [registro de implementação](implementacao/README.md)); concluir a especificação e o restante do protótipo, avaliar e escrever os capítulos restantes.
+**Próximos marcos:** a implementação do núcleo começou (Fases 0 a 7 concluídas, incluindo a conversa guiada em 25/10/2026; ver [registro de implementação](implementacao/README.md)); concluir a especificação e o restante do protótipo, avaliar e escrever os capítulos restantes.
 
 ## Mapa
 

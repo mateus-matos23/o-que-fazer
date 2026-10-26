@@ -34,12 +34,12 @@ Os requisitos abaixo organizam o conteúdo discutido. Eles precisam ser detalhad
 | RF18 | Permitir busca direta por serviço no modo “Onde resolvo?”. | Visão do produto. |
 | RF19 | Explicar por que uma etapa aparece e por que depende de outra. | Núcleo explicável. |
 | RF20 | Tratar informação divergente, desatualizada ou não disponível. | Qualidade da orientação. |
-| RF21 | Conduzir o cidadão até a situação por um funil de perguntas amplas (triagem), informando o limite de cobertura nos ramos sem jornada. | Proposto (Fase 7). |
-| RF22 | Mostrar, após cada resposta, o efeito dela no plano (providências que entraram, que saíram e quantas seguem em análise). | Proposto (Fase 7). |
-| RF23 | Perguntar a preferência de atendimento (internet/aplicativo, telefone, pessoalmente, tanto faz) e ordenar os canais por ela, sem esconder nenhum. | Proposto (Fase 7). |
-| RF24 | Redigir perguntas e opções em linguagem simples, com dica opcional por pergunta. | Proposto (Fase 7). |
+| RF21 | Conduzir o cidadão até a situação por um funil de perguntas amplas (triagem), informando o limite de cobertura nos ramos sem jornada. | Consolidado (Fase 7, fatia 2). |
+| RF22 | Mostrar, após cada resposta, o efeito dela no plano (providências que entraram, que saíram e quantas seguem em análise). | Consolidado (Fase 7, fatia 3). |
+| RF23 | Perguntar a preferência de atendimento (internet/aplicativo, telefone, pessoalmente, tanto faz) e ordenar os canais por ela, sem esconder nenhum. | Consolidado (Fase 7, fatia 4). |
+| RF24 | Redigir perguntas e opções em linguagem simples, com dica opcional por pergunta. | Consolidado (Fase 7, fatia 1). |
 | RF25 | Exibir requisitos e canais conforme os fatos informados, mantendo os de aplicabilidade indeterminada com marcação. | Consolidado (Fase 7, fatia 6). |
-| RF26 | Destacar no plano por onde começar, listar o que separar antes (agrupado por etapa) e oferecer versão para impressão. | Proposto (Fase 7). |
+| RF26 | Destacar no plano por onde começar, listar o que separar antes (agrupado por etapa) e oferecer versão para impressão. | Consolidado (Fase 7, fatia 5). |
 
 ## Regras de negócio e de orientação
 

@@ -54,7 +54,7 @@ Fluxo previsto:
 6. Consultar o plano e os detalhes de cada etapa.
 7. Acessar o canal oficial correspondente.
 
-**Conversa guiada (Proposto, Fase 7, 25/10/2026).** A situação pode ser encontrada por um funil de triagem, com perguntas amplas e inspiração no Akinator, que leva a uma situação da lista. Quando um ramo do funil não tem jornada, o sistema informa o limite de cobertura. Cada resposta mostra o seu efeito no plano ("por causa dessa resposta, X entrou no seu plano" ou "Y saiu do seu plano"). As perguntas usam linguagem simples e podem ter uma dica. A conversa termina num plano que indica por onde começar ("Comece por aqui").
+**Conversa guiada (Consolidado, Fase 7, 25/10/2026).** A situação pode ser encontrada por um funil de triagem, com perguntas amplas e inspiração no Akinator, que leva a uma situação da lista. Quando um ramo do funil não tem jornada, o sistema informa o limite de cobertura. Cada resposta mostra o seu efeito no plano ("por causa dessa resposta, X entrou no seu plano" ou "Y saiu do seu plano"). As perguntas usam linguagem simples e podem ter uma dica. A conversa termina num plano que indica por onde começar ("Comece por aqui").
 
 ### Onde resolvo?
 

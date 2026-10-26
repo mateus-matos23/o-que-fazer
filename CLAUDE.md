@@ -6,7 +6,7 @@ O sistema é **orientativo**: não executa serviços, não autentica nos portais
 
 ## Fase atual
 
-Fases 0 a 6 concluídas (núcleo, três jornadas, interface com meta WCAG 2.2 AA e busca "Onde resolvo?"). RF02 (texto livre) segue pendente. Antes de implementar algo, confira a documentação em `docs/` e as decisões em aberto em `docs/pendencias.md`.
+Fases 0 a 7 concluídas (núcleo, três jornadas, interface com meta WCAG 2.2 AA, busca "Onde resolvo?" e conversa guiada: funil de triagem, efeito da resposta, preferência de atendimento e plano com "Comece por aqui"). RF02 (texto livre) segue pendente. Antes de implementar algo, confira a documentação em `docs/` e as decisões em aberto em `docs/pendencias.md`.
 
 ## Comandos
 
