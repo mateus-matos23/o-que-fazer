@@ -1,15 +1,20 @@
 """Repositório contra o content/ real (fixture `loaded` do conftest raiz) e dados mínimos extras."""
 
+from datetime import UTC, datetime
+
 import pytest
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
+from catalog.loader import load_content
 from catalog.models import Condition, Dependency, Procedure, Rule, Situation
+from conftest import ROOT
 from guidance.engine.evaluation import evaluate
 from guidance.engine.model import Facts, Unknown
 from guidance.engine.plan import build_plan
 from guidance.engine.questions import next_question
-from guidance.repository import SituationNotFound, load_catalog
+from guidance.repository import SituationNotFound, clear_catalog_cache, load_catalog
+from sources.models import Source, SourceImport
 
 pytestmark = pytest.mark.django_db
 
@@ -122,6 +127,7 @@ def test_prerequisite_outside_candidates_is_loaded_transitively(loaded: dict[str
 
 def test_query_count_is_independent_of_catalog_size(loaded: dict[str, int]) -> None:
     def count() -> int:
+        clear_catalog_cache()  # mede a montagem, não o acerto de cache
         with CaptureQueriesContext(connection) as ctx:
             load_catalog("cpf-irregular")
         return len(ctx)
@@ -148,9 +154,53 @@ def test_query_count_is_independent_of_catalog_size(loaded: dict[str, int]) -> N
         previous = extra
 
     assert count() == baseline
-    assert baseline <= 16
+    assert baseline <= 17  # 16 da montagem + 1 da versão do cache
 
 
 def test_unknown_situation(loaded: dict[str, int]) -> None:
     with pytest.raises(SituationNotFound):
         load_catalog("nao-existe")
+
+
+def _queries_of_load(slug: str) -> int:
+    with CaptureQueriesContext(connection) as ctx:
+        load_catalog(slug)
+    return len(ctx)
+
+
+def test_cached_catalog_costs_one_query(loaded: dict[str, int]) -> None:
+    first = load_catalog("cpf-irregular")
+    assert _queries_of_load("cpf-irregular") == 1
+    assert load_catalog("cpf-irregular") is first
+
+
+def test_unknown_situation_is_not_cached() -> None:
+    for _ in range(2):
+        with pytest.raises(SituationNotFound):
+            _queries_of_load("nao-existe")
+
+
+def test_only_new_ok_import_invalidates_cache(loaded: dict[str, int]) -> None:
+    first = load_catalog("cpf-irregular")
+    procedure = first.procedures["regularizar-cpf-suspenso"]
+    source = Source.objects.get(slug=procedure.citation.source_slug)
+    snapshot = source.snapshots.get()
+    later = datetime(2026, 10, 20, tzinfo=UTC)
+    SourceImport.objects.create(
+        source=source, fetched_at=later, outcome=SourceImport.Outcome.FAILED, error="timeout"
+    )
+    assert load_catalog("cpf-irregular") is first  # falha não altera citações
+
+    SourceImport.objects.create(
+        source=source, fetched_at=later, outcome=SourceImport.Outcome.OK, snapshot=snapshot
+    )
+    second = load_catalog("cpf-irregular")
+    assert second.procedures["regularizar-cpf-suspenso"].citation.fetched_at == later
+
+
+def test_content_reload_invalidates_cache(loaded: dict[str, int]) -> None:
+    first = load_catalog("cpf-irregular")
+    load_content(ROOT / "content")
+    second = load_catalog("cpf-irregular")
+    assert second is not first
+    assert second == first  # mesmo conteúdo, montado de novo

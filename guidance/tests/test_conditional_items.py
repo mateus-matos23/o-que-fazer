@@ -20,7 +20,7 @@ from guidance.engine.model import (
 )
 from guidance.engine.plan import build_plan
 from guidance.engine.questions import next_question
-from guidance.repository import load_catalog, load_procedure
+from guidance.repository import clear_catalog_cache, load_catalog, load_procedure
 from guidance.tests import factories as f
 from guidance.views import _plan_context
 
@@ -164,6 +164,7 @@ def test_repository_fills_item_rule_and_keeps_query_count(loaded: dict[str, int]
     from django.test.utils import CaptureQueriesContext
 
     def count() -> int:
+        clear_catalog_cache()  # mede a montagem, não o acerto de cache
         with CaptureQueriesContext(connection) as ctx:
             load_catalog("cpf-irregular")
         return len(ctx)

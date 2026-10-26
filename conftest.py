@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 
 from catalog.loader import load_content
+from guidance.repository import clear_catalog_cache
 from sources.loader import load_sources
 from sources.models import Source, SourceImport, SourceSnapshot
 
@@ -68,6 +69,12 @@ def _snapshot(source: Source) -> SourceSnapshot:
         raw_text=text,
         raw_json=raw_json,
     )
+
+
+@pytest.fixture(autouse=True)
+def _empty_catalog_cache() -> None:
+    """O cache é por processo; sem limpar, um teste herdaria o catálogo montado por outro."""
+    clear_catalog_cache()
 
 
 @pytest.fixture

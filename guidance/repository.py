@@ -1,10 +1,10 @@
-"""Monta o `Catalog` do motor a partir do ORM, com número fixo de consultas."""
+"""Monta o `Catalog` do motor a partir do ORM, com número fixo de consultas e cache por processo."""
 
 from collections.abc import Iterable
 from datetime import datetime
 from typing import Literal
 
-from django.db.models import Max, Prefetch, Q, QuerySet
+from django.db.models import Max, Prefetch, Q, QuerySet, Subquery
 
 from catalog.models import (
     AnswerOption,
@@ -211,7 +211,47 @@ def _snapshot_ids(*groups: Iterable[CitedRow]) -> set[int]:
     return {c.snapshot_id for group in groups for c in group}
 
 
+type CatalogVersion = tuple[int, int | None]
+
+# Por slug, só a versão mais recente: o tamanho fica limitado ao número de situações.
+_catalog_cache: dict[str, tuple[CatalogVersion, Catalog]] = {}
+
+
+def _catalog_version(situation_slug: str) -> CatalogVersion | None:
+    """Id da situação e da última importação OK, numa consulta.
+
+    `load_content` recria o catálogo (ids novos) e `fetch_sources` cria importações; qualquer um
+    dos dois muda a versão. shortcut: `load_sources` sozinho (nome de órgão, URL de fonte) não muda
+    a versão; o fluxo documentado sempre termina em `load_content`; se isso mudar, versionar fontes.
+    """
+    last_ok_import = SourceImport.objects.filter(outcome=SourceImport.Outcome.OK).order_by("-id")
+    return (
+        Situation.objects.filter(slug=situation_slug)
+        .annotate(last_import=Subquery(last_ok_import.values("id")[:1]))
+        .values_list("id", "last_import")
+        .first()
+    )
+
+
+def clear_catalog_cache() -> None:
+    _catalog_cache.clear()
+
+
 def load_catalog(situation_slug: str) -> Catalog:
+    """O `Catalog` é imutável, então pode ser reusado entre requests enquanto a versão não mudar."""
+    version = _catalog_version(situation_slug)
+    if version is None:
+        raise SituationNotFound(situation_slug)
+    cached = _catalog_cache.get(situation_slug)
+    if cached is not None and cached[0] == version:
+        return cached[1]
+    # Uma carga concorrente pode misturar versões; a próxima request vê a versão nova e refaz.
+    catalog = _build_catalog(situation_slug)
+    _catalog_cache[situation_slug] = (version, catalog)
+    return catalog
+
+
+def _build_catalog(situation_slug: str) -> Catalog:
     try:
         situation = Situation.objects.get(slug=situation_slug)
     except Situation.DoesNotExist:

@@ -12,6 +12,7 @@ from guidance.engine.model import Catalog
 from guidance.engine.ordering import DependencyCycleError
 from guidance.engine.plan import build_plan
 from guidance.forms import UNKNOWN_VALUE
+from guidance.repository import clear_catalog_cache
 from guidance.tests import factories as f
 from guidance.views import _step_view, _uncovered_lines
 from sources.models import SourceImport
@@ -81,6 +82,7 @@ def test_uncovered_warning_only_with_out_of_coverage_option(
     AnswerOption.objects.filter(question__slug=QUESTION, slug="suspenso").update(
         out_of_coverage=True
     )
+    clear_catalog_cache()  # edição direta no banco; em produção o conteúdo só muda por load_content
     html = _html(client, PLAN)
     assert "Limite de cobertura" in html
     assert "Não encontramos orientação oficial para esta resposta nesta versão." in html
