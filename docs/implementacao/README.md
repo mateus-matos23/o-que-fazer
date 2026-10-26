@@ -33,6 +33,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 7 | Conversa guiada: funil de triagem, efeito da resposta, preferência de atendimento e plano com ponto de partida (RF21 a RF26) | Consolidado (25/10/2026) |
 | 8 | Hospedagem: Dockerfile, gunicorn, WhiteNoise e deploy no Render com Neon (ADR 0006) | Consolidado (26/10/2026, commits `de7d221`, `94f9ec7`) |
 | 9 | Redesenho visual "azulejo": paleta, triagem ilustrada, etapas da conversa e plano como linha do tempo | Consolidado (26/10/2026) |
+| 10 | Aderência às práticas das skills do projeto: logging, HTTPS, retenção de sessões, cache do catálogo e refactors | Consolidado (26/10/2026) |
 
 ## Decisões tomadas em 24/10/2026 (aprovadas pelo autor)
 
@@ -469,6 +470,12 @@ A direção visual vem das fachadas de São Luís: fundo cor de cal, azulejo azu
   - Passou: ordem de Tab e foco visível na triagem e na pergunta; nenhuma rolagem horizontal a 360 px nem a 200% de zoom; contraste de texto ≥ 6,35:1; ícones com `aria-hidden`; alvos ≥ 24 px, exceto links dentro de frases, que a SC 2.5.8 dispensa.
   - Corrigido: a borda das opções de resposta (`--line`, 1,36:1) não delimitava o alvo clicável com o contraste que a SC 1.4.11 pede. Passou a usar `--line-strong` (#8A7752, 4,34:1 sobre branco).
   - Não verificado: sobreposição visual no zoom e foco por teclado nas demais rotas.
+
+## Fase 10 — Aderência às skills do projeto
+
+Uma auditoria comparou o código com as skills de `.claude/skills/` (django-expert, python-error-handling, python-design-patterns, python-performance-optimization, python-type-safety, python-testing-patterns e supabase-postgres-best-practices). Cada achado virou uma fatia com teste. As decisões de HTTPS, sessões e cache foram tomadas pelo autor em 26/10/2026.
+
+- **10a — Logging em produção.** `settings.py` ganhou `LOGGING`: um `StreamHandler` no root, e o logger `django` sem handlers próprios, propagando para o root. Motivo: no padrão do Django, o console só escreve com `DEBUG` ligado e o `mail_admins` não tem destinatário. Com isso, o traceback de um 500 no Render não aparecia em log nenhum. Teste: um erro de `django.request` com `DEBUG` desligado chega a um handler de console.
 
 ## Limitações conhecidas
 

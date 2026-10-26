@@ -91,6 +91,16 @@ if os.environ.get("DJANGO_BEHIND_PROXY") == "1":
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# O padrão do Django só escreve no console com DEBUG ligado; sem isto, o traceback de um 500 em
+# produção não chega a log nenhum. O logger `django` perde os handlers e propaga para o root.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": "INFO"},
+    "loggers": {"django": {"handlers": [], "level": "INFO"}},
+}
+
 # Sessão do cidadão: sem cadastro e retenção curta (RN15).
 SESSION_COOKIE_AGE = 60 * 60 * 2
 SESSION_COOKIE_HTTPONLY = True
