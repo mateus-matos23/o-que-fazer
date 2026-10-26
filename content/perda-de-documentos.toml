@@ -20,8 +20,11 @@
 # - Dependência B.O. -> segunda via: só a da CNH tem trecho (DETRAN-MA). CPF e CIN seguem sem
 #   dependência (observação 5 da evidência).
 # - Esclarecimento intermediário: "não sabe o número do CPF" só tem a orientação genérica de contatar
-#   a Receita, sem canal lido; não foi criado.
-# - Conta gov.br nível prata/ouro para o canal gov.br: o trecho está fora do bloco de texto da amostra.
+#   a Receita, sem canal lido; não foi criado. Já "não sei" na pergunta de IR tem o esclarecimento
+#   consultar-declaracoes-ir (clarifies), com fonte própria (consultar-meu-imposto-de-renda). A janela de
+#   "dois anos" é da pergunta, não da página; a descrição não a afirma.
+# - Conta gov.br nível prata/ouro para o canal gov.br de 2ª via do CPF: o trecho está fora do bloco de texto
+#   da amostra (a do consultar-meu-imposto-de-renda traz o aviso e entra como requisito do esclarecimento).
 # - Condição do canal "sem gov.br" (não ter declarado IR nos últimos dois anos): está no texto da página
 #   (amostra), o que resolve a observação 6 da evidência; entra na descrição do canal e também é regra
 #   (pergunta "declarou-imposto-de-renda"): "sim" esconde o canal, "não sei" o mostra marcado.
@@ -59,6 +62,29 @@ situations = ["perda-de-documentos"]
 options = [
   {slug = "sim", label = "Sim, entreguei"},
   {slug = "nao", label = "Não entreguei"},
+]
+
+# Esclarecimento intermediário: não é candidato; entra no plano quando a resposta de IR é "não sei" (via clarifies).
+[[procedures]]
+slug = "consultar-declaracoes-ir"
+title = "Consultar se você entregou declaração de imposto de renda"
+description = "Consulte na Receita Federal a situação do seu imposto de renda, inclusive as declarações entregues e os recibos, e volte para responder à pergunta. O sistema não consulta seus dados."
+agency = "receita-federal"
+jurisdiction = "FEDERAL"
+clarifies = "declarou-imposto-de-renda"
+source = "govbr-consultar-meu-imposto-de-renda"
+excerpt = "Consulte a situação do seu imposto de renda desse ano e de anos anteriores junto à Receita Federal."
+requirements = [
+  {description = "Ter conta gov.br nível Prata ou Ouro.", source = "govbr-consultar-meu-imposto-de-renda", excerpt = "Você precisa ter uma conta nível Prata ou Ouro para acessar este serviço."},
+  {description = "Ser o contribuinte ou o representante dele.", source = "govbr-consultar-meu-imposto-de-renda", excerpt = "Contribuinte ou seu representante."},
+]
+channels = [
+  {kind = "ONLINE", description = "Meu Imposto de Renda.", url = "https://mir.receita.fazenda.gov.br/portalmir", source = "govbr-consultar-meu-imposto-de-renda", excerpt = "Meu Imposto de Renda"},
+  {kind = "APP", description = "App Receita Federal.", source = "govbr-consultar-meu-imposto-de-renda", excerpt = "App Receita Federal"},
+]
+details = [
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-consultar-meu-imposto-de-renda", excerpt = "Este serviço é gratuito para o cidadão."},
+  {kind = "DEADLINE", text = "Atendimento imediato.", source = "govbr-consultar-meu-imposto-de-renda", excerpt = "Atendimento imediato"},
 ]
 
 [[procedures]]

@@ -3,7 +3,13 @@
 from collections import defaultdict, deque
 from dataclasses import dataclass
 
-from guidance.engine.evaluation import evaluate, evaluate_procedure, evaluate_rule, visible_items
+from guidance.engine.evaluation import (
+    evaluate,
+    evaluate_procedure,
+    evaluate_rule,
+    pending_rule_questions,
+    visible_items,
+)
 from guidance.engine.model import (
     Catalog,
     ChannelDef,
@@ -52,8 +58,13 @@ def build_plan(catalog: Catalog, facts: Facts) -> Plan:
         if evaluation.status is Tri.APPLICABLE:
             status[slug] = Tri.APPLICABLE
             reasons[slug] = tuple(r for r, s in evaluation.rules if s is Tri.APPLICABLE)
+    pending = pending_rule_questions(catalog, facts, evaluations)
     for slug, procedure in catalog.procedures.items():
-        if procedure.clarifies is not None and facts.get(procedure.clarifies) is Unknown.UNKNOWN:
+        if (
+            procedure.clarifies is not None
+            and facts.get(procedure.clarifies) is Unknown.UNKNOWN
+            and procedure.clarifies in pending  # só enquanto a pergunta ainda importa
+        ):
             clarifies[slug] = catalog.questions[procedure.clarifies]
             status.setdefault(slug, Tri.UNDETERMINED)
             reasons.setdefault(slug, ())

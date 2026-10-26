@@ -160,6 +160,14 @@ jurisdiction = "FEDERAL"
 access_notes = "Página do catálogo gov.br; leitura sem login. Declara \"Última Modificação: 06/08/2026\"."
 
 [[sources]]
+slug = "govbr-consultar-meu-imposto-de-renda"
+agency = "receita-federal"
+url = "https://www.gov.br/pt-br/servicos/consultar-meu-imposto-de-renda"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do catálogo gov.br; leitura sem login. O serviço exige conta gov.br nível Prata ou Ouro. Declara \"Última Modificação: 23/07/2026\"."
+
+[[sources]]
 slug = "api-servicos-10424"
 agency = "mgi-portal-servicos"
 url = "https://servicos.gov.br/api/v1/servicos/10424"

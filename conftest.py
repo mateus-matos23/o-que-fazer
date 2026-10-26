@@ -41,6 +41,7 @@ SAMPLE_FILES = {
     "fgts-saque-dispensa": "html-fgts-saque-dispensa.md",
     "govbr-obter-carteira-de-trabalho": "html-obter-a-carteira-de-trabalho.md",
     "govbr-obter-cartao-cpf": "html-obter-cartao-de-cpf.md",
+    "govbr-consultar-meu-imposto-de-renda": "html-consultar-meu-imposto-de-renda.md",
     "api-servicos-10424": "api-servicos-10424.json",
     "policiacivil-delegacia-online": "html-policiacivil-delegacia-online.md",
     "govbr-cin-faq": "html-govbr-cin-faq.md",

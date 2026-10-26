@@ -1,11 +1,13 @@
+from dataclasses import replace
+
 import pytest
 
 from guidance.engine.evaluation import evaluate
-from guidance.engine.model import Catalog, Facts, Tri, Unknown
+from guidance.engine.model import Catalog, ChannelDef, Facts, Tri, Unknown
 from guidance.engine.ordering import DependencyCycleError
 from guidance.engine.plan import Plan, build_plan
 from guidance.engine.questions import next_question
-from guidance.tests.factories import catalog, cond, dep, procedure, question, rule
+from guidance.tests.factories import CITATION, catalog, cond, dep, procedure, question, rule
 
 UNKNOWN = Unknown.UNKNOWN
 A = frozenset({"a"})
@@ -199,3 +201,17 @@ def test_uncovered_ignores_unknown_unanswered_and_covered_choice() -> None:
     assert build_plan(cat, {}).uncovered == ()
     assert build_plan(cat, {"q": A}).uncovered == ()
     assert build_plan(cat, {"q": B}).uncovered == (("q", "b"),)
+
+
+def test_clarification_only_while_question_still_matters() -> None:
+    # "iq" é citada só pela regra de um canal de "main": a pergunta importa se "main" se aplica.
+    channel = ChannelDef("ONLINE", "canal", "", CITATION, rule("c", cond("iq", "ANY_OF", "a")))
+    main = replace(procedure("main", ON), channels=(channel,))
+    cat = catalog(
+        (question("q"), question("iq")),
+        (main, procedure("check", clarifies="iq")),
+        candidates=("main",),
+    )
+    facts: Facts = {"q": A, "iq": UNKNOWN}
+    assert "check" in slugs(build_plan(cat, facts))
+    assert "check" not in slugs(build_plan(cat, {"q": B, "iq": UNKNOWN}))

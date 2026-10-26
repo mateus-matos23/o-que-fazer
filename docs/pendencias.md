@@ -53,5 +53,6 @@
 12. Cronograma com datas e critérios de conclusão de cada etapa.
 13. Conferência final das referências e da normalização institucional.
 14. Incorporação verificável da última revisão de estilo ao arquivo acadêmico.
+15. "Não sei" sem como descobrir em 3 perguntas. Em 25/10/2026 (fatia 8 da Fase 7), só `declarou-imposto-de-renda` ganhou esclarecimento com fonte oficial (`consultar-declaracoes-ir`). Ficam sem fonte suficiente `forma-de-termino`, `tipo-de-vinculo` e `vezes-seguro-desemprego` (desligamento do trabalho). O que foi buscado: CTPS, CAGED e a página do seguro-desemprego não afirmam que mostram o motivo do desligamento, o tipo de vínculo ou o histórico de pedidos; Dataprev e Emprega Brasil não abriram (dependem de JavaScript ou deram timeout); o PDF do modelo de TRCT do eSocial (campo 22, "Causa do Afastamento") não foi aberto. Próximos passos possíveis: abrir o PDF do TRCT do eSocial e conferir se o campo identifica a causa do desligamento; abrir Dataprev e Emprega Brasil num navegador e conferir se mostram o histórico de pedidos de seguro. Enquanto isso, essas perguntas seguem só com "Não sei" mantendo o fato desconhecido.
 
 Não há cronograma fechado ou resultados de avaliação suficientes para preencher essas pendências com números ou datas.

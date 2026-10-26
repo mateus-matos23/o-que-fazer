@@ -124,6 +124,19 @@ Custo: "Este serviço é gratuito para o cidadão."
 - Nota de contexto: a Receita informa que o cartão físico do CPF não existe mais e que o comprovante impresso e a versão digital têm a mesma validade (fonte de busca, não lida na íntegra).
 - Se a pessoa não souber o número do CPF, a orientação é contatar a Receita (sem canal detalhado lido).
 
+### Consultar o imposto de renda (Receita Federal): como descobrir a resposta de IR
+
+Coletado em 25/10/2026 ([amostra](../amostras/html-consultar-meu-imposto-de-renda.md)): https://www.gov.br/pt-br/servicos/consultar-meu-imposto-de-renda, HTTP 200, "Última Modificação: 23/07/2026". Sustenta o esclarecimento `consultar-declaracoes-ir`, mostrado quando a resposta à pergunta de IR é "Não sei". Linhas da amostra:
+
+- Linha 13: "Consulte a situação do seu imposto de renda desse ano e de anos anteriores junto à Receita Federal." (trecho principal)
+- Linha 14: a página cita "consultar as declarações entregues e recibos" (usado na descrição, sem trecho próprio).
+- Linha 17: "Contribuinte ou seu representante." (requisito)
+- Linhas 94 a 96: "Você precisa ter uma conta nível Prata ou Ouro para acessar este serviço." (requisito)
+- Linha 23: canal Web "Meu Imposto de Renda" (https://mir.receita.fazenda.gov.br/portalmir, do HTML); linha 25: canal Aplicativo móvel "App Receita Federal".
+- Linha 32: "Este serviço é gratuito para o cidadão." (custo); linha 30: "Atendimento imediato" (prazo).
+
+A janela de "dois anos" é da pergunta e do trecho da 2ª via do CPF, não desta página; a descrição do esclarecimento não a afirma.
+
 ### Segunda via do título de eleitor (TSE / TRE-MA)
 
 **Conteúdo aproveitável (apenas de trechos de busca; nenhuma página foi lida)**

@@ -1,5 +1,6 @@
 """Avaliação ternária (Kleene) de regras e procedimentos. Decide o que se aplica, nunca a ordem."""
 
+from collections import Counter
 from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Protocol
@@ -81,3 +82,48 @@ def evaluate(catalog: Catalog, facts: Facts) -> dict[str, Evaluation]:
     return {
         slug: evaluate_procedure(catalog.procedures[slug], facts) for slug in catalog.candidates
     }
+
+
+def pending_rule_questions(
+    catalog: Catalog, facts: Facts, evaluations: dict[str, Evaluation]
+) -> Counter[str]:
+    """Perguntas citadas por regras indeterminadas que ainda importam, com a contagem de regras:
+    de candidatos indeterminados, de dependências condicionais de etapas aplicáveis e de
+    requisitos ou canais condicionais de procedimentos aplicáveis. Inclui as já respondidas."""
+    pending: Counter[str] = Counter()
+    for evaluation in evaluations.values():
+        if evaluation.status is not Tri.UNDETERMINED:
+            continue
+        pending.update(
+            {
+                condition.question
+                for rule, status in evaluation.rules
+                if status is Tri.UNDETERMINED
+                for condition in rule.conditions
+            }
+        )
+    # CONDITIONAL indeterminada sobre etapa aplicável: a resposta pode puxar pré-requisito.
+    for dependency in catalog.dependencies:
+        after = evaluations.get(dependency.after)
+        rule = dependency.rule
+        if (
+            dependency.kind == "CONDITIONAL"
+            and rule is not None
+            and after is not None
+            and after.status is Tri.APPLICABLE
+            and evaluate_rule(rule, facts) is Tri.UNDETERMINED
+        ):
+            pending.update({c.question for c in rule.conditions})
+    # Requisito ou canal condicional indeterminado de procedimento aplicável.
+    # shortcut: itens condicionais de pré-requisitos puxados e de esclarecimentos não geram
+    # pergunta (a marca "pode valer" persiste); pontuar sobre as etapas de build_plan quando
+    # houver conteúdo assim.
+    for slug, evaluation in evaluations.items():
+        if evaluation.status is not Tri.APPLICABLE:
+            continue
+        procedure = catalog.procedures[slug]
+        item_rules = [i.rule for i in procedure.requirements] + [i.rule for i in procedure.channels]
+        for rule in item_rules:
+            if rule is not None and evaluate_rule(rule, facts) is Tri.UNDETERMINED:
+                pending.update({c.question for c in rule.conditions})
+    return pending

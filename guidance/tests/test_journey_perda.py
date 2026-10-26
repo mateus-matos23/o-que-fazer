@@ -6,7 +6,7 @@ from django.test import Client
 
 from guidance.engine.evaluation import evaluate
 from guidance.engine.model import Catalog, Facts, Tri, Unknown
-from guidance.engine.plan import Plan, build_plan
+from guidance.engine.plan import Plan, PlanStep, build_plan
 from guidance.engine.questions import next_question
 from guidance.repository import load_catalog
 
@@ -127,3 +127,33 @@ def test_income_tax_question_only_when_cpf_is_applicable(catalog: Catalog) -> No
 def test_changing_income_tax_answer_recomputes_channels(catalog: Catalog) -> None:
     assert not any("sem gov.br" in d for d, _ in _cpf_channels(catalog, "sim"))
     assert any("sem gov.br" in d for d, _ in _cpf_channels(catalog, "nao"))
+
+
+CLARIFICATION = "consultar-declaracoes-ir"
+
+
+def _steps_with_ir(catalog: Catalog, ir: str | Unknown | None) -> dict[str, PlanStep]:
+    facts: dict[str, frozenset[str] | Unknown] = {QUESTION: frozenset({"cpf"})}
+    if ir is not None:
+        facts[IR] = ir if isinstance(ir, Unknown) else frozenset({ir})
+    return {s.procedure.slug: s for s in build_plan(catalog, facts).steps}
+
+
+def test_unknown_income_tax_answer_brings_clarification(catalog: Catalog) -> None:
+    steps = _steps_with_ir(catalog, Unknown.UNKNOWN)
+    clarified = steps[CLARIFICATION].clarifies
+    assert clarified is not None and clarified.slug == IR
+    assert CPF in steps
+
+
+@pytest.mark.parametrize("ir", ["sim", "nao", None])
+def test_known_or_unasked_income_tax_has_no_clarification(catalog: Catalog, ir: str | None) -> None:
+    assert CLARIFICATION not in _steps_with_ir(catalog, ir)
+
+
+def test_clarification_disappears_when_cpf_is_removed(catalog: Catalog) -> None:
+    facts: dict[str, frozenset[str] | Unknown] = {
+        QUESTION: frozenset({"cnh"}),
+        IR: Unknown.UNKNOWN,
+    }
+    assert CLARIFICATION not in _slugs(build_plan(catalog, facts))

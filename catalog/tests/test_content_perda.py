@@ -85,5 +85,8 @@ def test_only_dependency_is_police_report_before_cnh(loaded: dict[str, int]) -> 
     ]
 
 
-def test_no_clarification_step(loaded: dict[str, int]) -> None:
-    assert not Procedure.objects.filter(clarifies__situations__slug=SITUATION).exists()
+def test_only_income_tax_clarification_step(loaded: dict[str, int]) -> None:
+    steps = Procedure.objects.filter(clarifies__situations__slug=SITUATION)
+    assert list(steps.values_list("slug", "clarifies__slug")) == [
+        ("consultar-declaracoes-ir", "declarou-imposto-de-renda")
+    ]
