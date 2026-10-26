@@ -31,6 +31,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 5 | Jornadas desligamento do trabalho e perda de documentos | Consolidado |
 | 6 | UI/UX, acessibilidade, frontend e RF18 (RF02 segue pendente) | Consolidado |
 | 7 | Conversa guiada: funil de triagem, efeito da resposta, preferência de atendimento e plano com ponto de partida (RF21 a RF26) | Consolidado (25/10/2026) |
+| 8 | Hospedagem: Dockerfile, gunicorn, WhiteNoise e deploy no Render com Neon (ADR 0006) | Consolidado (26/10/2026, commits `de7d221`, `94f9ec7`) |
 
 ## Decisões tomadas em 24/10/2026 (aprovadas pelo autor)
 
@@ -423,6 +424,18 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Consolidado; as fatias 0 a 9
 - Estado: a pergunta "foi perda, furto ou roubo?" **não entra** (Pendente em [jornadas](../produto/jornadas.md) e em [pendências](../pendencias.md), item 16). Motivo: nenhuma fonte muda o plano conforme a causa, então a pergunta violaria a RN02. Gatilho para reavaliar: fonte oficial dizendo que roubo não é registrável na Delegacia Online.
 - Não abriram: https://delegaciaonline.ssp.ma.gov.br/ e ident.ssp.ma.gov.br (DNS não resolve; o segundo foi endereço tentado, não link encontrado); notícia da Secom sobre a 2ª via da CIN após perda (redireciona para login); https://www.ssp.ma.gov.br/ident/ (404). A Delegacia Online é uma notícia de 2018 e o formulário atual não foi lido.
 - Gates não rodados: a fatia não muda código. `git diff --check` limpo.
+
+## Fase 8 — Hospedagem
+
+Decisão e alternativas em [ADR 0006](../arquitetura/decisoes/0006-hospedagem-e-deploy.md). Esta seção registra o que foi feito, na ordem.
+
+- **8a — Dockerfile e conexão segura (`de7d221`).** Imagem em dois estágios com uv, usuário não-root e `.dockerignore`. Dependência nova: `gunicorn`. `settings.py` ganhou `POSTGRES_SSLMODE` (padrão `prefer`; o Neon exige `require`). Motivo: manter as variáveis `POSTGRES_*` que dev e teste já usam, em vez de adotar `DATABASE_URL`.
+  - Dois problemas achados ao construir a imagem: o `.python-version` fixa `3.15.0` e a imagem traz `3.15.1` (arquivo fora da imagem pelo `.dockerignore`), e o gunicorn falhava sem diretório home do usuário da imagem (`useradd --create-home`).
+- **8b — Estáticos, proxy e migrate (`94f9ec7`).** Dependência nova: `whitenoise`. `collectstatic` no build, `STATIC_ROOT`, e `DJANGO_BEHIND_PROXY=1` para `SECURE_PROXY_SSL_HEADER`. O `CMD` roda `migrate --noinput` antes do gunicorn (atalho `shortcut:` registrado no Dockerfile). Testes para o cabeçalho do proxy e para a ordem do middleware; o aviso do WhiteNoise sobre `staticfiles/` ausente é filtrado no pytest.
+- **8c — Carga em produção.** Com `.env.production` (fora do git): `load_sources content/sources.toml` (9 órgãos, 23 fontes), `fetch_sources` (23 de 23 OK) e `load_content content` (3 situações, 6 perguntas, 14 procedimentos, 12 escolhas de triagem). O primeiro comando sugerido omitia o diretório e a ordem de carga; foi corrigido na sessão.
+- **8d — Deploy no Render.** O primeiro acesso retornou 400 por `DJANGO_ALLOWED_HOSTS` incorreto no painel; corrigido o valor, o site passou a responder.
+- **Gates da 8b:** ruff, mypy, 426 testes e `git diff --check` verdes. A imagem foi validada localmente (estáticos com 200; `migrate` falha de forma explícita sem banco).
+- **Não verificado:** jornada completa até o plano em produção (CSRF atrás do proxy), limites atuais dos planos gratuitos, backup e monitoramento do banco.
 
 ## Limitações conhecidas
 
