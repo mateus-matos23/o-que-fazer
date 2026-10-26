@@ -19,6 +19,7 @@ O público é o cidadão, em grande parte usando smartphone e conexões instáve
    - Um único arquivo CSS próprio em `guidance/static/guidance/`.
    - Sem etapa de build, sem JavaScript obrigatório e sem dependência nova.
    - A fonte Atkinson Hyperlegible Next (licença SIL OFL 1.1, arquivo junto às fontes) é servida localmente, sem CDN.
+   - Revisto em 26/10/2026: "sem JavaScript obrigatório e sem dependência nova" passou a seguir o critério da [ADR 0007](0007-criterio-js-e-dependencias.md). O fluxo principal continua funcionando sem JavaScript.
 2. **Acessibilidade:** a meta é WCAG 2.2 nível AA. A verificação é própria:
    - testes de HTML para rótulos, landmarks, idioma e associação de erros;
    - verificação no navegador com o agente `verificador-ui`: só teclado, foco visível, zoom de 200%, largura de 360 px e contraste calculado das cores do tema.

@@ -496,6 +496,18 @@ Uma auditoria comparou o código com as skills de `.claude/skills/` (django-expe
   - a corrida entre `load_content` e `load_catalog` em `guidance/repository.py`;
   - ramos de erro dos commands.
 
+## Fase 11 — Critério de JS e dependências e acessibilidade complementar
+
+Uma revisão externa sugeriu frameworks (govbr-ds, Bootstrap, Tailwind, HTMX com Alpine.js, widget-tweaks), o VLibras e um checklist de acessibilidade. A maior parte do checklist já era atendida desde as Fases 6 e 9. As lacunas restantes e as sugestões foram avaliadas pelo autor em 26/10/2026.
+
+- **11a — Critério em vez de proibição.** A [ADR 0007](../arquitetura/decisoes/0007-criterio-js-e-dependencias.md) troca o "sem JavaScript e sem dependência" da ADR 0004 por quatro pontos:
+  - o fluxo principal funciona sem JavaScript;
+  - em produção, só entra o que resolve uma necessidade observada, com o custo registrado;
+  - dependências de dev têm exigência menor;
+  - script de terceiro só entra se for oficial e opcional, carregado por ação do cidadão.
+
+  Motivo: a proibição rejeitava pelo mesmo argumento ferramentas sem ganho e ferramentas com ganho real de acessibilidade. Ficaram rejeitados govbr-ds, Bootstrap, Tailwind, HTMX com Alpine.js e widget-tweaks. O axe-core foi aceito no dev, e o VLibras ficou em estudo.
+
 ## Limitações conhecidas
 
 - O banco não garante que o snapshot de uma importação pertence à mesma fonte da importação. Essa garantia hoje é só do código de coleta (`sources/services.py`).
