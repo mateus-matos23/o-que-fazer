@@ -434,6 +434,11 @@ Decisão e alternativas em [ADR 0006](../arquitetura/decisoes/0006-hospedagem-e-
 - **8b — Estáticos, proxy e migrate (`94f9ec7`).** Dependência nova: `whitenoise`. `collectstatic` no build, `STATIC_ROOT`, e `DJANGO_BEHIND_PROXY=1` para `SECURE_PROXY_SSL_HEADER`. O `CMD` roda `migrate --noinput` antes do gunicorn (atalho `shortcut:` registrado no Dockerfile). Testes para o cabeçalho do proxy e para a ordem do middleware; o aviso do WhiteNoise sobre `staticfiles/` ausente é filtrado no pytest.
 - **8c — Carga em produção.** Com `.env.production` (fora do git): `load_sources content/sources.toml` (9 órgãos, 23 fontes), `fetch_sources` (23 de 23 OK) e `load_content content` (3 situações, 6 perguntas, 14 procedimentos, 12 escolhas de triagem). O primeiro comando sugerido omitia o diretório e a ordem de carga; foi corrigido na sessão.
 - **8d — Deploy no Render.** O primeiro acesso retornou 400 por `DJANGO_ALLOWED_HOSTS` incorreto no painel; corrigido o valor, o site passou a responder.
+- **8e — Latência entre perguntas.** Cada resposta levava segundos porque o Render estava em Oregon e o Neon em São Paulo. Cada resposta (POST, redirecionamento e GET) recarrega o catálogo duas vezes: 16 a 19 consultas por carga, medidas no dev. Somadas à sessão no banco e a uma conexão TLS nova por request, são cerca de 50 idas e voltas entre os continentes.
+  - Correção operacional: novos projetos no Render e no Neon, ambos em Virginia, porque nenhum dos dois muda a região de um serviço existente.
+  - Correção no código: `CONN_MAX_AGE=60` com `CONN_HEALTH_CHECKS`, para reusar a conexão entre requests.
+  - O cache do catálogo em memória ficou de fora: só entra se a medição depois da mudança mostrar uma resposta acima de 500 ms.
+  - Pendente: carga do conteúdo no banco novo, jornada completa no Render novo e medição de antes e depois.
 - **Gates da 8b:** ruff, mypy, 426 testes e `git diff --check` verdes. A imagem foi validada localmente (estáticos com 200; `migrate` falha de forma explícita sem banco).
 - **Não verificado:** jornada completa até o plano em produção (CSRF atrás do proxy), limites atuais dos planos gratuitos, backup e monitoramento do banco.
 

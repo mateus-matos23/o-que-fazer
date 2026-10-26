@@ -61,6 +61,10 @@ DATABASES = {
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
         # Neon (produção) exige "require"; local mantém o padrão do driver.
         "OPTIONS": {"sslmode": os.environ.get("POSTGRES_SSLMODE", "prefer")},
+        # Reusa a conexão entre requests (evita TLS + autenticação a cada resposta); a checagem
+        # reabre a conexão que o Neon derruba ao escalar para zero.
+        "CONN_MAX_AGE": 60,
+        "CONN_HEALTH_CHECKS": True,
         # Banco de teste separado do de desenvolvimento; criado e destruído pelo pytest-django.
         "TEST": {"NAME": os.environ.get("POSTGRES_TEST_DB", "oqf_test")},
     }
