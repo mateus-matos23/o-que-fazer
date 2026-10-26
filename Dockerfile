@@ -11,6 +11,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --locked
+# O settings exige estas variáveis na importação; os valores do build não são usados em runtime.
+RUN DJANGO_SECRET_KEY=build POSTGRES_DB=build POSTGRES_USER=build POSTGRES_PASSWORD=build \
+    .venv/bin/python manage.py collectstatic --noinput
 
 FROM python:3.15-slim
 ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
@@ -19,4 +22,5 @@ RUN useradd --system --create-home --uid 1000 app
 COPY --from=builder --chown=app:app /app /app
 USER app
 EXPOSE 8000
-CMD ["sh", "-c", "gunicorn config.wsgi --bind 0.0.0.0:${PORT:-8000}"]
+# shortcut: migrate no start de cada instância; com mais de uma réplica, mover para um release command.
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi --bind 0.0.0.0:${PORT:-8000}"]

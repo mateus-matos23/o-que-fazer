@@ -9,5 +9,9 @@ wheels/
 # Virtual environments
 .venv
 
+# Gerado por collectstatic
+staticfiles/
+
 # Ambiente local
 .env
+.env.production
