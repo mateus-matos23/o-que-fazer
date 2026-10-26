@@ -238,3 +238,19 @@ def test_no_block_without_effect(
     monkeypatch.setattr("guidance.views.answer_effect", lambda *_: AnswerEffect((), (), 0))
     _post(client, "suspenso")
     assert _effect_block(client, PLAN) is None
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        PLAN,
+        "/s/cpf-irregular/respostas/",
+        "/onde-resolvo/",
+        "/onde-resolvo/consultar-situacao-cpf/",
+    ],
+)
+def test_read_only_pages_reject_post(loaded: dict[str, int], client: Client, url: str) -> None:
+    assert client.get(url).status_code in {200, 302}  # o plano sem respostas volta à pergunta
+    response = client.post(url)
+    assert response.status_code == 405
+    assert response["Allow"] == "GET"

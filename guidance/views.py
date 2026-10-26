@@ -279,6 +279,7 @@ def _uncovered_lines(catalog: Catalog, pairs: tuple[tuple[str, str], ...]) -> li
     return lines
 
 
+@require_GET
 def plan(request: HttpRequest, slug: str) -> HttpResponse:
     catalog = _load(slug)
     facts = read_facts(request.session, catalog)
@@ -326,6 +327,7 @@ class AnswerLine:
     unknown: bool
 
 
+@require_GET
 def review(request: HttpRequest, slug: str) -> HttpResponse:
     catalog = _load(slug)
     facts = read_facts(request.session, catalog)
@@ -371,6 +373,7 @@ def restart(request: HttpRequest, slug: str) -> HttpResponse:
     return _see_other(reverse("guidance:question", args=[slug]))
 
 
+@require_GET
 def search(request: HttpRequest) -> HttpResponse:
     form = SearchForm(request.GET if "q" in request.GET else None)
     results = None
@@ -386,6 +389,7 @@ def search(request: HttpRequest) -> HttpResponse:
     return render(request, "guidance/search.html", {"form": form, "results": results})
 
 
+@require_GET
 def procedure_detail(request: HttpRequest, slug: str) -> HttpResponse:
     try:
         procedure = load_procedure(slug)

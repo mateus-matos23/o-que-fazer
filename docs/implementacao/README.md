@@ -485,6 +485,7 @@ Uma auditoria comparou o código com as skills de `.claude/skills/` (django-expe
   - Fica guardada só a versão mais recente de cada situação, então a memória é limitada ao número de situações.
   - `shortcut:` rodar `load_sources` sozinho (nome de órgão ou URL de fonte) não muda a versão. O fluxo documentado sempre termina em `load_content`.
   - Os testes cobrem: acerto com 1 consulta, situação inexistente fora do cache, invalidação por importação OK (importação com falha não invalida) e por recarga do conteúdo. A suíte limpa o cache antes de cada teste.
+- **10g — Método HTTP nas páginas de leitura.** `plan`, `review`, `search` e `procedure_detail` ganharam `@require_GET`, como as outras views de leitura. Um POST nessas páginas passou a receber 405 com `Allow: GET`, em vez de ser tratado como GET. Nenhum formulário da interface faz POST para elas. Há teste para as quatro rotas.
 
 ## Limitações conhecidas
 
