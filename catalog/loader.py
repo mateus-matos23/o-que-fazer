@@ -716,6 +716,7 @@ def validate(directory: Path) -> tuple[Content, dict[str, SourceSnapshot]]:
 
 
 def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
+    """Apaga e recria o catálogo; `bulk_create` por tabela, na ordem das chaves estrangeiras."""
     for model in (
         TriageNode,
         Dependency,
@@ -728,10 +729,33 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
     ):
         model.objects.all().delete()
 
-    question_by_slug: dict[str, Question] = {}
-    option_by_key: dict[tuple[str, str], AnswerOption] = {}
-    for q in content.questions:
-        question = Question.objects.create(
+    question_by_slug, option_by_key = _create_questions(content.questions)
+    procedure_by_slug = _create_procedures(content.procedures, question_by_slug, snapshots)
+    situation_by_slug = _create_situations(content, procedure_by_slug, question_by_slug)
+    _create_triage(content.triage, situation_by_slug)
+    rule_by_slug = _create_rules(
+        content.rules, procedure_by_slug, question_by_slug, option_by_key, snapshots
+    )
+    # Requisitos e canais referenciam regras, então só nascem depois delas.
+    _create_items(content.procedures, procedure_by_slug, rule_by_slug, snapshots)
+    Dependency.objects.bulk_create(
+        Dependency(
+            before=procedure_by_slug[d.before],
+            after=procedure_by_slug[d.after],
+            kind=d.kind,
+            rule=rule_by_slug[d.rule] if d.rule else None,
+            snapshot=snapshots[d.cite.source],
+            excerpt=d.cite.excerpt,
+        )
+        for d in content.dependencies
+    )
+
+
+def _create_questions(
+    records: list[QuestionRecord],
+) -> tuple[dict[str, Question], dict[tuple[str, str], AnswerOption]]:
+    created = Question.objects.bulk_create(
+        Question(
             slug=q.slug,
             text=q.text,
             help_text=q.help_text,
@@ -739,19 +763,30 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
             allows_unknown=q.allows_unknown,
             order=q.order,
         )
-        question_by_slug[q.slug] = question
-        for slug, label in q.options:
-            option_by_key[(q.slug, slug)] = AnswerOption.objects.create(
-                question=question,
-                slug=slug,
-                label=label,
-                out_of_coverage=slug in q.out_of_coverage,
-            )
+        for q in records
+    )
+    question_by_slug = {q.slug: q for q in created}
+    options = AnswerOption.objects.bulk_create(
+        AnswerOption(
+            question=question_by_slug[q.slug],
+            slug=slug,
+            label=label,
+            out_of_coverage=slug in q.out_of_coverage,
+        )
+        for q in records
+        for slug, label in q.options
+    )
+    return question_by_slug, {(o.question.slug, o.slug): o for o in options}
 
+
+def _create_procedures(
+    records: list[ProcedureRecord],
+    question_by_slug: dict[str, Question],
+    snapshots: dict[str, SourceSnapshot],
+) -> dict[str, Procedure]:
     agency_by_slug = {a.slug: a for a in Agency.objects.all()}
-    procedure_by_slug: dict[str, Procedure] = {}
-    for p in content.procedures:
-        procedure = Procedure.objects.create(
+    created = Procedure.objects.bulk_create(
+        Procedure(
             slug=p.slug,
             title=p.title,
             description=p.description,
@@ -761,90 +796,133 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
             snapshot=snapshots[p.cite.source],
             excerpt=p.cite.excerpt,
         )
-        procedure_by_slug[p.slug] = procedure
-        for item in p.details:
-            ProcedureDetail.objects.create(
-                procedure=procedure,
-                kind=item.kind,
-                text=item.text,
-                snapshot=snapshots[item.cite.source],
-                excerpt=item.cite.excerpt,
-            )
+        for p in records
+    )
+    procedure_by_slug = {p.slug: p for p in created}
+    ProcedureDetail.objects.bulk_create(
+        ProcedureDetail(
+            procedure=procedure_by_slug[p.slug],
+            kind=item.kind,
+            text=item.text,
+            snapshot=snapshots[item.cite.source],
+            excerpt=item.cite.excerpt,
+        )
+        for p in records
+        for item in p.details
+    )
+    return procedure_by_slug
 
-    situation_by_slug: dict[str, Situation] = {}
-    for s in content.situations:
-        situation = Situation.objects.create(slug=s.slug, title=s.title)
-        situation.candidates.set([procedure_by_slug[c] for c in s.candidates])
-        situation_by_slug[s.slug] = situation
-    for q in content.questions:
-        question_by_slug[q.slug].situations.set(Situation.objects.filter(slug__in=q.situations))
 
-    _create_triage(content.triage, situation_by_slug)
+def _create_situations(
+    content: Content,
+    procedure_by_slug: dict[str, Procedure],
+    question_by_slug: dict[str, Question],
+) -> dict[str, Situation]:
+    created = Situation.objects.bulk_create(
+        Situation(slug=s.slug, title=s.title) for s in content.situations
+    )
+    situation_by_slug = {s.slug: s for s in created}
+    Situation.candidates.through._default_manager.bulk_create(
+        Situation.candidates.through(
+            situation_id=situation_by_slug[s.slug].pk, procedure_id=procedure_by_slug[c].pk
+        )
+        for s in content.situations
+        for c in s.candidates
+    )
+    Question.situations.through._default_manager.bulk_create(
+        Question.situations.through(
+            question_id=question_by_slug[q.slug].pk, situation_id=situation_by_slug[slug].pk
+        )
+        for q in content.questions
+        for slug in q.situations
+    )
+    return situation_by_slug
 
-    rule_by_slug: dict[str, Rule] = {}
-    for r in content.rules:
-        rule = Rule.objects.create(
+
+def _create_triage(nodes: list[TriageNodeRecord], situation_by_slug: dict[str, Situation]) -> None:
+    created = TriageNode.objects.bulk_create(
+        TriageNode(slug=n.slug, text=n.text, help_text=n.help_text) for n in nodes
+    )
+    node_by_slug = {n.slug: n for n in created}
+    TriageChoice.objects.bulk_create(
+        TriageChoice(
+            node=node_by_slug[n.slug],
+            label=o.label,
+            icon=o.icon,
+            order=order,
+            next_node=node_by_slug[o.next_node] if o.next_node else None,
+            situation=situation_by_slug[o.situation] if o.situation else None,
+        )
+        for n in nodes
+        for order, o in enumerate(n.options, start=1)
+    )
+
+
+def _create_rules(
+    records: list[RuleRecord],
+    procedure_by_slug: dict[str, Procedure],
+    question_by_slug: dict[str, Question],
+    option_by_key: dict[tuple[str, str], AnswerOption],
+    snapshots: dict[str, SourceSnapshot],
+) -> dict[str, Rule]:
+    created = Rule.objects.bulk_create(
+        Rule(
             slug=r.slug,
             procedure=procedure_by_slug[r.procedure] if r.procedure else None,
             explanation=r.explanation,
             snapshot=snapshots[r.cite.source],
             excerpt=r.cite.excerpt,
         )
-        rule_by_slug[r.slug] = rule
-        for c in r.conditions:
-            condition = Condition.objects.create(
-                rule=rule, question=question_by_slug[c.question], operator=c.operator
-            )
-            condition.options.set([option_by_key[(c.question, o)] for o in c.options])
-
-    # Requisitos e canais referenciam regras, então só nascem depois delas.
-    for p in content.procedures:
-        procedure = procedure_by_slug[p.slug]
-        for item in p.requirements:
-            Requirement.objects.create(
-                procedure=procedure,
-                description=item.text,
-                rule=rule_by_slug[item.rule] if item.rule else None,
-                snapshot=snapshots[item.cite.source],
-                excerpt=item.cite.excerpt,
-            )
-        for item in p.channels:
-            ServiceChannel.objects.create(
-                procedure=procedure,
-                kind=item.kind,
-                description=item.text,
-                url=item.url,
-                rule=rule_by_slug[item.rule] if item.rule else None,
-                snapshot=snapshots[item.cite.source],
-                excerpt=item.cite.excerpt,
-            )
-
-    for d in content.dependencies:
-        Dependency.objects.create(
-            before=procedure_by_slug[d.before],
-            after=procedure_by_slug[d.after],
-            kind=d.kind,
-            rule=rule_by_slug[d.rule] if d.rule else None,
-            snapshot=snapshots[d.cite.source],
-            excerpt=d.cite.excerpt,
+        for r in records
+    )
+    rule_by_slug = {r.slug: r for r in created}
+    pairs = [(r, c) for r in records for c in r.conditions]
+    conditions = Condition.objects.bulk_create(
+        Condition(
+            rule=rule_by_slug[r.slug], question=question_by_slug[c.question], operator=c.operator
         )
+        for r, c in pairs
+    )
+    Condition.options.through._default_manager.bulk_create(
+        Condition.options.through(
+            condition_id=condition.pk, answeroption_id=option_by_key[(c.question, o)].pk
+        )
+        for condition, (_, c) in zip(conditions, pairs, strict=True)
+        for o in c.options
+    )
+    return rule_by_slug
 
 
-def _create_triage(nodes: list[TriageNodeRecord], situation_by_slug: dict[str, Situation]) -> None:
-    node_by_slug = {
-        n.slug: TriageNode.objects.create(slug=n.slug, text=n.text, help_text=n.help_text)
-        for n in nodes
-    }
-    for n in nodes:
-        for order, o in enumerate(n.options, start=1):
-            TriageChoice.objects.create(
-                node=node_by_slug[n.slug],
-                label=o.label,
-                icon=o.icon,
-                order=order,
-                next_node=node_by_slug[o.next_node] if o.next_node else None,
-                situation=situation_by_slug[o.situation] if o.situation else None,
-            )
+def _create_items(
+    records: list[ProcedureRecord],
+    procedure_by_slug: dict[str, Procedure],
+    rule_by_slug: dict[str, Rule],
+    snapshots: dict[str, SourceSnapshot],
+) -> None:
+    Requirement.objects.bulk_create(
+        Requirement(
+            procedure=procedure_by_slug[p.slug],
+            description=item.text,
+            rule=rule_by_slug[item.rule] if item.rule else None,
+            snapshot=snapshots[item.cite.source],
+            excerpt=item.cite.excerpt,
+        )
+        for p in records
+        for item in p.requirements
+    )
+    ServiceChannel.objects.bulk_create(
+        ServiceChannel(
+            procedure=procedure_by_slug[p.slug],
+            kind=item.kind,
+            description=item.text,
+            url=item.url,
+            rule=rule_by_slug[item.rule] if item.rule else None,
+            snapshot=snapshots[item.cite.source],
+            excerpt=item.cite.excerpt,
+        )
+        for p in records
+        for item in p.channels
+    )
 
 
 _COUNTED: tuple[type[models.Model], ...] = (

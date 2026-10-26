@@ -46,13 +46,14 @@ def _semantic_problems(
     known_agencies = {record["slug"] for record in agencies} | set(
         Agency.objects.values_list("slug", flat=True)
     )
+    owner_by_url = dict(Source.objects.values_list("url", "slug"))
     for record in sources:
         if record["agency"] not in known_agencies:
             problems.append(f"{file}: {record['slug']}: agência inexistente: {record['agency']}")
         # shortcut: troca de URL entre fontes existentes é rejeitada; tratar se surgir caso real
-        clash = Source.objects.filter(url=record["url"]).exclude(slug=record["slug"]).first()
-        if clash:
-            problems.append(f"{file}: {record['slug']}: url já usada pela fonte {clash.slug}")
+        owner = owner_by_url.get(record["url"])
+        if owner is not None and owner != record["slug"]:
+            problems.append(f"{file}: {record['slug']}: url já usada pela fonte {owner}")
     return problems
 
 
@@ -73,11 +74,12 @@ def load_sources(path: Path) -> dict[str, int]:
                 slug=record["slug"],
                 defaults={"name": record["name"], "jurisdiction": record["jurisdiction"]},
             )
+        agency_by_slug = {a.slug: a for a in Agency.objects.all()}
         for record in sources:
             Source.objects.update_or_create(
                 slug=record["slug"],
                 defaults={
-                    "agency": Agency.objects.get(slug=record["agency"]),
+                    "agency": agency_by_slug[record["agency"]],
                     "url": record["url"],
                     "format": record["format"],
                     "jurisdiction": record["jurisdiction"],

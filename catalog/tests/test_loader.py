@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pytest
 from django.core.management import CommandError, call_command
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 
 from catalog.loader import load_content
 from catalog.models import (
@@ -702,3 +704,11 @@ def test_triage_duplicate_slug_across_files(content: Path) -> None:
         load_content(content)
     assert "journey.toml: sub: slug duplicado em triage" in info.value.lines
     assert "other.toml: sub: slug duplicado em triage" in info.value.lines
+
+
+def test_replace_inserts_once_per_table(content: Path) -> None:
+    with CaptureQueriesContext(connection) as ctx:
+        load_content(content)
+    tables = [q["sql"].split()[2] for q in ctx.captured_queries if q["sql"].startswith("INSERT")]
+    assert tables
+    assert len(tables) == len(set(tables)), tables
