@@ -2,7 +2,6 @@
 
 from collections.abc import Iterable
 from datetime import datetime
-from typing import Literal
 
 from django.db.models import Max, Prefetch, Q, QuerySet, Subquery
 
@@ -19,23 +18,22 @@ from catalog.models import ProcedureDetail as Detail
 from guidance.engine.model import (
     Catalog,
     ChannelDef,
+    ChannelKind,
     Citation,
     ConditionDef,
     DependencyDef,
+    DependencyKind,
     DetailDef,
+    DetailKind,
+    Operator,
     OptionDef,
     ProcedureDef,
     QuestionDef,
+    QuestionKind,
     RequirementDef,
     RuleDef,
 )
 from sources.models import SourceImport
-
-QuestionKind = Literal["SINGLE", "MULTIPLE"]
-Operator = Literal["ANY_OF", "NONE_OF"]
-ChannelKind = Literal["ONLINE", "IN_PERSON", "PHONE", "APP", "EMAIL"]
-DetailKind = Literal["COST", "DEADLINE"]
-DependencyKind = Literal["MANDATORY", "CONDITIONAL", "RECOMMENDED"]
 
 QUESTION_KINDS: tuple[QuestionKind, ...] = ("SINGLE", "MULTIPLE")
 OPERATORS: tuple[Operator, ...] = ("ANY_OF", "NONE_OF")

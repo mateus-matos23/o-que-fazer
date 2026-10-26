@@ -8,6 +8,7 @@ from typing import Any
 
 from django.db import models, transaction
 
+from guidance.engine.model import DependencyKind, Operator, QuestionKind
 from guidance.engine.ordering import DependencyCycleError, kahn_layers
 from sources.models import Agency, Jurisdiction, Source, SourceImport, SourceSnapshot
 from sources.text import contains_excerpt, snapshot_text
@@ -163,7 +164,7 @@ class Item:
 
 
 @dataclass(frozen=True)
-class ProcedureDef:
+class ProcedureRecord:
     file: str
     slug: str
     title: str
@@ -178,28 +179,28 @@ class ProcedureDef:
 
 
 @dataclass(frozen=True)
-class ConditionDef:
+class ConditionRecord:
     question: str
-    operator: str
+    operator: Operator  # validado pelo schema antes de virar registro
     options: list[str]
 
 
 @dataclass(frozen=True)
-class RuleDef:
+class RuleRecord:
     file: str
     slug: str
     procedure: str | None
     explanation: str
     cite: Cite
-    conditions: list[ConditionDef]
+    conditions: list[ConditionRecord]
 
 
 @dataclass(frozen=True)
-class DependencyDef:
+class DependencyRecord:
     file: str
     before: str
     after: str
-    kind: str
+    kind: DependencyKind  # validado pelo schema antes de virar registro
     rule: str | None
     cite: Cite
 
@@ -209,12 +210,12 @@ class DependencyDef:
 
 
 @dataclass(frozen=True)
-class QuestionDef:
+class QuestionRecord:
     file: str
     slug: str
     text: str
     help_text: str
-    kind: str
+    kind: QuestionKind  # validado pelo schema antes de virar registro
     allows_unknown: bool
     order: int
     situations: list[str]
@@ -223,7 +224,7 @@ class QuestionDef:
 
 
 @dataclass(frozen=True)
-class SituationDef:
+class SituationRecord:
     file: str
     slug: str
     title: str
@@ -231,7 +232,7 @@ class SituationDef:
 
 
 @dataclass(frozen=True)
-class TriageOptionDef:
+class TriageOptionRecord:
     label: str
     next_node: str | None
     situation: str | None
@@ -240,22 +241,22 @@ class TriageOptionDef:
 
 
 @dataclass(frozen=True)
-class TriageNodeDef:
+class TriageNodeRecord:
     file: str
     slug: str
     text: str
     help_text: str
-    options: list[TriageOptionDef]
+    options: list[TriageOptionRecord]
 
 
 @dataclass
 class Content:
-    situations: list[SituationDef] = field(default_factory=list)
-    questions: list[QuestionDef] = field(default_factory=list)
-    procedures: list[ProcedureDef] = field(default_factory=list)
-    rules: list[RuleDef] = field(default_factory=list)
-    dependencies: list[DependencyDef] = field(default_factory=list)
-    triage: list[TriageNodeDef] = field(default_factory=list)
+    situations: list[SituationRecord] = field(default_factory=list)
+    questions: list[QuestionRecord] = field(default_factory=list)
+    procedures: list[ProcedureRecord] = field(default_factory=list)
+    rules: list[RuleRecord] = field(default_factory=list)
+    dependencies: list[DependencyRecord] = field(default_factory=list)
+    triage: list[TriageNodeRecord] = field(default_factory=list)
 
 
 def _cite(raw: dict[str, Any]) -> Cite:
@@ -264,12 +265,12 @@ def _cite(raw: dict[str, Any]) -> Cite:
 
 def _parse(file: str, doc: dict[str, Any], content: Content) -> None:
     for r in doc.get("situations", []):
-        content.situations.append(SituationDef(file, r["slug"], r["title"], r["candidates"]))
+        content.situations.append(SituationRecord(file, r["slug"], r["title"], r["candidates"]))
     for r in doc.get("questions", []):
         options = [(o["slug"], o["label"]) for o in r["options"]]
         uncovered = frozenset(o["slug"] for o in r["options"] if o.get("out_of_coverage", False))
         content.questions.append(
-            QuestionDef(
+            QuestionRecord(
                 file,
                 r["slug"],
                 r["text"],
@@ -284,7 +285,7 @@ def _parse(file: str, doc: dict[str, Any], content: Content) -> None:
         )
     for r in doc.get("procedures", []):
         content.procedures.append(
-            ProcedureDef(
+            ProcedureRecord(
                 file,
                 r["slug"],
                 r["title"],
@@ -306,14 +307,14 @@ def _parse(file: str, doc: dict[str, Any], content: Content) -> None:
         )
     for r in doc.get("rules", []):
         conditions = [
-            ConditionDef(c["question"], c["operator"], c["options"]) for c in r["conditions"]
+            ConditionRecord(c["question"], c["operator"], c["options"]) for c in r["conditions"]
         ]
         content.rules.append(
-            RuleDef(file, r["slug"], r.get("procedure"), r["explanation"], _cite(r), conditions)
+            RuleRecord(file, r["slug"], r.get("procedure"), r["explanation"], _cite(r), conditions)
         )
     for r in doc.get("triage", []):
         choices = [
-            TriageOptionDef(
+            TriageOptionRecord(
                 o["label"],
                 o.get("next"),
                 o.get("situation"),
@@ -322,10 +323,12 @@ def _parse(file: str, doc: dict[str, Any], content: Content) -> None:
             )
             for o in r["options"]
         ]
-        content.triage.append(TriageNodeDef(file, r["slug"], r["text"], r.get("help", ""), choices))
+        content.triage.append(
+            TriageNodeRecord(file, r["slug"], r["text"], r.get("help", ""), choices)
+        )
     for r in doc.get("dependencies", []):
         content.dependencies.append(
-            DependencyDef(file, r["before"], r["after"], r["kind"], r.get("rule"), _cite(r))
+            DependencyRecord(file, r["before"], r["after"], r["kind"], r.get("rule"), _cite(r))
         )
 
 
@@ -450,7 +453,7 @@ def _structure_problems(content: Content) -> list[str]:
     return problems + _cycle_problems(content, procedures)
 
 
-def _rule_ref_problems(where: str, rule_slug: str, rules: dict[str, RuleDef]) -> list[str]:
+def _rule_ref_problems(where: str, rule_slug: str, rules: dict[str, RuleRecord]) -> list[str]:
     """Regra citada por requisito, canal ou dependência: existe e não define aplicabilidade."""
     rule = rules.get(rule_slug)
     if rule is None:
@@ -461,7 +464,7 @@ def _rule_ref_problems(where: str, rule_slug: str, rules: dict[str, RuleDef]) ->
 
 
 def _situation_question_problems(
-    content: Content, rules: dict[str, RuleDef], questions: dict[str, QuestionDef]
+    content: Content, rules: dict[str, RuleRecord], questions: dict[str, QuestionRecord]
 ) -> list[str]:
     """Toda pergunta citada por regra de um procedimento relevante precisa estar ligada à situação.
 
@@ -788,7 +791,7 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
         )
 
 
-def _create_triage(nodes: list[TriageNodeDef], situation_by_slug: dict[str, Situation]) -> None:
+def _create_triage(nodes: list[TriageNodeRecord], situation_by_slug: dict[str, Situation]) -> None:
     node_by_slug = {
         n.slug: TriageNode.objects.create(slug=n.slug, text=n.text, help_text=n.help_text)
         for n in nodes

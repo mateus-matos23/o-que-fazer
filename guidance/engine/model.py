@@ -19,6 +19,12 @@ class Unknown(Enum):
     UNKNOWN = "UNKNOWN"
 
 
+QuestionKind = Literal["SINGLE", "MULTIPLE"]
+Operator = Literal["ANY_OF", "NONE_OF"]
+ChannelKind = Literal["ONLINE", "IN_PERSON", "PHONE", "APP", "EMAIL"]
+DetailKind = Literal["COST", "DEADLINE"]
+DependencyKind = Literal["MANDATORY", "CONDITIONAL", "RECOMMENDED"]
+
 Answer = frozenset[str] | Unknown
 Facts = Mapping[str, Answer]  # chave = slug da pergunta; ausente = não respondida
 
@@ -44,7 +50,7 @@ class QuestionDef:
     slug: str
     text: str
     help_text: str
-    kind: Literal["SINGLE", "MULTIPLE"]
+    kind: QuestionKind
     allows_unknown: bool
     order: int
     options: tuple[OptionDef, ...]
@@ -53,7 +59,7 @@ class QuestionDef:
 @dataclass(frozen=True, slots=True)
 class ConditionDef:
     question: str
-    operator: Literal["ANY_OF", "NONE_OF"]
+    operator: Operator
     options: frozenset[str]
 
 
@@ -74,7 +80,7 @@ class RequirementDef:
 
 @dataclass(frozen=True, slots=True)
 class ChannelDef:
-    kind: Literal["ONLINE", "IN_PERSON", "PHONE", "APP", "EMAIL"]
+    kind: ChannelKind
     description: str
     url: str
     citation: Citation
@@ -83,7 +89,7 @@ class ChannelDef:
 
 @dataclass(frozen=True, slots=True)
 class DetailDef:
-    kind: Literal["COST", "DEADLINE"]
+    kind: DetailKind
     text: str
     citation: Citation
 
@@ -107,7 +113,7 @@ class ProcedureDef:
 class DependencyDef:
     before: str
     after: str
-    kind: Literal["MANDATORY", "CONDITIONAL", "RECOMMENDED"]
+    kind: DependencyKind
     rule: RuleDef | None
     citation: Citation
 

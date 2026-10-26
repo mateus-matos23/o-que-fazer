@@ -486,6 +486,7 @@ Uma auditoria comparou o código com as skills de `.claude/skills/` (django-expe
   - `shortcut:` rodar `load_sources` sozinho (nome de órgão ou URL de fonte) não muda a versão. O fluxo documentado sempre termina em `load_content`.
   - Os testes cobrem: acerto com 1 consulta, situação inexistente fora do cache, invalidação por importação OK (importação com falha não invalida) e por recarga do conteúdo. A suíte limpa o cache antes de cada teste.
 - **10g — Método HTTP nas páginas de leitura.** `plan`, `review`, `search` e `procedure_detail` ganharam `@require_GET`, como as outras views de leitura. Um POST nessas páginas passou a receber 405 com `Allow: GET`, em vez de ser tratado como GET. Nenhum formulário da interface faz POST para elas. Há teste para as quatro rotas.
+- **10h — Nomes e tipos dos registros da carga.** Em `catalog/loader.py`, os registros lidos do TOML passaram de `*Def` para `*Record` (`ProcedureRecord`, `RuleRecord` e outros). `kind` e `operator` agora usam os `Literal` do motor. Os aliases (`QuestionKind`, `Operator`, `ChannelKind`, `DetailKind`, `DependencyKind`) saíram de `guidance/repository.py` e foram para `guidance/engine/model.py`, que é de onde o repositório e o loader importam. Motivo: `ProcedureDef` e os demais tinham o mesmo nome dos tipos do motor, com outros campos, e o tipo `str` não registrava que o schema já tinha validado o valor. Nenhum comportamento mudou.
 
 ## Limitações conhecidas
 
