@@ -13,16 +13,25 @@ def _reload_settings() -> object:
 
 def test_proxy_header_is_off_by_default(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("DJANGO_BEHIND_PROXY", raising=False)
-    assert not hasattr(_reload_settings(), "SECURE_PROXY_SSL_HEADER")
+    module = _reload_settings()
+    assert not hasattr(module, "SECURE_PROXY_SSL_HEADER")
+    # Em dev (HTTP local) cookies Secure e redirect impediriam o uso.
+    assert not hasattr(module, "SECURE_SSL_REDIRECT")
+    assert not hasattr(module, "SESSION_COOKIE_SECURE")
 
 
 def test_proxy_header_is_set_behind_proxy(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("DJANGO_BEHIND_PROXY", "1")
     try:
-        assert getattr(_reload_settings(), "SECURE_PROXY_SSL_HEADER") == (  # noqa: B009
+        module = _reload_settings()
+        assert getattr(module, "SECURE_PROXY_SSL_HEADER") == (  # noqa: B009
             "HTTP_X_FORWARDED_PROTO",
             "https",
         )
+        assert getattr(module, "SECURE_SSL_REDIRECT") is True  # noqa: B009
+        assert getattr(module, "SESSION_COOKIE_SECURE") is True  # noqa: B009
+        assert getattr(module, "CSRF_COOKIE_SECURE") is True  # noqa: B009
+        assert getattr(module, "SECURE_HSTS_SECONDS") > 0  # noqa: B009
     finally:
         monkeypatch.undo()
         _reload_settings()

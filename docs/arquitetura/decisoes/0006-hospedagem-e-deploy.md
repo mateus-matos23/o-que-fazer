@@ -19,6 +19,7 @@ Planos gratuitos mudam com frequência. Os limites abaixo não foram reverificad
    - `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS` (domínio exato, sem esquema nem barra) e `DJANGO_DEBUG` ausente;
    - `POSTGRES_HOST`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` e `POSTGRES_SSLMODE=require`, usando o host direto do Neon (sem `-pooler`);
    - `DJANGO_BEHIND_PROXY=1`, que ativa `SECURE_PROXY_SSL_HEADER`. Sem ele, o CSRF rejeita os POSTs atrás do proxy TLS do Render.
+     - Revisto em 26/10/2026: a mesma variável liga também `SECURE_SSL_REDIRECT`, cookies de sessão e CSRF com `Secure` e HSTS de 1 hora com `includeSubDomains`. O valor curto e a ausência de preload existem porque o HSTS é difícil de reverter no navegador. O preload também exige domínio próprio, e o aviso `security.W021` fica silenciado por isso. O Render já redireciona para HTTPS e aceita resposta 3xx no health check.
 6. **Migrations** rodam no início de cada instância (`CMD`: `migrate --noinput` e depois gunicorn).
 7. **Conteúdo** é carregado manualmente, da máquina do mantenedor, contra o banco de produção, na ordem `load_sources content/sources.toml` → `fetch_sources` → `load_content content`. A ordem importa porque `load_content` verifica cada trecho citado contra o snapshot coletado.
 

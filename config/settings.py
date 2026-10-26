@@ -88,6 +88,15 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Atrás do proxy TLS da hospedagem; sem isso o CSRF rejeita POSTs por origem https.
 if os.environ.get("DJANGO_BEHIND_PROXY") == "1":
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    # O Render já redireciona para HTTPS; o redirect aqui vale para qualquer outro proxy.
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    # HSTS curto e sem preload: difícil de reverter no navegador, então começa pequeno.
+    SECURE_HSTS_SECONDS = 60 * 60
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # Preload exige max-age de um ano e um domínio próprio; o host atual é do Render.
+    SILENCED_SYSTEM_CHECKS = ["security.W021"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

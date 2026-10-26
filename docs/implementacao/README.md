@@ -476,6 +476,7 @@ A direção visual vem das fachadas de São Luís: fundo cor de cal, azulejo azu
 Uma auditoria comparou o código com as skills de `.claude/skills/` (django-expert, python-error-handling, python-design-patterns, python-performance-optimization, python-type-safety, python-testing-patterns e supabase-postgres-best-practices). Cada achado virou uma fatia com teste. As decisões de HTTPS, sessões e cache foram tomadas pelo autor em 26/10/2026.
 
 - **10a — Logging em produção.** `settings.py` ganhou `LOGGING`: um `StreamHandler` no root, e o logger `django` sem handlers próprios, propagando para o root. Motivo: no padrão do Django, o console só escreve com `DEBUG` ligado e o `mail_admins` não tem destinatário. Com isso, o traceback de um 500 no Render não aparecia em log nenhum. Teste: um erro de `django.request` com `DEBUG` desligado chega a um handler de console.
+- **10b — HTTPS atrás do proxy.** Com `DJANGO_BEHIND_PROXY=1`, ficam ligados `SECURE_SSL_REDIRECT`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE` e HSTS de 1 hora (sem preload; ver [ADR 0006](../arquitetura/decisoes/0006-hospedagem-e-deploy.md)). O `check --deploy` passou a não apontar nenhum problema. Motivo: o cookie de sessão identifica as respostas do cidadão e não deve trafegar em HTTP. Em dev nada muda, e os testes cobrem os dois estados.
 
 ## Limitações conhecidas
 
