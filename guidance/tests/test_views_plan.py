@@ -126,7 +126,7 @@ def test_cycle_gives_generic_500_and_logs(
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    def boom(catalog: Catalog, facts: object) -> None:
+    def boom(catalog: Catalog, facts: object, evaluations: object) -> None:
         raise DependencyCycleError(["a", "b"])
 
     monkeypatch.setattr("guidance.views.build_plan", boom)

@@ -9,7 +9,7 @@ from django.contrib.sessions.backends.base import SessionBase
 from django.test import Client
 
 from guidance.engine.channels import PREFERENCES, lacks_preferred, order_channels
-from guidance.engine.model import ChannelDef
+from guidance.engine.model import ChannelDef, Tri
 from guidance.engine.plan import build_plan
 from guidance.session import (
     PREFERENCE_KEY,
@@ -44,8 +44,11 @@ MIXED = [
 ]
 
 
-def _names(channels: tuple[ChannelDef, ...]) -> list[str]:
-    return [c.description for c in channels]
+PAIRS = [(c, Tri.APPLICABLE) for c in MIXED]
+
+
+def _names(pairs: tuple[tuple[ChannelDef, Tri], ...]) -> list[str]:
+    return [c.description for c, _ in pairs]
 
 
 @pytest.mark.parametrize(
@@ -58,13 +61,13 @@ def _names(channels: tuple[ChannelDef, ...]) -> list[str]:
     ],
 )
 def test_order_is_stable_per_preference_and_drops_nothing(slug: str, expected: list[str]) -> None:
-    ordered = order_channels(MIXED, PREFERENCES[slug])
+    ordered = order_channels(PAIRS, PREFERENCES[slug])
     assert _names(ordered) == expected
-    assert sorted(_names(ordered)) == sorted(_names(tuple(MIXED)))
+    assert sorted(_names(ordered)) == sorted(c.description for c in MIXED)
 
 
 def test_no_preference_keeps_order() -> None:
-    assert order_channels(MIXED, None) == tuple(MIXED)
+    assert order_channels(PAIRS, None) == tuple(PAIRS)
 
 
 def test_email_is_in_no_group() -> None:

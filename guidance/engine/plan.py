@@ -4,6 +4,7 @@ from collections import defaultdict, deque
 from dataclasses import dataclass
 
 from guidance.engine.evaluation import (
+    Evaluation,
     evaluate,
     evaluate_procedure,
     evaluate_rule,
@@ -47,8 +48,11 @@ class Plan:
     uncovered: tuple[tuple[str, str], ...]
 
 
-def build_plan(catalog: Catalog, facts: Facts) -> Plan:
-    evaluations = evaluate(catalog, facts)
+def build_plan(
+    catalog: Catalog, facts: Facts, evaluations: dict[str, Evaluation] | None = None
+) -> Plan:
+    if evaluations is None:
+        evaluations = evaluate(catalog, facts)
 
     status: dict[str, Tri] = {}
     reasons: dict[str, tuple[RuleDef, ...]] = {}

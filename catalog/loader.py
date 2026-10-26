@@ -386,16 +386,7 @@ def _structure_problems(content: Content) -> list[str]:
             for i, item in enumerate(items):
                 if item.rule is None:
                     continue
-                used = rules.get(item.rule)
-                if used is None:
-                    problems.append(
-                        f"{p.file}: {p.slug}: {name}[{i}]: regra inexistente: {item.rule}"
-                    )
-                elif used.procedure is not None:
-                    problems.append(
-                        f"{p.file}: {p.slug}: {name}[{i}]: regra {item.rule} define aplicabilidade"
-                        " (tem procedure)"
-                    )
+                problems += _rule_ref_problems(f"{p.file}: {p.slug}: {name}[{i}]", item.rule, rules)
         kinds = Counter(d.kind for d in p.details)
         problems += [
             f"{p.file}: {p.slug}: detalhe duplicado: {kind}" for kind, n in kinds.items() if n > 1
@@ -405,12 +396,13 @@ def _structure_problems(content: Content) -> list[str]:
     used_by_item = {
         i.rule for p in content.procedures for i in (*p.requirements, *p.channels) if i.rule
     }
+    used_by_rule_ref = used_by_dependency | used_by_item
     for r in content.rules:
         if r.procedure is not None and r.procedure not in procedures:
             problems.append(f"{r.file}: {r.slug}: procedimento inexistente: {r.procedure}")
         if not r.conditions:
             problems.append(f"{r.file}: {r.slug}: regra sem condições")
-        if r.procedure is None and r.slug not in used_by_dependency | used_by_item:
+        if r.procedure is None and r.slug not in used_by_rule_ref:
             problems.append(
                 f"{r.file}: {r.slug}: regra órfã (sem procedure, dependência, requisito ou canal)"
             )
@@ -441,17 +433,21 @@ def _structure_problems(content: Content) -> list[str]:
         if d.kind != Dependency.Kind.CONDITIONAL and d.rule is not None:
             problems.append(f"{d.file}: {d.label}: rule só é permitida em dependência CONDITIONAL")
         if d.rule is not None:
-            used = rules.get(d.rule)
-            if used is None:
-                problems.append(f"{d.file}: {d.label}: regra inexistente: {d.rule}")
-            elif used.procedure is not None:
-                problems.append(
-                    f"{d.file}: {d.label}: regra {d.rule} define aplicabilidade (tem procedure)"
-                )
+            problems += _rule_ref_problems(f"{d.file}: {d.label}", d.rule, rules)
     if content.triage:
         problems += _triage_problems(content, situations)
     problems += _situation_question_problems(content, rules, questions)
     return problems + _cycle_problems(content, procedures)
+
+
+def _rule_ref_problems(where: str, rule_slug: str, rules: dict[str, RuleDef]) -> list[str]:
+    """Regra citada por requisito, canal ou dependência: existe e não define aplicabilidade."""
+    rule = rules.get(rule_slug)
+    if rule is None:
+        return [f"{where}: regra inexistente: {rule_slug}"]
+    if rule.procedure is not None:
+        return [f"{where}: regra {rule_slug} define aplicabilidade (tem procedure)"]
+    return []
 
 
 def _situation_question_problems(
@@ -559,12 +555,14 @@ def _triage_problems(content: Content, situations: set[str]) -> list[str]:
             f"{nodes[first].file}: {first}: ciclo no funil de triagem envolvendo: "
             + ", ".join(exc.nodes)
         )
+    adjacency: dict[str, list[str]] = {}
+    for source, target in edges:
+        adjacency.setdefault(source, []).append(target)
     reached = {START_NODE} & nodes.keys()
     pending = list(reached)
     while pending:
-        current = pending.pop()
-        for before, target in edges:
-            if before == current and target not in reached:
+        for target in adjacency.get(pending.pop(), ()):
+            if target not in reached:
                 reached.add(target)
                 pending.append(target)
     problems += [
@@ -721,13 +719,15 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
                 excerpt=item.cite.excerpt,
             )
 
+    situation_by_slug: dict[str, Situation] = {}
     for s in content.situations:
         situation = Situation.objects.create(slug=s.slug, title=s.title)
         situation.candidates.set([procedure_by_slug[c] for c in s.candidates])
+        situation_by_slug[s.slug] = situation
     for q in content.questions:
         question_by_slug[q.slug].situations.set(Situation.objects.filter(slug__in=q.situations))
 
-    _create_triage(content.triage)
+    _create_triage(content.triage, situation_by_slug)
 
     rule_by_slug: dict[str, Rule] = {}
     for r in content.rules:
@@ -778,12 +778,11 @@ def _replace(content: Content, snapshots: dict[str, SourceSnapshot]) -> None:
         )
 
 
-def _create_triage(nodes: list[TriageNodeDef]) -> None:
+def _create_triage(nodes: list[TriageNodeDef], situation_by_slug: dict[str, Situation]) -> None:
     node_by_slug = {
         n.slug: TriageNode.objects.create(slug=n.slug, text=n.text, help_text=n.help_text)
         for n in nodes
     }
-    situation_by_slug = {s.slug: s for s in Situation.objects.all()}
     for n in nodes:
         for order, o in enumerate(n.options, start=1):
             TriageChoice.objects.create(

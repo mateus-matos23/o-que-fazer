@@ -4,7 +4,7 @@ from guidance import views
 
 app_name = "guidance"
 urlpatterns = [
-    path("", views.triage, name="home"),
+    path("", views.home, name="home"),
     path("comecar/<slug:slug>/", views.triage, name="triage"),
     path("situacoes/", views.situation_list, name="situation_list"),
     path("fora-da-cobertura/", views.uncovered, name="uncovered"),

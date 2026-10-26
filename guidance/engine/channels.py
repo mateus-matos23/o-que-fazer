@@ -3,7 +3,7 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from guidance.engine.model import ChannelDef
+from guidance.engine.model import ChannelDef, Tri
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,12 +43,12 @@ PREFERENCES: dict[str, ChannelPreference] = {
 
 
 def order_channels(
-    channels: Sequence[ChannelDef], preference: ChannelPreference | None
-) -> tuple[ChannelDef, ...]:
-    """Canais preferidos primeiro; a ordem original é mantida dentro de cada grupo."""
+    pairs: Sequence[tuple[ChannelDef, Tri]], preference: ChannelPreference | None
+) -> tuple[tuple[ChannelDef, Tri], ...]:
+    """Pares (canal, aplicabilidade) com os preferidos primeiro; a ordem original é mantida."""
     if preference is None:
-        return tuple(channels)
-    return tuple(sorted(channels, key=lambda c: c.kind not in preference.kinds))  # sort é estável
+        return tuple(pairs)
+    return tuple(sorted(pairs, key=lambda pair: pair[0].kind not in preference.kinds))  # estável
 
 
 def lacks_preferred(channels: Sequence[ChannelDef], preference: ChannelPreference | None) -> bool:

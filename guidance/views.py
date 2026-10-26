@@ -95,7 +95,7 @@ def _answer_and_record_effect(
     request: HttpRequest, catalog: Catalog, before: Facts, question_slug: str, answer: Answer
 ) -> None:
     write_answer(request.session, catalog.situation_slug, question_slug, answer)
-    after = read_facts(request.session, catalog)
+    after = {**before, question_slug: answer}
     try:
         effect = answer_effect(catalog, before, after)
     except DependencyCycleError:
@@ -109,23 +109,32 @@ def situation_list(request: HttpRequest) -> HttpResponse:
     return render(request, "guidance/situation_list.html", {"situations": situations})
 
 
-@require_GET
-def triage(request: HttpRequest, slug: str = START_NODE) -> HttpResponse:
-    home = reverse("guidance:home")
-    if slug == START_NODE and request.path != home:
-        return redirect(home)  # o início tem uma só URL
-    node = (
+def _triage_node(slug: str) -> TriageNode | None:
+    return (
         TriageNode.objects.filter(slug=slug)
         .prefetch_related(
             Prefetch("choices", TriageChoice.objects.select_related("next_node", "situation"))
         )
         .first()
     )
+
+
+@require_GET
+def home(request: HttpRequest) -> HttpResponse:
+    node = _triage_node(START_NODE)
+    if node is None:  # conteúdo sem funil: a lista de situações é a entrada
+        return situation_list(request)
+    return render(request, "guidance/triage.html", {"node": node, "is_start": True})
+
+
+@require_GET
+def triage(request: HttpRequest, slug: str) -> HttpResponse:
+    if slug == START_NODE:
+        return redirect("guidance:home")  # o início tem uma só URL
+    node = _triage_node(slug)
     if node is None:
-        if slug == START_NODE:  # conteúdo sem funil: a lista de situações é a entrada
-            return situation_list(request)
         raise Http404("Pergunta não encontrada")
-    return render(request, "guidance/triage.html", {"node": node, "is_start": slug == START_NODE})
+    return render(request, "guidance/triage.html", {"node": node, "is_start": False})
 
 
 @require_GET
@@ -245,9 +254,10 @@ def _requirement_lines(
 def _channel_lines(
     pairs: tuple[tuple[ChannelDef, Tri], ...], preference: ChannelPreference | None = None
 ) -> tuple[ChannelLine, ...]:
-    maybe = {c: _maybe(c, t) for c, t in pairs}
-    ordered = order_channels([c for c, _ in pairs], preference)
-    return tuple(ChannelLine(ServiceChannel.Kind(c.kind).label, c, maybe[c]) for c in ordered)
+    return tuple(
+        ChannelLine(ServiceChannel.Kind(c.kind).label, c, _maybe(c, t))
+        for c, t in order_channels(pairs, preference)
+    )
 
 
 def _detail_texts(procedure: ProcedureDef, kind: Literal["COST", "DEADLINE"]) -> tuple[str, ...]:
@@ -272,10 +282,11 @@ def _uncovered_lines(catalog: Catalog, pairs: tuple[tuple[str, str], ...]) -> li
 def plan(request: HttpRequest, slug: str) -> HttpResponse:
     catalog = _load(slug)
     facts = read_facts(request.session, catalog)
-    if next_question(catalog, facts, evaluate(catalog, facts)) is not None:
+    evaluations = evaluate(catalog, facts)
+    if next_question(catalog, facts, evaluations) is not None:
         return redirect("guidance:question", slug=slug)  # plano só com perguntas encerradas
     try:
-        result = build_plan(catalog, facts)
+        result = build_plan(catalog, facts, evaluations)
     except DependencyCycleError as error:
         logger.error("ciclo entre dependências: situação=%s procedimentos=%s", slug, error.nodes)
         return render(
@@ -287,7 +298,6 @@ def plan(request: HttpRequest, slug: str) -> HttpResponse:
     preference = read_channel_preference(request.session)
     context = {
         "catalog": catalog,
-        "plan": result,
         "preference": preference,
         **_plan_context(catalog, result, preference),
         "effect": _effect_view(request, catalog),
