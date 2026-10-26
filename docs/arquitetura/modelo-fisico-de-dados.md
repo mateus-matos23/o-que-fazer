@@ -30,7 +30,7 @@ Na carga, o trecho é procurado no texto da versão coletada (HTML sem tags ou v
 | `Condition` | `rule` FK, `question` FK, `operator` (`ANY_OF`/`NONE_OF`), `options` M2M → `AnswerOption` | As opções pertencem à pergunta (validado na carga). |
 | `Dependency` | `before` FK, `after` FK, `kind` (`MANDATORY`/`CONDITIONAL`/`RECOMMENDED`), `rule` FK (nulo), citação | Check: `rule` preenchida se e somente se `CONDITIONAL`. Único por (`before`, `after`), com `before ≠ after`. |
 | `TriageNode` | `slug`, `text`, `help_text` | Pergunta ampla do funil de triagem (RF21). Encaminhamento, sem citação (RN02; [ADR 0005](decisoes/0005-funil-de-triagem.md)). O nó `inicio` é a página inicial. |
-| `TriageChoice` | `node` FK, `label`, `order`, `next_node` FK → `TriageNode` (nulo), `situation` FK → `Situation` (nulo) | Único por (`node`, `order`). Check: no máximo um destino; ambos nulos = fora da cobertura. A carga apaga os nós antes das situações. |
+| `TriageChoice` | `node` FK, `label`, `order`, `next_node` FK → `TriageNode` (nulo), `situation` FK → `Situation` (nulo), `icon` (opcional, escolhas de `TriageChoice.Icon`; só decorativo) | Único por (`node`, `order`). Check: no máximo um destino; ambos nulos = fora da cobertura. A carga apaga os nós antes das situações. |
 
 `Agency` e `Jurisdiction` vêm da app `sources`.
 

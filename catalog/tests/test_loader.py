@@ -639,6 +639,12 @@ TRIAGE_ERRORS = {
         ).replace('{label = "Quatro", uncovered = false, situation = "sit"},', ""),
         "journey.toml: sit: situação não alcançável pelo funil de triagem",
     ),
+    "unknown icon": (
+        _triage(
+            '{label = "Fora", uncovered = true}', '{label = "Fora", uncovered = true, icon = "x"}'
+        ),
+        "options[0].icon: valor 'x' fora de",
+    ),
     "node without options": (
         _triage('options = [{label = "Fim", uncovered = true}]', "options = []"),
         "inicio2: nó sem opções",
@@ -672,6 +678,15 @@ def test_triage_stores_nodes_and_choices_in_order(content: Path) -> None:
     assert second.situation is not None and second.situation.slug == "sit"
     assert (third.next_node, third.situation) == (None, None)
     assert load_content(content) == counts  # recarga substitui tudo
+
+
+def test_triage_icon_is_stored_and_optional(content: Path) -> None:
+    (content / "journey.toml").write_text(
+        _triage('{label = "Um", next = "sub"}', '{label = "Um", next = "sub", icon = "work"}')
+    )
+    load_content(content)
+    first, second, *_ = TriageNode.objects.get(slug="inicio").choices.all()
+    assert (first.icon, second.icon) == ("work", "")
 
 
 def test_content_without_triage_is_valid(content: Path) -> None:

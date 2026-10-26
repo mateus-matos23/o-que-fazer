@@ -6,28 +6,28 @@ slug = "inicio"
 text = "Sobre o que é o que aconteceu com você?"
 help = "Escolha o assunto mais próximo. Se errar, é só voltar."
 options = [
-  {label = "Documentos pessoais (CPF, identidade, carteira de motorista)", next = "documentos"},
-  {label = "Trabalho ou emprego", next = "trabalho"},
-  {label = "Família (nascimento de filho, falecimento)", uncovered = true},
-  {label = "Veículo (compra ou venda)", uncovered = true},
-  {label = "Outro assunto", uncovered = true},
+  {label = "Documentos pessoais (CPF, identidade, carteira de motorista)", icon = "document", next = "documentos"},
+  {label = "Trabalho ou emprego", icon = "work", next = "trabalho"},
+  {label = "Família (nascimento de filho, falecimento)", icon = "family", uncovered = true},
+  {label = "Veículo (compra ou venda)", icon = "vehicle", uncovered = true},
+  {label = "Outro assunto", icon = "other", uncovered = true},
 ]
 
 [[triage]]
 slug = "documentos"
 text = "O que aconteceu com seus documentos?"
 options = [
-  {label = "Perdi um ou mais documentos", situation = "perda-de-documentos"},
-  {label = "Meu CPF está com problema (por exemplo, suspenso ou pendente de regularização)", situation = "cpf-irregular"},
-  {label = "Preciso tirar um documento pela primeira vez", uncovered = true},
-  {label = "Outra coisa", uncovered = true},
+  {label = "Perdi um ou mais documentos", icon = "lost", situation = "perda-de-documentos"},
+  {label = "Meu CPF está com problema (por exemplo, suspenso ou pendente de regularização)", icon = "problem", situation = "cpf-irregular"},
+  {label = "Preciso tirar um documento pela primeira vez", icon = "first-time", uncovered = true},
+  {label = "Outra coisa", icon = "other", uncovered = true},
 ]
 
 [[triage]]
 slug = "trabalho"
 text = "O que aconteceu no trabalho?"
 options = [
-  {label = "Saí do emprego (fui mandado embora, pedi para sair ou o contrato acabou)", situation = "desligamento-do-trabalho"},
-  {label = "Estou procurando o primeiro emprego", uncovered = true},
-  {label = "Outra coisa", uncovered = true},
+  {label = "Saí do emprego (fui mandado embora, pedi para sair ou o contrato acabou)", icon = "leaving", situation = "desligamento-do-trabalho"},
+  {label = "Estou procurando o primeiro emprego", icon = "first-job", uncovered = true},
+  {label = "Outra coisa", icon = "other", uncovered = true},
 ]

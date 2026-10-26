@@ -122,7 +122,12 @@ _TABLES = {
             "options": [
                 Schema(
                     {"label": text_of(TriageChoice, "label")},
-                    {"next": str, "situation": str, "uncovered": bool},
+                    {
+                        "next": str,
+                        "situation": str,
+                        "uncovered": bool,
+                        "icon": frozenset(TriageChoice.Icon.values),
+                    },
                 )
             ],
         },
@@ -231,6 +236,7 @@ class TriageOptionDef:
     next_node: str | None
     situation: str | None
     uncovered: bool
+    icon: str = ""
 
 
 @dataclass(frozen=True)
@@ -308,7 +314,11 @@ def _parse(file: str, doc: dict[str, Any], content: Content) -> None:
     for r in doc.get("triage", []):
         choices = [
             TriageOptionDef(
-                o["label"], o.get("next"), o.get("situation"), o.get("uncovered", False)
+                o["label"],
+                o.get("next"),
+                o.get("situation"),
+                o.get("uncovered", False),
+                o.get("icon", ""),
             )
             for o in r["options"]
         ]
@@ -788,6 +798,7 @@ def _create_triage(nodes: list[TriageNodeDef], situation_by_slug: dict[str, Situ
             TriageChoice.objects.create(
                 node=node_by_slug[n.slug],
                 label=o.label,
+                icon=o.icon,
                 order=order,
                 next_node=node_by_slug[o.next_node] if o.next_node else None,
                 situation=situation_by_slug[o.situation] if o.situation else None,

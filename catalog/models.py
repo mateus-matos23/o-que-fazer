@@ -197,8 +197,22 @@ class TriageNode(models.Model):
 
 
 class TriageChoice(models.Model):
+    class Icon(models.TextChoices):
+        # Cada valor tem um SVG em guidance/templates/guidance/icons/<valor>.svg.
+        DOCUMENT = "document", "Documento"
+        WORK = "work", "Trabalho"
+        FAMILY = "family", "Família"
+        VEHICLE = "vehicle", "Veículo"
+        OTHER = "other", "Outro assunto"
+        LOST = "lost", "Perda"
+        PROBLEM = "problem", "Problema"
+        FIRST_TIME = "first-time", "Primeira vez"
+        LEAVING = "leaving", "Saída"
+        FIRST_JOB = "first-job", "Primeiro emprego"
+
     node = models.ForeignKey(TriageNode, on_delete=models.CASCADE, related_name="choices")
     label = models.CharField(max_length=200)
+    icon = models.CharField(max_length=20, choices=Icon.choices, blank=True)  # decorativo
     order = models.PositiveSmallIntegerField()
     # CASCADE no destino; PROTECT na situação vale porque `_replace` apaga os nós antes.
     next_node = models.ForeignKey(

@@ -450,6 +450,13 @@ Motivo: o autor achou a interface simples demais e pouco convidativa para o cida
 A direção visual vem das fachadas de São Luís: fundo cor de cal, azulejo azul-cobalto com ocre e verde-petróleo nas ações. Só a faixa de azulejo do cabeçalho é ornamento; o resto da interface fica sóbrio. Os cartões usam borda sólida com a base mais grossa, como o vidrado de um ladrilho, no lugar de sombra.
 
 - **9a — Paleta e base.** Novos tokens em `site.css`, com a tabela de contraste recalculada: o menor par de texto é 6,35:1 e o botão primário tem 7,33:1. O cabeçalho ganhou a faixa e a marca (`azulejo.svg`, desenho próprio e decorativo, com `alt=""`). Botões, opções, avisos e etapas receberam raio maior e borda com base mais grossa. A opção marcada usa fundo `--soft` e borda `--ink`.
+- **9b — Triagem ilustrada.** As escolhas da triagem viraram cartões com um ladrilho ocre de ícone: uma coluna no celular e duas no desktop. A pergunta inicial ficou maior e funciona como abertura da página.
+  - O ícone vem do campo opcional `TriageChoice.icon` (migration `0006`), declarado em `content/triage.toml`.
+  - O loader recusa valores fora de `TriageChoice.Icon`.
+  - Cada valor tem um SVG em `guidance/templates/guidance/icons/`, incluído no HTML com `aria-hidden="true"`. O rótulo continua sendo o nome acessível do link.
+  - Os ícones são do Lucide (licença ISC, em `LICENSE-lucide.txt`), copiados como arquivos, sem dependência nova.
+  - Testes: ícone salvo e opcional, ícone inválido recusado, ícone decorativo ou ausente na página e um template para cada valor.
+  - Depois do deploy, é preciso repetir `load_content` em produção para preencher os ícones.
 
 ## Limitações conhecidas
 

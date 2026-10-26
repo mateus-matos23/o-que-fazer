@@ -2,6 +2,7 @@ import re
 
 import pytest
 from django.db import IntegrityError, connection, transaction
+from django.template.loader import get_template
 from django.test import Client
 from django.test.utils import CaptureQueriesContext
 
@@ -17,7 +18,7 @@ def _html(client: Client, url: str) -> str:
 
 
 def _links(html: str) -> list[str]:
-    ul = re.search(r'<ul class="situations">(.*?)</ul>', html, re.DOTALL)
+    ul = re.search(r'<ul class="choice-cards">(.*?)</ul>', html, re.DOTALL)
     assert ul
     return re.findall(r'href="([^"]+)"', ul.group(1))
 
@@ -35,6 +36,19 @@ def test_root_shows_start_node(loaded: dict[str, int], client: Client) -> None:
     ]
     assert 'href="/situacoes/"' in html and 'href="/onde-resolvo/"' in html
     assert "Voltar ao início" not in html
+
+
+def test_choice_icon_is_decorative_and_optional(loaded: dict[str, int], client: Client) -> None:
+    cards = _html(client, "/").split('<ul class="choice-cards">')[1].split("</ul>")[0]
+    assert cards.count('<span class="icon-tile"><svg class="icon" aria-hidden="true"') == 5
+    TriageChoice.objects.filter(node__slug="inicio").update(icon="")
+    cards = _html(client, "/").split('<ul class="choice-cards">')[1].split("</ul>")[0]
+    assert "icon-tile" not in cards and "<svg" not in cards
+
+
+@pytest.mark.parametrize("icon", TriageChoice.Icon.values)
+def test_every_icon_has_a_template(icon: str) -> None:
+    assert get_template(f"guidance/icons/{icon}.svg")
 
 
 def test_root_has_constant_query_count(loaded: dict[str, int], client: Client) -> None:
