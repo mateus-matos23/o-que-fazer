@@ -490,6 +490,11 @@ Uma auditoria comparou o código com as skills de `.claude/skills/` (django-expe
 - **10i — Apresentação separada das views.** As linhas de apresentação (`StepView`, `ChannelLine`, `RequirementLine`, `DependencyLine`, `UncoveredLine`, `AnswerLine`, `EffectView`) e as funções que as montam saíram de `guidance/views.py` e foram para `guidance/presentation.py`, sem I/O. A montagem das linhas da revisão (`answer_lines`) também saiu da view. As views ficaram com HTTP, sessão e consultas. O arquivo passou de cerca de 410 para 264 linhas. Motivo: separar a responsabilidade e deixar os presenters testáveis sem request. Nenhum comportamento mudou, e os testes passaram a importar de `guidance.presentation`.
 - **10j — Validação da carga dividida por tabela.** `_structure_problems` (`catalog/loader.py`) tinha cerca de 110 linhas. Agora ela só coordena `_situation_problems`, `_question_problems`, `_procedure_problems`, `_rule_problems` e `_dependency_problems`, uma por tabela. As mensagens e a ordem em que aparecem não mudaram, o que os 112 testes de `catalog` confirmam.
 - **10k — Carga em lote.** `_replace` (`catalog/loader.py`) trocou os `objects.create` em laço por um `bulk_create` por tabela, incluindo as tabelas intermediárias de M2M. A função também foi dividida por tabela: `_create_questions`, `_create_procedures`, `_create_situations`, `_create_rules` e `_create_items`. Em `sources/loader.py`, o dono de cada URL e os órgãos passaram a ser lidos numa consulta só, e não uma por fonte. Motivo: a carga em produção roda da máquina do mantenedor contra o Neon, e cada ida e volta custa latência. A ordem dos ids não mudou. Um teste garante um único INSERT por tabela, e a suíte caiu de cerca de 80 s para cerca de 50 s.
+- **10l — Medição de cobertura.** Entrou a dependência de dev `pytest-cov`, aprovada e instalada pelo autor. A cobertura fica em `[tool.coverage]` no `pyproject.toml`, mede linhas e ramos e ignora migrations e testes. Ela roda sob demanda com `pytest --cov` e não faz parte dos gates. Medição de 26/10/2026: 97% (1654 instruções e 440 ramos; faltam 50 instruções). As lacunas que restam:
+  - `config/asgi.py` e `config/wsgi.py`, pontos de entrada do servidor;
+  - os `__str__` dos models;
+  - a corrida entre `load_content` e `load_catalog` em `guidance/repository.py`;
+  - ramos de erro dos commands.
 
 ## Limitações conhecidas
 

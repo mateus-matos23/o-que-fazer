@@ -53,6 +53,8 @@ git diff --check
 
 Os testes usam o banco `oqf_test`, criado e destruído pelo pytest-django. Eles não acessam a internet: os snapshots vêm das amostras em `docs/dados/amostras/`.
 
+A cobertura fica fora dos gates. Para medir, rode `uv run --env-file .env pytest --cov`; a configuração está em `[tool.coverage]` no `pyproject.toml`.
+
 ## Estrutura
 
 | Pasta | Conteúdo |
