@@ -527,6 +527,13 @@ Uma revisão externa sugeriu frameworks (govbr-ds, Bootstrap, Tailwind, HTMX com
   - nenhuma palavra partida na barra de etapas.
 
   O `npm run a11y` passou: 21 páginas, nenhuma violação.
+- **11d — Estudo do VLibras.** Medição em página descartável, fora do repositório, com Chromium headless e CDP, capturando a rede da página, do iframe e do worker. Resultado na [ADR 0008](../arquitetura/decisoes/0008-vlibras.md), em estado Proposto.
+  - Carregar o script custa cerca de 16 KB e contata `vlibras.gov.br` e `cdn.jsdelivr.net`.
+  - Abrir o widget baixa cerca de 20,7 MB, o avatar Unity.
+  - Traduzir envia só o texto clicado (`{"text": ...}`) para `traducao2.vlibras.gov.br` e baixa os sinais de `dicionario2.vlibras.gov.br`, cerca de 267 KB por frase. Não houve analytics.
+  - O botão abre pelo teclado, mas mede 40 px. A tradução por teclado não foi verificada.
+
+  A proposta é um botão próprio que só carrega o script por ação do cidadão, fora de "Rever respostas". Nada foi implementado; aguarda decisão do autor.
 
 ## Limitações conhecidas
 
