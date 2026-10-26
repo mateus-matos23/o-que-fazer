@@ -208,6 +208,20 @@ def test_stylesheet_has_print_rules() -> None:
     assert 'a[href^="http"]::after' in print_block and "break-inside: avoid" in print_block
 
 
+def test_screen_text_is_at_least_16px() -> None:
+    screen = _stylesheet().split("@media print", 1)[0]
+    sizes = re.findall(r"font-size:\s*([\d.]+)(rem|px)", screen)
+    assert sizes
+    assert [s for s in sizes if float(s[0]) < (1 if s[1] == "rem" else 16)] == []
+
+
+def test_screen_targets_are_at_least_44px() -> None:
+    screen = _stylesheet().split("@media print", 1)[0]
+    heights = [int(h) for h in re.findall(r"min-height:\s*(\d+)px", screen)]
+    assert heights
+    assert [h for h in heights if h < 44] == []
+
+
 def _stylesheet() -> str:
     path = finders.find("guidance/site.css")
     assert isinstance(path, str)

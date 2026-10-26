@@ -513,6 +513,20 @@ Uma revisão externa sugeriu frameworks (govbr-ds, Bootstrap, Tailwind, HTMX com
   - uma jornada por situação, respondendo a primeira opção até o plano e depois a revisão.
 
   Em cada página, roda o axe com as tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` e `wcag22aa`. Antes de começar, confirma que o axe aponta uma imagem sem `alt` injetada, para a varredura não passar em branco. Roda sob demanda (`npm run a11y`), fora dos gates, porque precisa de servidor e conteúdo carregado. Resultado de 26/10/2026 no `oqf_dev`: 21 páginas, nenhuma violação. O axe não substitui a verificação manual: teclado, zoom, leitor de tela e alvos de 44 px continuam fora do que ele mede.
+- **11c — Texto de 16 px e alvos de 44 px.** Em `site.css`:
+  - Textos que tinham 14 ou 15 px passaram a 16 px: barra de etapas, "Podem ser feitas em qualquer ordem" e número da etapa. A abertura do plano passou a herdar os 17 px do corpo.
+  - Links isolados passaram a ter 44 px de altura, com o texto centralizado. São os links de contexto e de busca (antes 24 px), do roteiro e de "Rever respostas" (antes 40 px) e do "Comece por aqui". A meta é a da SC 2.5.5 (AAA), além do AA (2.5.8, 24 px) que já era cumprido. Os links dentro de frases seguem dispensados.
+  - Motivo: o público usa celular e tem pouca familiaridade com tecnologia.
+  - Com 16 px, a barra de etapas não cabe em uma linha a 360 px. O `overflow-wrap: anywhere` do corpo partia "Plano" no meio da palavra. A barra passou a usar `overflow-wrap: normal` e `flex-wrap: wrap`, e o último item desce para a linha de baixo.
+
+  Dois testes leem a folha de estilo, fora do bloco de impressão: nenhum `font-size` abaixo de 1 rem ou 16 px e nenhum `min-height` em px abaixo de 44.
+
+  Verificação no Chromium headless via CDP (26/10/2026, `oqf_dev`) no plano, na revisão, na pergunta e no procedimento, nas larguras de 320, 360, 400, 640 e 1280 px (640 equivale a 1280 com zoom de 200%):
+  - nenhuma rolagem horizontal;
+  - todos os alvos medidos com 44×44 px ou mais;
+  - nenhuma palavra partida na barra de etapas.
+
+  O `npm run a11y` passou: 21 páginas, nenhuma violação.
 
 ## Limitações conhecidas
 
