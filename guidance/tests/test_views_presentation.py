@@ -213,3 +213,37 @@ def _stylesheet() -> str:
     assert isinstance(path, str)
     with open(path, encoding="utf-8") as handle:
         return handle.read()
+
+
+def _journey_steps(current: str, preference: object = None) -> list[tuple[str, str]]:
+    html = render_to_string(
+        "guidance/_journey_steps.html", {"current": current, "preference": preference}
+    )
+    return [
+        (
+            "current" if "aria-current" in attrs else "done" if "(concluída)" in rest else "next",
+            label,
+        )
+        for attrs, label, rest in re.findall(r"<li([^>]*)>(\w+)(.*?)</li>", html)
+    ]
+
+
+@pytest.mark.parametrize(
+    ("current", "preference", "expected"),
+    [
+        ("questions", None, ["done", "current", "next", "next"]),
+        ("preference", None, ["done", "done", "current", "next"]),
+        ("plan", object(), ["done", "done", "done", "current"]),
+        ("plan", None, ["done", "done", "next", "current"]),  # plano sem preferência escolhida
+    ],
+)
+def test_journey_steps_mark_done_and_current(
+    current: str, preference: object, expected: list[str]
+) -> None:
+    steps = _journey_steps(current, preference)
+    assert [label for _, label in steps] == ["Assunto", "Perguntas", "Atendimento", "Plano"]
+    assert [state for state, _ in steps] == expected
+
+
+def test_question_page_shows_journey_steps(loaded: dict[str, int], client: Client) -> None:
+    assert '<li class="current" aria-current="step">Perguntas</li>' in _html(client, URL)

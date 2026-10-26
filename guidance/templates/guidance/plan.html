@@ -2,6 +2,7 @@
 {% block title %}Seu plano - {{ catalog.situation_title }} - O que Fazer?{% endblock %}
 {% block content %}
 <p class="context-link"><a href="{% url 'guidance:question' catalog.situation_slug %}">{{ catalog.situation_title }}</a></p>
+{% include "guidance/_journey_steps.html" with current="plan" %}
 {% include "guidance/_answer_effect.html" %}
 <h1>Seu plano</h1>
 <p class="disclaimer">Este sistema é apenas orientativo. Ele não executa serviços nem confirma direitos; confira sempre na fonte oficial.</p>

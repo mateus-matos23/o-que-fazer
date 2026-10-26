@@ -457,6 +457,10 @@ A direção visual vem das fachadas de São Luís: fundo cor de cal, azulejo azu
   - Os ícones são do Lucide (licença ISC, em `LICENSE-lucide.txt`), copiados como arquivos, sem dependência nova.
   - Testes: ícone salvo e opcional, ícone inválido recusado, ícone decorativo ou ausente na página e um template para cada valor.
   - Depois do deploy, é preciso repetir `load_content` em produção para preencher os ícones.
+- **9c — Etapas da conversa.** Pergunta, preferência de atendimento e plano mostram as etapas Assunto → Perguntas → Atendimento → Plano (`_journey_steps.html`).
+  - Não há barra percentual porque o total de perguntas é adaptativo, e um "3 de 7" seria falso.
+  - O estado não depende só da cor: a etapa atual tem `aria-current="step"` e negrito, e as concluídas têm ✓ e o texto oculto "(concluída)".
+  - No plano, "Atendimento" só aparece como concluída se houver preferência escolhida.
 
 ## Limitações conhecidas
 

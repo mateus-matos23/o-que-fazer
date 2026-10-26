@@ -2,6 +2,7 @@
 {% block title %}{% if form.errors %}Erro: {% endif %}{{ catalog.situation_title }} - O que Fazer?{% endblock %}
 {% block content %}
 <p class="context-link"><a href="{% url 'guidance:question' catalog.situation_slug %}">{{ catalog.situation_title }}</a></p>
+{% include "guidance/_journey_steps.html" with current="questions" %}
 {% include "guidance/_answer_effect.html" %}
 <p class="progress">Você já respondeu {{ answer_count }} pergunta{{ answer_count|pluralize }}.
   {% if answer_count %}<a href="{% url 'guidance:review' catalog.situation_slug %}">Rever respostas</a>{% endif %}</p>
