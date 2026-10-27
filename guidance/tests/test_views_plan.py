@@ -212,7 +212,7 @@ def test_real_journey_starts_with_every_first_layer_step(
     assert response.status_code == 303
     client.post(perda, {"question": "declarou-imposto-de-renda", "answer": "sim"})
     html = _html(client, perda + "plano/")
-    assert '<p class="plan-summary">2 passos. Comece pelo 1.</p>' in html
+    assert '<p class="plan-summary">4 etapas. Comece pelo passo 1.</p>' in html
     first, second = html.split('<span class="layer-number">')[1:]
     assert "Comece aqui" in first and "Pode fazer em qualquer ordem" in first
     for slug in ("registrar-ocorrencia-extravio", "segunda-via-cin", "segunda-via-cpf"):
@@ -231,3 +231,4 @@ def test_step_button_goes_to_the_official_online_channel(
         '<a class="button" href="https://servicos.receita.fazenda.gov.br/Servicos/CPF/'
         'regularizar/Default.asp" rel="noopener">Ir para o site oficial' in button
     )
+    assert "Ver a página oficial do serviço" not in button

@@ -115,7 +115,7 @@ def _layers(html: str) -> list[str]:
 
 def test_layers_number_steps_and_note_only_parallel_groups() -> None:
     html = _plan_html()
-    assert '<p class="plan-summary">2 passos. Comece pelo 1.</p>' in html
+    assert '<p class="plan-summary">3 etapas. Comece pelo passo 1.</p>' in html
     first, second = _layers(html)
     assert "</span>1</span>" in first and "Comece aqui" in first and NOTE not in first
     assert 'id="etapa-a"' in first
@@ -125,13 +125,13 @@ def test_layers_number_steps_and_note_only_parallel_groups() -> None:
 
 def test_single_step_has_no_layer_head() -> None:
     html = _render_plan(f.catalog((), (_procedure("a"),)))
-    assert '<p class="plan-summary">1 passo.</p>' in html
+    assert '<p class="plan-summary">1 etapa.</p>' in html
     assert "layer-head" not in html and "Comece aqui" not in html
 
 
 def test_single_parallel_layer_notes_order_without_number() -> None:
     html = _render_plan(f.catalog((), (_procedure("a"), _procedure("b"))))
-    assert '<p class="plan-summary">1 passo.</p>' in html
+    assert '<p class="plan-summary">2 etapas.</p>' in html
     assert NOTE in html and "layer-number" not in html and "Comece aqui" not in html
 
 
@@ -150,6 +150,15 @@ def test_each_step_keeps_its_details_collapsed() -> None:
         assert details.lstrip().startswith("<summary>Ver detalhes")
         assert '<dl class="facts">' in details and "<dt>Fonte</dt>" in details
     assert html.count("<details>") == 3 and "<details open" not in html
+
+
+def test_step_without_channel_url_links_to_its_official_source() -> None:
+    card = _plan_html().split('<article id="etapa-a"')[1].split("<details>")[0]
+    assert (
+        '<a class="button secondary" href="https://exemplo.gov.br/fonte" rel="noopener">'
+        "Ver a página oficial do serviço" in card
+    )
+    assert "Ir para o site oficial" not in card
 
 
 def test_identical_requirement_is_not_merged_across_steps() -> None:

@@ -4,7 +4,7 @@
 <p class="context-link"><a href="{% url 'guidance:question' catalog.situation_slug %}">{{ catalog.situation_title }}</a></p>
 <h1>Seu plano</h1>
 {% regroup steps by step.layer as layers %}
-{% if steps %}<p class="plan-summary">{{ layers|length }} passo{{ layers|length|pluralize }}.{% if layers|length > 1 %} Comece pelo 1.{% endif %}</p>{% endif %}
+{% if steps %}<p class="plan-summary">{{ steps|length }} etapa{{ steps|length|pluralize }}.{% if layers|length > 1 %} Comece pelo passo 1.{% endif %}</p>{% endif %}
 {% include "guidance/_answer_effect.html" %}
 <div class="plan-meta">
   <p class="disclaimer">Orientação a partir das suas respostas. Quem confirma é o órgão.</p>
@@ -43,6 +43,8 @@
         {% endif %}
         {% if item.primary_channel %}
         <a class="button" href="{{ item.primary_channel.channel.url }}" rel="noopener">Ir para o site oficial<span class="visually-hidden">: {{ procedure.title }}</span></a>
+        {% else %}{# sem URL de canal na fonte, leva à própria fonte oficial citada #}
+        <a class="button secondary" href="{{ procedure.citation.source_url }}" rel="noopener">Ver a página oficial do serviço<span class="visually-hidden">: {{ procedure.title }}</span></a>
         {% endif %}
         <details>
           <summary>Ver detalhes<span class="visually-hidden">: {{ procedure.title }}</span></summary>

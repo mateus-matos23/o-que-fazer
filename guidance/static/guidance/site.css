@@ -383,7 +383,8 @@ dd { margin: 0; }
 .answers p:nth-child(2) { font-weight: 700; }
 .answers a { display: inline-flex; align-items: center; min-height: 48px; font-weight: 700; }
 
-/* Libras: botão flutuante à direita, no lugar do botão oficial do VLibras, que o substitui (ADR 0008). */
+/* Libras: botão flutuante à direita, no lugar do botão oficial do VLibras, que o substitui (ADR 0008).
+   Na vertical, ocupa só 44px da borda e cobre menos texto no celular. */
 :root { --vlibras-btn-focus-visible-outline: 3px solid var(--ink); }
 .libras-toggle {
   position: fixed;
@@ -391,8 +392,10 @@ dd { margin: 0; }
   top: 50%;
   transform: translateY(-50%);
   z-index: 5;
+  writing-mode: vertical-rl;
   min-height: 48px;
-  padding: 0.5rem 0.75rem;
+  min-width: 44px;
+  padding: 0.75rem 0.5rem;
   border-right-width: 0;
   border-radius: var(--radius-button) 0 0 var(--radius-button);
   font-size: 1rem;
