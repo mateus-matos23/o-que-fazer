@@ -15,6 +15,9 @@ O recorte contempla informações de serviços federais e, quando aplicável, do
 | Perda de documentos | Demonstra múltiplos documentos, eliminação de procedimentos, canais e possíveis dependências. |
 | Irregularidade do CPF | Demonstra ambiguidade, resposta “não sei” e necessidade de uma consulta intermediária. |
 | Desligamento do trabalho | Demonstra diferenças de contexto e múltiplas providências, sem presumir elegibilidade. |
+| Transferência de veículo | Demonstra dependência obrigatória com fonte (vistoria em ECV antes da transferência digital) e ramificação entre transferência digital e balcão. Entrou em 27/10/2026. |
+| Falecimento na família | Demonstra uma pergunta que separa regras (pensão urbana e rural) e o “não sei” mantendo as duas em análise. Entrou em 27/10/2026. |
+| Aposentadoria | Demonstra o “não sei” levando ao simulador como esclarecimento e um limite de cobertura (meio rural fora). Entrou em 27/10/2026. |
 
 A versão acadêmica enfatiza poucas jornadas representativas, com qualidade e avaliação controladas. A quantidade final de ramificações e serviços associados permanece pendente.
 
@@ -67,6 +70,78 @@ Perguntas candidatas tratam da forma de término do contrato, do vínculo e da d
 
 A plataforma não presume que todo desligamento gera direito a seguro-desemprego, saque ou outro benefício. Os critérios devem estar representados em regras verificadas e a confirmação final é oficial.
 
+### Jornada demonstrativa: transferência de veículo
+
+**Entrada:** “Comprei ou vendi um veículo usado”. Na triagem, a pergunta é “O que aconteceu com o veículo?”.
+
+**Estado:** **Consolidado (27/10/2026)** para a transferência digital do DETRAN-MA. A transferência no balcão segue **Pendente**, porque a página do DETRAN-MA (id 19272) está em defeso eleitoral.
+
+Perguntas:
+
+- Como o veículo está mudando de dono? Escolha única; herança, doação e leilão têm atendimento próprio no DETRAN-MA.
+- Algum destes casos vale para a transferência? Escolha múltipla, com os casos de atendimento presencial; sem marcação, nenhum caso. “Não sei” só nesta pergunta: quem não sabe se o CRV é digital mantém as duas transferências indeterminadas, sem descartar nenhuma.
+
+Procedimentos:
+
+- Consultar restrições e indicadores do veículo (Senatran), recomendado antes da transferência. A página do DETRAN-MA pede que “não conste restrições”, mas não exige a consulta.
+- Vistoria veicular em ECV, obrigatória antes da transferência digital: “Após aprovação, o usuário seguirá para a plataforma online”.
+- Transferência digital de propriedade (DETRAN-MA).
+- Transferência no balcão (DETRAN-MA), para os casos de atendimento presencial citados pela própria página digital.
+
+O que ficou fora:
+
+- Taxa da transferência: a tabela de taxas lida não traz o item; aparece como “não informado”.
+- Documentos de cada caso de balcão: a página remete à Portaria Detran 166/2020, que não foi lida.
+- Vistoria reprovada por alteração de característica ou regravação de chassi ou motor: o resultado não é perguntado, porque só se sabe depois da vistoria.
+- Débitos (IPVA, multas) como impedimento: sem trecho nas amostras; é hipótese.
+
+### Jornada demonstrativa: falecimento na família
+
+**Entrada:** “Alguém da minha família faleceu”. Na triagem, a pergunta é “O que aconteceu na sua família?”.
+
+**Estado:** **Consolidado (27/10/2026)** para as duas pensões por morte e para a certidão de inexistência de dependentes, com fontes do INSS.
+
+Perguntas:
+
+- Qual era a sua relação com a pessoa que faleceu? Escolha única, sem “não sei”. A relação define se há dependentes nas classes do INSS; “outra” afasta as duas pensões sem perguntar o meio de trabalho.
+- A pessoa que faleceu trabalhava em meio urbano ou rural? Escolha única, com “não sei”. Sem essa resposta, as duas pensões ficam em análise, sem descartar nenhuma.
+
+Procedimentos:
+
+- Pensão por morte urbana e pensão por morte rural, cada uma com a regra do seu meio de trabalho.
+- Certidão de inexistência de dependentes habilitados à pensão por morte, sem regra; vale para qualquer resposta.
+- Os três procedimentos não têm ordem entre si (RN08). Prazo “não informado”.
+
+O que ficou fora:
+
+- Certidão de óbito: fornecida pelo cartório, sem fonte coletada.
+- Saque de FGTS e PIS por falecimento: a página do FGTS não tem texto no HTML, e o slug gov.br correspondente retornou 404.
+- Pensão de servidor público e acordo internacional: não coletados.
+- Nascimento de filho: opção fora da cobertura dentro de Família, sem fonte baixável para o registro de nascimento.
+
+### Jornada demonstrativa: aposentadoria
+
+**Entrada:** “Quero me aposentar”. Na triagem, a pergunta é “O que você quer fazer sobre a aposentadoria?”.
+
+**Estado:** **Consolidado (27/10/2026)** para a aposentadoria por idade urbana, a aposentadoria por tempo de contribuição, o extrato do CNIS e o simulador (INSS).
+
+Perguntas:
+
+- Qual aposentadoria você quer pedir? Escolha única, com “não sei”. Com “não sei”, as duas aposentadorias ficam indeterminadas, nenhuma é descartada, e o simulador entra como esclarecimento. O simulador não garante direito: a página diz que o resultado “não garante direito à aposentadoria”.
+- Você trabalhou em meio urbano ou rural? Escolha única, sem “não sei”, perguntada só quando a aposentadoria por idade pode valer.
+
+Procedimentos:
+
+- Aposentadoria por idade (trabalhador urbano), com as duas condições: tipo “por idade” e meio urbano.
+- Aposentadoria por tempo de contribuição, que depende só do tipo, porque a página não restringe o pedido ao meio urbano.
+- Extrato do CNIS, sem regra: a página diz que qualquer pessoa com cadastro no CNIS pode pedi-lo.
+- Sem ordem entre os procedimentos (RN08). Custo e prazo aparecem como “não informado”: os tempos da página (espera e duração de etapa) não são prazo de resposta.
+
+O que ficou fora:
+
+- Aposentadoria rural: a página do gov.br não foi encontrada (slug retornou 404). É o limite do meio rural.
+- Aposentadoria por acordo internacional, certidão de tempo de contribuição e aposentadoria de servidor público: não coletadas.
+
 ### Jornadas candidatas de expansão
 
 O histórico também considerou:
@@ -76,9 +151,9 @@ O histórico também considerou:
 3. Segunda via de documento.
 4. Primeiro emprego.
 5. Nascimento de filho.
-6. Falecimento de familiar.
-7. Compra de veículo usado.
-8. Venda de veículo.
+6. Falecimento de familiar. **Consolidado (27/10/2026):** no protótipo, na jornada falecimento na família.
+7. Compra de veículo usado. **Consolidado (27/10/2026):** no protótipo, na jornada transferência de veículo.
+8. Venda de veículo. **Consolidado (27/10/2026):** no protótipo, na jornada transferência de veículo.
 9. Mudança de endereço.
 10. Pendência eleitoral.
 11. Descoberta de onde solicitar um benefício.
@@ -87,7 +162,7 @@ O histórico também considerou:
 14. Localização de atendimento presencial.
 15. Necessidade de resolver uma situação com urgência.
 
-Essas situações compõem a visão de expansão. Não devem ser apresentadas como funcionalidades implementadas ou obrigatórias no recorte acadêmico atual.
+Essas situações compõem a visão de expansão. Os itens 6 a 8 entraram no protótipo em 27/10/2026; os demais não devem ser apresentados como funcionalidades implementadas ou obrigatórias no recorte acadêmico atual.
 
 ### Exemplos adicionais discutidos
 

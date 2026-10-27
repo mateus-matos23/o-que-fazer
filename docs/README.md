@@ -10,7 +10,7 @@ Documentação de concepção e modelagem do sistema. Originada da consolidaçã
 **Mecânica:** perguntas progressivas, fatos e regras verificáveis.  
 **Resultado:** procedimentos aplicáveis e sequência fundamentada de próximos passos.  
 **Recorte territorial:** federal, Maranhão e São Luís, conforme a jornada.  
-**Jornadas prioritárias:** perda de documentos, CPF irregular e desligamento do trabalho.  
+**Jornadas prioritárias:** perda de documentos, CPF irregular, desligamento do trabalho, transferência de veículo, falecimento na família e aposentadoria (estas três entraram em 27/10/2026).\
 **Caráter:** orientativo, com encaminhamento para fontes e canais oficiais.  
 **Dados:** fontes heterogêneas com normalização, revisão e proveniência.  
 **Stack:** Python 3.15, Django 6.1.2, PostgreSQL 18 e uv 0.13.0 (ver [ADR 0001](arquitetura/decisoes/0001-stack.md)).  

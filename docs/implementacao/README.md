@@ -34,6 +34,8 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 8 | Hospedagem: Dockerfile, gunicorn, WhiteNoise e deploy no Render com Neon (ADR 0006) | Consolidado (26/10/2026, commits `de7d221`, `94f9ec7`) |
 | 9 | Redesenho visual "azulejo": paleta, triagem ilustrada, etapas da conversa e plano como linha do tempo | Consolidado (26/10/2026) |
 | 10 | Aderência às práticas das skills do projeto: logging, HTTPS, retenção de sessões, cache do catálogo e refactors | Consolidado (26/10/2026) |
+| 11 | Critério de JS e dependências, varredura com axe-core, texto de 16 px e alvos de 44 px, e VLibras a pedido | Consolidado (26/10/2026) |
+| 12 | Novas jornadas: transferência de veículo, falecimento na família e aposentadoria | Consolidado (27/10/2026), com pendências de carga e navegador (ver Fase 12) |
 
 ## Decisões tomadas em 24/10/2026 (aprovadas pelo autor)
 
@@ -562,6 +564,31 @@ Uma revisão externa sugeriu frameworks (govbr-ds, Bootstrap, Tailwind, HTMX com
   Limitações:
   - a 320 px, o botão (74×48 px) cobre parte do texto à direita, como o oficial;
   - a tradução por teclado e o uso em celular real, Firefox e Safari não foram verificados.
+
+## Fase 12 — Novas jornadas
+
+Em 27/10/2026, o autor acrescentou três jornadas à versão do protótipo: transferência de veículo, falecimento na família e aposentadoria. A versão acadêmica previa só perda de documentos, CPF irregular e desligamento do trabalho. Esta mudança de escopo ainda precisa ser confirmada com o orientador ([pendência 1](../pendencias.md)). O critério e os vereditos estão em [jornadas candidatas](../dados/evidencias/jornadas-candidatas.md#veredito-de-27102026).
+
+- **12a — Pesquisa e gate (`c1f48f0`).** Coleta das amostras de 27/10/2026 e veredito sobre seis candidatas. O critério exige: pelo menos 2 procedimentos com trecho literal em fonte baixada pelo `fetch_sources`; pelo menos 1 pergunta que muda aplicabilidade, ordem ou canal (RN02); requisitos e canais com trecho; data declarada separada da data de coleta (RN12).
+  - Entram: compra ou venda de veículo usado, falecimento na família e aposentadoria.
+  - Não entram: nascimento de filho (registro de nascimento sem fonte baixável; vira opção fora da cobertura dentro de Família) e benefícios sociais (só o Cadastro Único foi confirmado).
+  - Primeiro emprego fica dentro de Trabalho; mudança de endereço depende de fontes em defeso eleitoral e não teve nova coleta.
+- **12b — Transferência de veículo (`9a996b3`).** Duas perguntas: forma de transferência e casos de atendimento presencial. A vistoria em ECV é dependência obrigatória da transferência digital, e a consulta de restrições da Senatran é recomendada (RN08). “Não sei” só na segunda pergunta, mantendo as duas transferências indeterminadas.
+  - Fora: taxa da transferência (“não informado”), documentos de cada caso de balcão (Portaria Detran 166/2020 não lida), resultado da vistoria reprovada e débitos como impedimento.
+- **12c — Falecimento na família (`f7e588e`).** Duas perguntas: relação com a pessoa que faleceu e meio de trabalho. Pensão urbana e rural têm regras separadas; “não sei” no meio mantém as duas em análise. A certidão de inexistência de dependentes não tem regra. Não há dependência entre os três serviços.
+  - Fora: certidão de óbito (cartório, sem fonte), saque de FGTS e PIS (página sem texto no HTML e slug 404), pensão de servidor público e acordo internacional.
+- **12d — Aposentadoria (`f558e96`).** Duas perguntas: tipo de aposentadoria, com “não sei” levando ao simulador como esclarecimento, e meio de trabalho, perguntado só quando a aposentadoria por idade pode valer. Meio rural fica fora da cobertura. O extrato do CNIS não tem regra.
+  - Fora: aposentadoria rural (slug 404), acordo internacional, certidão de tempo de contribuição e servidor público.
+
+Limites conhecidos desta fase:
+
+- A página do balcão do DETRAN-MA (id 19272) segue em defeso eleitoral. O balcão é conhecido só pelo que a página digital cita.
+- A taxa da transferência fica “não informado”, porque a tabela de taxas lida não traz o item.
+- A amostra do DETRAN-MA (id 23692) foi recoletada em 27/10/2026, com hash novo (ver [amostras](../dados/amostras/README.md#coleta-de-27102026)).
+- Nenhum `DEADLINE` foi criado a partir de tempos de espera ou de etapa: as páginas do INSS trazem esses tempos, mas não o prazo de resposta do pedido.
+- Novo ícone da triagem `retirement` (migração `0007_alter_triagechoice_icon`), para o assunto aposentadoria. O banco precisa da migração e da carga de conteúdo para exibi-lo, como nas demais mudanças de ícone da [Fase 9b](#fase-9--redesenho-visual).
+- **Pendente:** carga real no `oqf_dev` com as três jornadas e verificação no navegador delas. Nenhuma das duas foi feita até esta atualização.
+- **Pendente:** confirmação da mudança de escopo com o orientador.
 
 ## Limitações conhecidas
 
