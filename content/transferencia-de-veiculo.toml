@@ -27,7 +27,7 @@
 
 [[situations]]
 slug = "transferencia-de-veiculo"
-title = "Comprei ou vendi um veículo usado"
+title = "Comprei, vendi ou recebi um veículo usado"
 candidates = [
   "consultar-restricoes-veiculo",
   "vistoria-veicular-ecv",

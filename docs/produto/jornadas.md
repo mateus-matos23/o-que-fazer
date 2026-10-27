@@ -72,7 +72,7 @@ A plataforma não presume que todo desligamento gera direito a seguro-desemprego
 
 ### Jornada demonstrativa: transferência de veículo
 
-**Entrada:** “Comprei ou vendi um veículo usado”. Na triagem, a pergunta é “O que aconteceu com o veículo?”.
+**Entrada:** “Comprei, vendi ou recebi um veículo usado”. Na triagem, a pergunta é “O que aconteceu com o veículo?”.
 
 **Estado:** **Consolidado (27/10/2026)** para a transferência digital do DETRAN-MA. A transferência no balcão segue **Pendente**, porque a página do DETRAN-MA (id 19272) está em defeso eleitoral.
 
