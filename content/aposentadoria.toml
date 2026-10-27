@@ -14,8 +14,9 @@
 #   garante direito à aposentadoria".
 # - Extrato do CNIS: sem regra (vale para qualquer pessoa com cadastro no CNIS).
 # - Sem dependências entre os procedimentos (RN08).
-# - Prazos: "Tempo estimado de espera" e "Tempo de duração da etapa" são tempos de atendimento ou de etapa,
-#   não prazo de resposta; não viram detalhe DEADLINE. Custo não aparece nas amostras: nenhum COST.
+# - Prazos: só "Quanto tempo leva?" (tempo estimado para a prestação do serviço) vira DEADLINE.
+#   "Tempo estimado de espera" e "Tempo de duração da etapa" são tempos de atendimento ou de etapa.
+# - Custo: as quatro páginas declaram o serviço gratuito (COST).
 #
 # Fora da jornada (sem trecho literal ou sem fonte; não entram):
 # - Aposentadoria rural: a página gov.br não foi encontrada (slug retornou 404).
@@ -79,6 +80,10 @@ channels = [
   {kind = "PHONE", description = "Ligue 135, caso o sistema esteja indisponível.", source = "govbr-aposentadoria-idade-urbano", excerpt = "Ligue 135, caso o sistema esteja indisponível."},
   {kind = "IN_PERSON", description = "Atendimento presencial, se necessário: agende pelo telefone 135 ou busque uma unidade que tenha acordo com o INSS na sua região.", source = "govbr-aposentadoria-idade-urbano", excerpt = "Agende pelo telefone 135, ou Busque uma unidade que tenha acordo com o INSS na sua região"},
 ]
+details = [
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-aposentadoria-idade-urbano", excerpt = "Este serviço é gratuito para o cidadão."},
+  {kind = "DEADLINE", text = "Em média 45 dias corridos.", source = "govbr-aposentadoria-idade-urbano", excerpt = "Em média 45 dia(s) corrido(s) é o tempo estimado para a prestação deste serviço."},
+]
 
 [[procedures]]
 slug = "aposentadoria-por-tempo-de-contribuicao"
@@ -101,6 +106,10 @@ channels = [
   {kind = "ONLINE", description = "Site do Meu INSS, com CPF e senha, em \"Aposentadoria por tempo de contribuição\".", source = "govbr-aposentadoria-tempo-contribuicao", excerpt = "Site do Meu INSS"},
   {kind = "PHONE", description = "Ligue 135, caso o sistema esteja indisponível.", source = "govbr-aposentadoria-tempo-contribuicao", excerpt = "Ligue 135, caso o sistema esteja indisponível."},
   {kind = "IN_PERSON", description = "Atendimento presencial, se necessário: agende pelo telefone 135 ou busque uma unidade que tenha acordo com o INSS na sua região.", source = "govbr-aposentadoria-tempo-contribuicao", excerpt = "Agende pelo telefone 135, ou Busque uma unidade que tenha acordo com o INSS na sua região"},
+]
+details = [
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-aposentadoria-tempo-contribuicao", excerpt = "Este serviço é gratuito para o cidadão."},
+  {kind = "DEADLINE", text = "Em média 45 dias corridos.", source = "govbr-aposentadoria-tempo-contribuicao", excerpt = "Em média 45 dia(s) corrido(s) é o tempo estimado para a prestação deste serviço."},
 ]
 
 [[procedures]]
@@ -125,6 +134,10 @@ channels = [
   {kind = "PHONE", description = "Ligue 135, caso o sistema esteja indisponível.", source = "govbr-extrato-cnis", excerpt = "Ligue 135, caso o sistema esteja indisponível."},
   {kind = "IN_PERSON", description = "Atendimento presencial, se necessário: agende pelo telefone 135 ou busque uma unidade que tenha acordo com o INSS na sua região.", source = "govbr-extrato-cnis", excerpt = "Agende pelo telefone 135, ou Busque uma unidade que tenha acordo com o INSS na sua região"},
 ]
+details = [
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-extrato-cnis", excerpt = "Este serviço é gratuito para o cidadão."},
+  {kind = "DEADLINE", text = "Atendimento imediato.", source = "govbr-extrato-cnis", excerpt = "Quanto tempo leva? Atendimento imediato"},
+]
 
 # Esclarecimento intermediário: não é candidato; entra no plano quando o tipo é "não sei" (via clarifies).
 [[procedures]]
@@ -143,6 +156,10 @@ requirements = [
 channels = [
   {kind = "APP", description = "Aplicativo Meu INSS (Google Play ou App Store).", source = "govbr-simular-aposentadoria", excerpt = "Baixe o Meu INSS no"},
   {kind = "ONLINE", description = "Site do Meu INSS, com CPF e senha, em \"Simular aposentadoria\".", source = "govbr-simular-aposentadoria", excerpt = "Site do Meu INSS"},
+]
+details = [
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-simular-aposentadoria", excerpt = "Este serviço é gratuito para o cidadão."},
+  {kind = "DEADLINE", text = "Atendimento imediato.", source = "govbr-simular-aposentadoria", excerpt = "Quanto tempo leva? Atendimento imediato"},
 ]
 
 [[rules]]

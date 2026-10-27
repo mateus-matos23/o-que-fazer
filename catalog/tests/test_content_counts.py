@@ -16,7 +16,7 @@ def test_global_counts(loaded: dict[str, int]) -> None:
         "Question": 12,
         "AnswerOption": 43,
         "Procedure": 25,
-        "ProcedureDetail": 12,
+        "ProcedureDetail": 20,
         "Requirement": 75,
         "ServiceChannel": 62,
         "Rule": 21,

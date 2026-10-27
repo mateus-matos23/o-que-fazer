@@ -67,11 +67,25 @@ def test_all_procedures_are_inss_federal(loaded: dict[str, int]) -> None:
     assert simulator.agency.slug == "inss" and simulator.jurisdiction == "FEDERAL"
 
 
-def test_no_deadline_or_cost_from_waiting_times(loaded: dict[str, int]) -> None:
-    # Tempos de espera e de etapa das páginas não são prazo de resposta (evidência).
-    assert not ProcedureDetail.objects.filter(
-        procedure__slug__in=[BY_AGE, BY_TIME, CNIS, SIMULATOR]
-    ).exists()  # RN11: sem custo ou prazo documentado nas amostras
+@pytest.mark.parametrize(
+    ("procedure", "deadline"),
+    [
+        (BY_AGE, "Em média 45 dias corridos."),
+        (BY_TIME, "Em média 45 dias corridos."),
+        (CNIS, "Atendimento imediato."),
+        (SIMULATOR, "Atendimento imediato."),
+    ],
+)
+def test_cost_and_deadline_come_from_how_long_it_takes(
+    loaded: dict[str, int], procedure: str, deadline: str
+) -> None:
+    # Só "Quanto tempo leva?" vira prazo; tempos de espera e de etapa não (evidência).
+    details = {d.kind: d for d in ProcedureDetail.objects.filter(procedure__slug=procedure)}
+    assert set(details) == {"COST", "DEADLINE"}
+    assert details["COST"].text == "Gratuito para o cidadão."
+    assert details["COST"].excerpt == "Este serviço é gratuito para o cidadão."
+    assert details["DEADLINE"].text == deadline
+    assert "Tempo de duração da etapa" not in details["DEADLINE"].excerpt
 
 
 @pytest.mark.parametrize(

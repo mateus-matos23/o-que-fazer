@@ -73,3 +73,19 @@ Termo de representação legal - tutela, curatela ou termo de guarda
 Tempo de duração da etapa
 Atendimento imediato
 ```
+
+## Trecho de custo e prazo
+
+- Coleta: 2026-10-27T10:35:00-03:00 (versão de fonte gravada por `fetch_sources`)
+- SHA-256 do HTML completo baixado: `7e238f370bd1585582f75ae5a62ddc90ab6f6cff83628f6215fa4ba3febf0ee8`
+- Trecho: linhas 217 a 223 do extrato de texto (371 linhas não vazias), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+
+```text
+Quanto tempo leva?
+Em média
+45
+dia(s) corrido(s)
+é o tempo estimado para a prestação deste serviço.
+Informações adicionais ao tempo estimado
+Este serviço é gratuito para o cidadão.
+```

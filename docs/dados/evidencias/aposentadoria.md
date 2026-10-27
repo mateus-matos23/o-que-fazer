@@ -24,7 +24,9 @@ Estado: **Consolidado** para a aposentadoria por idade urbana, a aposentadoria p
 - Sem dependências entre os procedimentos (RN08).
 - Requisitos: o bloco "Documentação" de cada página. As duas aposentadorias trazem identificação e CPF do titular e, quando houver, do procurador ou representante legal, mais a procuração ou o termo de representação; o simulador pede identificação e CPF do titular. O extrato do CNIS traz o mesmo bloco das aposentadorias.
 - Canais: aplicativo e site do Meu INSS; telefone 135 "caso o sistema esteja indisponível"; atendimento presencial (agendamento pelo 135 ou unidade com acordo com o INSS) nas páginas de idade, tempo e extrato. O simulador só tem aplicativo e site.
-- Prazo e custo: nenhum detalhe. "Tempo estimado de espera" (5 minutos; 30 dias corridos no presencial) e "Tempo de duração da etapa" ("Atendimento imediato") não são prazo de resposta do pedido, por isso não viram detalhe `DEADLINE`. As amostras não citam custo, então não há detalhe `COST`.
+- Prazo: vem só da seção "Quanto tempo leva?", que é o tempo estimado para a prestação do serviço: "Em média 45 dia(s) corrido(s)" nas duas aposentadorias e "Atendimento imediato" no extrato do CNIS e no simulador. "Tempo estimado de espera" (5 minutos; 30 dias corridos no presencial) e "Tempo de duração da etapa" são tempos de atendimento ou de etapa, não prazo do pedido, e não viram detalhe `DEADLINE`.
+- Custo: as quatro páginas dizem "Este serviço é gratuito para o cidadão." (detalhe `COST`).
+- Os trechos de custo e prazo estão no "Trecho de custo e prazo" de cada amostra, tirado da versão de fonte coletada por `fetch_sources` em 27/10/2026, 10:34 a 10:35.
 
 ## Fora da jornada
 

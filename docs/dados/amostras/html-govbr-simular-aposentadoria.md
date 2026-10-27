@@ -49,3 +49,16 @@ Tempo de duração da etapa
 Atendimento imediato
 Outras Informações
 ```
+
+## Trecho de custo e prazo
+
+- Coleta: 2026-10-27T10:35:11-03:00 (versão de fonte gravada por `fetch_sources`)
+- SHA-256 do HTML completo baixado: `8f21313644e572f06c51869cc1b676af5009c8d37022ad443381117417afff52`
+- Trecho: linhas 176 a 179 do extrato de texto (323 linhas não vazias), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+
+```text
+Quanto tempo leva?
+Atendimento imediato
+Informações adicionais ao tempo estimado
+Este serviço é gratuito para o cidadão.
+```

@@ -2,6 +2,8 @@
 
 Amostras coletadas por `curl` (sem WebFetch). Os arquivos `api-servicos-*.json` contêm a ficha completa, formatada e sem alteração de conteúdo. Os arquivos `html-*.md` não contêm o HTML bruto: trazem URL, HTTP, data/hora da coleta, a linha de data declarada, o SHA-256 do HTML completo e de 40 linhas de texto literal (tags removidas com `html.parser`).
 
+Algumas amostras têm, no fim, um "Trecho de custo e prazo": a seção "Quanto tempo leva?" e a frase de gratuidade, tirados da versão de fonte coletada por `fetch_sources`, com data e SHA-256 próprios. A fixture de testes junta todos os trechos de uma amostra.
+
 Fonte de identidade (`https://www.gov.br/identidade`) não foi amostrada: ver Falhas.
 
 | arquivo | fonte | tipo | HTTP | data da coleta | "Última Modificação" declarada | sha256 (só HTML) |

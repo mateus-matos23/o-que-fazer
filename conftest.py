@@ -69,9 +69,10 @@ def _snapshot(source: Source) -> SourceSnapshot:
         if source.format == Source.Format.GOVBR_API:
             text, raw_json = raw, json.loads(raw)
         else:
-            block = re.search(r"```text\n(.*?)```", raw, re.DOTALL)
-            assert block, source.slug
-            text, raw_json = block.group(1), None
+            # uma amostra pode ter mais de um trecho literal (ex.: o de custo e prazo)
+            blocks = re.findall(r"```text\n(.*?)```", raw, re.DOTALL)
+            assert blocks, source.slug
+            text, raw_json = "\n".join(blocks), None
     return SourceSnapshot.objects.create(
         source=source,
         content_sha256=hashlib.sha256(text.encode()).hexdigest(),

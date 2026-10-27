@@ -75,3 +75,19 @@ Cadastro de Pessoa Física (CPF)
 Procuração no modelo do INSS ou pública
 Termo de representação legal - tutela, curatela ou termo de guarda
 ```
+
+## Trecho de custo e prazo
+
+- Coleta: 2026-10-27T10:35:05-03:00 (versão de fonte gravada por `fetch_sources`)
+- SHA-256 do HTML completo baixado: `b4e0beed715baf3f4a852b81319f12a75952200af452c181304e0e75497bc82c`
+- Trecho: linhas 220 a 226 do extrato de texto (373 linhas não vazias), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+
+```text
+Quanto tempo leva?
+Em média
+45
+dia(s) corrido(s)
+é o tempo estimado para a prestação deste serviço.
+Informações adicionais ao tempo estimado
+Este serviço é gratuito para o cidadão.
+```
