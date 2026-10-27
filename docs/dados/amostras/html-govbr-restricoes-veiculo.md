@@ -49,3 +49,16 @@ Na tela seguinte, clique em “Indicadores de Situação do Veículo” e veja o
 Canais de prestação
 Web :
 ```
+
+## Trecho de custo e prazo
+
+- Coleta: 2026-10-27T10:34:21-03:00 (versão de fonte gravada por `fetch_sources`)
+- SHA-256 do HTML completo baixado: `c38be42426e2795802a661a2d04490f9387b3502fbe614a2e4d62c00c0ab2510`
+- Trecho: linhas 180 a 183 do extrato de texto (341 linhas não vazias), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+
+```text
+Quanto tempo leva?
+Não estimado ainda
+Informações adicionais ao tempo estimado
+Este serviço é gratuito para o cidadão.
+```

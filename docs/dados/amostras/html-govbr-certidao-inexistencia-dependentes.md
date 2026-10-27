@@ -49,3 +49,16 @@ Busque uma unidade que tenha
 acordo
 com o INSS na sua região
 ```
+
+## Trecho de custo e prazo
+
+- Coleta: 2026-10-27T10:34:47-03:00 (versão de fonte gravada por `fetch_sources`)
+- SHA-256 do HTML completo baixado: `1ae5fa85cb2fb7c96359d14031a4b94ff2a6179005926efcedcc27a7c759543c`
+- Trecho: linhas 205 a 208 do extrato de texto (346 linhas não vazias), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+
+```text
+Quanto tempo leva?
+Não estimado ainda
+Informações adicionais ao tempo estimado
+Este serviço é gratuito para o cidadão.
+```

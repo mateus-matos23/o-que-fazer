@@ -17,6 +17,7 @@ Estado: **Consolidado** para a transferência digital (DETRAN-MA, id 23692); **P
 - "Não sei" só nos casos de balcão: quem não sabe se o CRV é digital fica com as duas transferências indeterminadas, nunca com uma delas descartada (RN03).
 - Vistoria em ECV antes da transferência digital: dependência obrigatória ("Após aprovação, o usuário seguirá para a plataforma online"). A vistoria só aparece com a transferência digital: a página não a descreve para o balcão.
 - Consulta de restrições (Senatran) antes da transferência: recomendada. A página do DETRAN-MA pede que "não conste restrições", mas não exige a consulta; a ordem é sugestão (RN08).
+- Custo da consulta de restrições: a página diz "Este serviço é gratuito para o cidadão." (detalhe `COST`, no "Trecho de custo e prazo" da amostra, coletado por `fetch_sources` em 27/10/2026).
 
 ## Fora da jornada
 

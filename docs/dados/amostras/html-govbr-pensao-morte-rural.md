@@ -81,3 +81,19 @@ Tempo de duração da etapa
 Atendimento imediato
 Receber resposta
 ```
+
+## Trecho de custo e prazo
+
+- Coleta: 2026-10-27T10:34:31-03:00 (versão de fonte gravada por `fetch_sources`)
+- SHA-256 do HTML completo baixado: `49a12fcb2f7886b61f98b69ef055ad42756f2ecb6c197e131bc6a74da001dc9e`
+- Trecho: linhas 220 a 226 do extrato de texto (374 linhas não vazias), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+
+```text
+Quanto tempo leva?
+Em média
+45
+dia(s) corrido(s)
+é o tempo estimado para a prestação deste serviço.
+Informações adicionais ao tempo estimado
+Este serviço é gratuito para o cidadão.
+```

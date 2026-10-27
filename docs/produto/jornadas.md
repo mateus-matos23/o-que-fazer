@@ -110,7 +110,7 @@ Procedimentos:
 
 - Pensão por morte urbana e pensão por morte rural, cada uma com a regra do seu meio de trabalho.
 - Certidão de inexistência de dependentes habilitados à pensão por morte, sem regra; vale para qualquer resposta.
-- Os três procedimentos não têm ordem entre si (RN08). Prazo “não informado”.
+- Os três procedimentos não têm ordem entre si (RN08). Os três são gratuitos; a pensão rural leva em média 45 dias corridos, e a pensão urbana e a certidão têm prazo “não informado” (“Não estimado ainda” na página).
 
 O que ficou fora:
 
@@ -135,7 +135,7 @@ Procedimentos:
 - Aposentadoria por idade (trabalhador urbano), com as duas condições: tipo “por idade” e meio urbano.
 - Aposentadoria por tempo de contribuição, que depende só do tipo, porque a página não restringe o pedido ao meio urbano.
 - Extrato do CNIS, sem regra: a página diz que qualquer pessoa com cadastro no CNIS pode pedi-lo.
-- Sem ordem entre os procedimentos (RN08). Custo e prazo aparecem como “não informado”: os tempos da página (espera e duração de etapa) não são prazo de resposta.
+- Sem ordem entre os procedimentos (RN08). Os quatro são gratuitos. O prazo vem de “Quanto tempo leva?”: em média 45 dias corridos nas duas aposentadorias e atendimento imediato no extrato e no simulador; os tempos de espera e de duração de etapa não são prazo de resposta.
 
 O que ficou fora:
 

@@ -2,7 +2,7 @@
 
 import pytest
 
-from catalog.models import Dependency, Procedure, Question, Rule, Situation
+from catalog.models import Dependency, Procedure, ProcedureDetail, Question, Rule, Situation
 
 pytestmark = pytest.mark.django_db
 
@@ -42,4 +42,14 @@ def test_all_procedures_are_inss_federal(loaded: dict[str, int]) -> None:
     procedures = Procedure.objects.filter(situations__slug=SITUATION)
     assert procedures.count() == 3
     assert all(p.agency.slug == "inss" and p.jurisdiction == "FEDERAL" for p in procedures)
-    assert not any(p.details.filter(kind="COST").exists() for p in procedures)  # RN11
+    assert all(p.details.get(kind="COST").text == "Gratuito para o cidadão." for p in procedures)
+
+
+def test_only_the_rural_pension_has_an_estimated_time(loaded: dict[str, int]) -> None:
+    # "Não estimado ainda" na pensão urbana e na certidão fica "não informado" (RN11).
+    deadlines = ProcedureDetail.objects.filter(
+        procedure__situations__slug=SITUATION, kind="DEADLINE"
+    )
+    assert [(d.procedure.slug, d.text) for d in deadlines] == [
+        ("pensao-por-morte-rural", "Em média 45 dias corridos.")
+    ]

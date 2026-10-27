@@ -14,6 +14,7 @@
 #   não a descreve para o balcão.
 # - Consulta de restrições (Senatran) antes da transferência: RECOMMENDED. A página do DETRAN-MA pede
 #   que "não conste restrições", mas não exige a consulta; a ordem é sugestão (RN08).
+# - Custo da consulta de restrições: a página gov.br declara o serviço gratuito (COST).
 #
 # Fora por falta de trecho literal ou de fonte (a afirmação não entra; custo/prazo vira "não informado"):
 # - Taxa da transferência: a tabela de taxas lida não traz o item. Prazo: não consta.
@@ -84,6 +85,7 @@ channels = [
 ]
 details = [
   {kind = "DEADLINE", text = "Atendimento imediato.", source = "govbr-restricoes-veiculo", excerpt = "Atendimento imediato"},
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-restricoes-veiculo", excerpt = "Este serviço é gratuito para o cidadão."},
 ]
 
 [[procedures]]

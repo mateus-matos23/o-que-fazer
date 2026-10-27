@@ -2,7 +2,7 @@
 
 import pytest
 
-from catalog.models import Dependency, Procedure, Question, Situation
+from catalog.models import Dependency, Procedure, ProcedureDetail, Question, Situation
 
 pytestmark = pytest.mark.django_db
 
@@ -37,6 +37,12 @@ def test_dependencies_inspection_mandatory_restrictions_recommended(loaded: dict
         ("consultar-restricoes-veiculo", "transferencia-digital-veiculo", "RECOMMENDED"),
         ("consultar-restricoes-veiculo", "transferencia-balcao-veiculo", "RECOMMENDED"),
     }
+
+
+def test_restrictions_lookup_is_free(loaded: dict[str, int]) -> None:
+    cost = ProcedureDetail.objects.get(procedure__slug="consultar-restricoes-veiculo", kind="COST")
+    assert cost.text == "Gratuito para o cidadão."
+    assert cost.excerpt == "Este serviço é gratuito para o cidadão."
 
 
 def test_detran_procedures_have_no_documented_cost(loaded: dict[str, int]) -> None:

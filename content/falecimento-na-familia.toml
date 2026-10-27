@@ -10,6 +10,8 @@
 #   nunca descartadas (RN03).
 # - Certidão de inexistência de dependentes: sem regra; vale para quem precisa comprovar que a pessoa
 #   falecida não tem dependentes recebendo pensão.
+# - Custo: as três páginas declaram o serviço gratuito (COST). Prazo: só "Quanto tempo leva?" vira
+#   DEADLINE; a pensão urbana e a certidão dizem "Não estimado ainda" e ficam "não informado".
 # - Sem dependências: nenhum trecho ordena os três serviços (RN08).
 #
 # Fora da jornada (sem trecho literal ou sem fonte; não entram):
@@ -77,6 +79,9 @@ channels = [
   {kind = "ONLINE", description = "Site do Meu INSS, com CPF e senha, em \"Pensão por morte urbana\".", source = "govbr-pensao-morte-urbana", excerpt = "Site do Meu INSS"},
   {kind = "PHONE", description = "Ligue 135, caso o sistema esteja indisponível.", source = "govbr-pensao-morte-urbana", excerpt = "Ligue 135, caso o sistema esteja indisponível."},
 ]
+details = [
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-pensao-morte-urbana", excerpt = "Este serviço é gratuito para o cidadão."},
+]
 
 [[procedures]]
 slug = "pensao-por-morte-rural"
@@ -100,6 +105,10 @@ channels = [
   {kind = "PHONE", description = "Ligue 135, caso o sistema esteja indisponível.", source = "govbr-pensao-morte-rural", excerpt = "Ligue 135, caso o sistema esteja indisponível."},
   {kind = "IN_PERSON", description = "Atendimento presencial, se necessário: agende pelo telefone 135 ou busque uma unidade que tenha acordo com o INSS na sua região.", source = "govbr-pensao-morte-rural", excerpt = "Agende pelo telefone 135, ou Busque uma unidade que tenha acordo com o INSS na sua região"},
 ]
+details = [
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-pensao-morte-rural", excerpt = "Este serviço é gratuito para o cidadão."},
+  {kind = "DEADLINE", text = "Em média 45 dias corridos.", source = "govbr-pensao-morte-rural", excerpt = "Em média 45 dia(s) corrido(s) é o tempo estimado para a prestação deste serviço."},
+]
 
 [[procedures]]
 slug = "certidao-inexistencia-dependentes"
@@ -114,6 +123,9 @@ channels = [
   {kind = "ONLINE", description = "Site do Meu INSS, com CPF e senha, em \"Certidão de inexistência\".", source = "govbr-certidao-inexistencia-dependentes", excerpt = "Site do Meu INSS"},
   {kind = "PHONE", description = "Ligue 135, caso o sistema esteja indisponível.", source = "govbr-certidao-inexistencia-dependentes", excerpt = "Ligue 135, caso o sistema esteja indisponível."},
   {kind = "IN_PERSON", description = "Atendimento presencial, se necessário: agende pelo telefone 135 ou busque uma unidade que tenha acordo com o INSS na sua região.", source = "govbr-certidao-inexistencia-dependentes", excerpt = "Agende pelo telefone 135, ou Busque uma unidade que tenha acordo com o INSS na sua região"},
+]
+details = [
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-certidao-inexistencia-dependentes", excerpt = "Este serviço é gratuito para o cidadão."},
 ]
 
 [[rules]]

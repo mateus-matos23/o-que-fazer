@@ -21,7 +21,9 @@ Estado: **Consolidado** para as duas pensões por morte (urbana e rural) e para 
 - Sem dependências entre os três serviços: nenhum trecho ordena um serviço antes de outro (RN08).
 - Requisitos das pensões: os itens do bloco "Documentação" da página (identificação, comprovação de dependência, procurador ou representante legal).
 - Canais: aplicativo e site do Meu INSS; telefone 135 "caso o sistema esteja indisponível". O atendimento presencial (agendamento pelo 135 ou unidade com acordo com o INSS) está nas amostras da pensão rural e da certidão e entra nesses dois procedimentos.
-- Prazo: "não informado" nas pensões e na certidão. As páginas trazem "Atendimento imediato" como duração de uma etapa e "Até 30 dia(s) corrido(s)" para o atendimento presencial; nenhum dos dois é o prazo de resposta do pedido, por isso não entraram.
+- Prazo: vem só da seção "Quanto tempo leva?" (tempo estimado para a prestação do serviço). A pensão rural traz "Em média 45 dia(s) corrido(s)"; a pensão urbana e a certidão dizem "Não estimado ainda" e ficam "não informado". "Tempo de duração da etapa" e "Até 30 dia(s) corrido(s)" do atendimento presencial são tempos de etapa ou de espera, não prazo do pedido, e não entram.
+- Custo: as três páginas dizem "Este serviço é gratuito para o cidadão." (detalhe `COST`).
+- Os trechos de custo e prazo estão no "Trecho de custo e prazo" de cada amostra, tirado da versão de fonte coletada por `fetch_sources` em 27/10/2026.
 
 ## Fora da jornada
 
