@@ -51,6 +51,9 @@ SAMPLE_FILES = {
     "detran-taxas": "html-detran-taxas.md",
     "detran-transf-digital": "html-detran-transf-digital.md",
     "govbr-restricoes-veiculo": "html-govbr-restricoes-veiculo.md",
+    "govbr-pensao-morte-urbana": "html-govbr-pensao-morte-urbana.md",
+    "govbr-pensao-morte-rural": "html-govbr-pensao-morte-rural.md",
+    "govbr-certidao-inexistencia-dependentes": "html-govbr-certidao-inexistencia-dependentes.md",
 }
 
 

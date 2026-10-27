@@ -261,3 +261,35 @@ url = "https://www.gov.br/pt-br/servicos/consultar-informacoes-sobre-restricoes-
 format = "HTML"
 jurisdiction = "FEDERAL"
 access_notes = "Página do serviço Consultar restrições e indicadores de veículos; leitura sem login. Declara \"Última Modificação: 15/12/2025\"."
+
+# Jornada "falecimento na família" (27/10/2026).
+# Origem: docs/dados/evidencias/falecimento-na-familia.md.
+
+[[agencies]]
+slug = "inss"
+name = "Instituto Nacional do Seguro Social (INSS)"
+jurisdiction = "FEDERAL"
+
+[[sources]]
+slug = "govbr-pensao-morte-urbana"
+agency = "inss"
+url = "https://www.gov.br/pt-br/servicos/solicitar-pensao-por-morte-urbana"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do serviço Solicitar pensão por morte urbana; leitura sem login. Declara \"Última Modificação: 19/08/2026\"."
+
+[[sources]]
+slug = "govbr-pensao-morte-rural"
+agency = "inss"
+url = "https://www.gov.br/pt-br/servicos/solicitar-pensao-por-morte-rural"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do serviço Solicitar pensão por morte rural; leitura sem login. Declara \"Última Modificação: 19/08/2026\"."
+
+[[sources]]
+slug = "govbr-certidao-inexistencia-dependentes"
+agency = "inss"
+url = "https://www.gov.br/pt-br/servicos/solicitar-certidao-de-inexistencia-de-dependentes-habilitados-a-pensao-por-morte"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do serviço Solicitar certidão de inexistência de dependentes habilitados à pensão por morte; leitura sem login. Declara \"Última Modificação: 19/08/2026\"."

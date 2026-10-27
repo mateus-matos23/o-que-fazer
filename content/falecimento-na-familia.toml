@@ -1,0 +1,139 @@
+# Jornada "falecimento na família" (27/10/2026). Fonte da verdade: docs/dados/evidencias/falecimento-na-familia.md.
+# Fontes: páginas gov.br do INSS (pensão por morte urbana e rural; certidão de inexistência de dependentes),
+# coletadas em 27/10/2026. As três declaram "Última Modificação: 19/08/2026" (RN12).
+#
+# Decisões:
+# - Duas perguntas: a relação com a pessoa que faleceu (SINGLE, sem "não sei") e o meio em que ela
+#   trabalhava (SINGLE, com "não sei"). A relação decide se há dependente nas classes do INSS; "outra"
+#   afasta as duas pensões sem perguntar o meio.
+# - Pensão urbana e rural: regras separadas pelo meio. "Não sei" no meio deixa as duas indeterminadas,
+#   nunca descartadas (RN03).
+# - Certidão de inexistência de dependentes: sem regra; vale para quem precisa comprovar que a pessoa
+#   falecida não tem dependentes recebendo pensão.
+# - Sem dependências: nenhum trecho ordena os três serviços (RN08).
+#
+# Fora da jornada (sem trecho literal ou sem fonte; não entram):
+# - Certidão de óbito: cartório, sem fonte coletada.
+# - Saque de FGTS/PIS por falecimento: a página do FGTS não tem texto no HTML e o slug gov.br retornou 404.
+# - Pensão de servidor público (pensão civil): não coletada.
+# - Acordo internacional: não coletado.
+
+[[situations]]
+slug = "falecimento-na-familia"
+title = "Alguém da minha família faleceu"
+candidates = [
+  "pensao-por-morte-urbana",
+  "pensao-por-morte-rural",
+  "certidao-inexistencia-dependentes",
+]
+
+[[questions]]
+slug = "relacao-com-falecido"
+text = "Qual era a sua relação com a pessoa que faleceu?"
+help = "O INSS divide os dependentes em classes. Escolha a relação que mais se aproxima da sua."
+kind = "SINGLE"
+allows_unknown = false
+order = 0
+situations = ["falecimento-na-familia"]
+options = [
+  {slug = "conjuge", label = "Cônjuge ou companheiro(a), inclusive homoafetivo"},
+  {slug = "filho", label = "Filho(a) menor de 21 anos não emancipado(a), ou de qualquer idade com invalidez ou deficiência intelectual ou mental declarada pela justiça"},
+  {slug = "pais", label = "Mãe ou pai"},
+  {slug = "irmao", label = "Irmão(ã) menor de 21 anos não emancipado(a), ou de qualquer idade com invalidez ou deficiência declarada pela justiça"},
+  {slug = "outra", label = "Outra relação (por exemplo, filho maior de 21 anos sem deficiência)"},
+]
+
+[[questions]]
+slug = "meio-de-trabalho-falecido"
+text = "A pessoa que faleceu trabalhava em meio urbano ou rural?"
+help = "Se não souber, escolha \"Não sei\"."
+kind = "SINGLE"
+allows_unknown = true
+order = 1
+situations = ["falecimento-na-familia"]
+options = [
+  {slug = "urbano", label = "Meio urbano"},
+  {slug = "rural", label = "Meio rural"},
+]
+
+[[procedures]]
+slug = "pensao-por-morte-urbana"
+title = "Pedir pensão por morte urbana"
+description = "Benefício para os dependentes de quem trabalhava em meio urbano e, na data do óbito, possuía a qualidade de segurado, recebia benefício previdenciário ou já tinha direito a algum benefício. Pela ordem de prioridade das classes, a classe anterior exclui a seguinte: com cônjuge, os pais e os irmãos ficam excluídos. O sistema não confirma se você tem direito."
+agency = "inss"
+jurisdiction = "FEDERAL"
+source = "govbr-pensao-morte-urbana"
+excerpt = "Serviço para pedir benefício para dependentes da pessoa falecida que trabalhava em meio urbano"
+requirements = [
+  {description = "Identificação (RG, CIN, CNH ou CTPS) da pessoa falecida e dos dependentes.", source = "govbr-pensao-morte-urbana", excerpt = "Identificação - RG, CIN, CNH ou CTPS da pessoa falecida e dependentes."},
+  {description = "Documentos que comprovem a dependência.", source = "govbr-pensao-morte-urbana", excerpt = "Documentos para comprovar a dependência."},
+  {description = "Se houver procurador ou representante legal: identificação (RG, CIN, CNH ou CTPS).", source = "govbr-pensao-morte-urbana", excerpt = "Identificação - RG, CIN, CNH ou CTPS"},
+  {description = "Se houver procurador ou representante legal: Cadastro de Pessoa Física (CPF).", source = "govbr-pensao-morte-urbana", excerpt = "Cadastro de Pessoa Física (CPF)"},
+  {description = "Se houver procurador: procuração no modelo do INSS ou pública.", source = "govbr-pensao-morte-urbana", excerpt = "Procuração no modelo do INSS ou pública"},
+  {description = "Se houver representante legal: termo de representação legal (tutela, curatela ou termo de guarda).", source = "govbr-pensao-morte-urbana", excerpt = "Termo de representação legal - tutela, curatela ou termo de guarda"},
+]
+channels = [
+  {kind = "APP", description = "Aplicativo Meu INSS (Google Play ou App Store).", source = "govbr-pensao-morte-urbana", excerpt = "Baixe o Meu INSS no"},
+  {kind = "ONLINE", description = "Site do Meu INSS, com CPF e senha, em \"Pensão por morte urbana\".", source = "govbr-pensao-morte-urbana", excerpt = "Site do Meu INSS"},
+  {kind = "PHONE", description = "Ligue 135, caso o sistema esteja indisponível.", source = "govbr-pensao-morte-urbana", excerpt = "Ligue 135, caso o sistema esteja indisponível."},
+]
+
+[[procedures]]
+slug = "pensao-por-morte-rural"
+title = "Pedir pensão por morte rural"
+description = "Benefício para os dependentes de quem trabalhava em meio rural e, na data do óbito, possuía a qualidade de segurado, recebia benefício previdenciário ou já tinha direito a algum benefício. Pela ordem de prioridade das classes, a classe anterior exclui a seguinte: com cônjuge, os pais e os irmãos ficam excluídos. O sistema não confirma se você tem direito."
+agency = "inss"
+jurisdiction = "FEDERAL"
+source = "govbr-pensao-morte-rural"
+excerpt = "Serviço para pedir benefício para dependentes da pessoa falecida que trabalhava em meio rural"
+requirements = [
+  {description = "Identificação (RG, CIN, CNH ou CTPS) da pessoa falecida e dos dependentes.", source = "govbr-pensao-morte-rural", excerpt = "Identificação - RG, CIN, CNH ou CTPS da pessoa falecida e dependentes."},
+  {description = "Documentos que comprovem a dependência.", source = "govbr-pensao-morte-rural", excerpt = "Documentos para comprovar a dependência."},
+  {description = "Se houver procurador ou representante legal: identificação (RG, CIN, CNH ou CTPS).", source = "govbr-pensao-morte-rural", excerpt = "Identificação - RG, CIN, CNH ou CTPS"},
+  {description = "Se houver procurador ou representante legal: Cadastro de Pessoa Física (CPF).", source = "govbr-pensao-morte-rural", excerpt = "Cadastro de Pessoa Física (CPF)"},
+  {description = "Se houver procurador: procuração no modelo do INSS ou pública.", source = "govbr-pensao-morte-rural", excerpt = "Procuração no modelo do INSS ou pública"},
+  {description = "Se houver representante legal: termo de representação legal (tutela, curatela ou termo de guarda).", source = "govbr-pensao-morte-rural", excerpt = "Termo de representação legal - tutela, curatela ou termo de guarda"},
+]
+channels = [
+  {kind = "APP", description = "Aplicativo Meu INSS (Google Play ou App Store).", source = "govbr-pensao-morte-rural", excerpt = "Baixe o Meu INSS no"},
+  {kind = "ONLINE", description = "Site do Meu INSS, com CPF e senha, em \"Pensão por morte rural\".", source = "govbr-pensao-morte-rural", excerpt = "Site do Meu INSS"},
+  {kind = "PHONE", description = "Ligue 135, caso o sistema esteja indisponível.", source = "govbr-pensao-morte-rural", excerpt = "Ligue 135, caso o sistema esteja indisponível."},
+  {kind = "IN_PERSON", description = "Atendimento presencial, se necessário: agende pelo telefone 135 ou busque uma unidade que tenha acordo com o INSS na sua região.", source = "govbr-pensao-morte-rural", excerpt = "Agende pelo telefone 135, ou Busque uma unidade que tenha acordo com o INSS na sua região"},
+]
+
+[[procedures]]
+slug = "certidao-inexistencia-dependentes"
+title = "Pedir certidão de inexistência de dependentes"
+description = "Documento que comprova que um(a) falecido(a) não possui dependentes recebendo pensão por morte pela sua morte. Pode ser pedido por quem precisa comprovar essa situação. O sistema não confirma se você tem direito."
+agency = "inss"
+jurisdiction = "FEDERAL"
+source = "govbr-certidao-inexistencia-dependentes"
+excerpt = "Serviço para pedir o documento que comprova não existir pessoas (dependentes) recebendo pensão por morte de alguém já falecido."
+channels = [
+  {kind = "APP", description = "Aplicativo Meu INSS (Google Play ou App Store).", source = "govbr-certidao-inexistencia-dependentes", excerpt = "Baixe o Meu INSS no"},
+  {kind = "ONLINE", description = "Site do Meu INSS, com CPF e senha, em \"Certidão de inexistência\".", source = "govbr-certidao-inexistencia-dependentes", excerpt = "Site do Meu INSS"},
+  {kind = "PHONE", description = "Ligue 135, caso o sistema esteja indisponível.", source = "govbr-certidao-inexistencia-dependentes", excerpt = "Ligue 135, caso o sistema esteja indisponível."},
+  {kind = "IN_PERSON", description = "Atendimento presencial, se necessário: agende pelo telefone 135 ou busque uma unidade que tenha acordo com o INSS na sua região.", source = "govbr-certidao-inexistencia-dependentes", excerpt = "Agende pelo telefone 135, ou Busque uma unidade que tenha acordo com o INSS na sua região"},
+]
+
+[[rules]]
+slug = "regra-pensao-urbana"
+procedure = "pensao-por-morte-urbana"
+explanation = "A pensão urbana é para dependentes de quem trabalhava em meio urbano, nas classes do INSS (cônjuge, filhos, pais ou irmãos)."
+source = "govbr-pensao-morte-urbana"
+excerpt = "Serviço para pedir benefício para dependentes da pessoa falecida que trabalhava em meio urbano"
+conditions = [
+  {question = "relacao-com-falecido", operator = "ANY_OF", options = ["conjuge", "filho", "pais", "irmao"]},
+  {question = "meio-de-trabalho-falecido", operator = "ANY_OF", options = ["urbano"]},
+]
+
+[[rules]]
+slug = "regra-pensao-rural"
+procedure = "pensao-por-morte-rural"
+explanation = "A pensão rural é para dependentes de quem trabalhava em meio rural, nas classes do INSS (cônjuge, filhos, pais ou irmãos)."
+source = "govbr-pensao-morte-rural"
+excerpt = "Serviço para pedir benefício para dependentes da pessoa falecida que trabalhava em meio rural"
+conditions = [
+  {question = "relacao-com-falecido", operator = "ANY_OF", options = ["conjuge", "filho", "pais", "irmao"]},
+  {question = "meio-de-trabalho-falecido", operator = "ANY_OF", options = ["rural"]},
+]

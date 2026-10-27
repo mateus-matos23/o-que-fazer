@@ -5,7 +5,7 @@
 - Coleta: 2026-10-27T09:52:54-03:00
 - "Última Modificação" / "Atualizado em" / "Publicado em" declarada (texto do HTML): Última Modificação: 19/08/2026
 - SHA-256 do HTML completo baixado: `70a7c618a16f733dbc9078ea6334058b404acf7585ad67519b7a3094a38e177a`
-- Trecho: linhas 139 a 198 do extrato de texto (407 linhas no total), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+- Trecho: linhas 139 a 210 do extrato de texto (407 linhas no total), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
 
 ```text
 O que é?
@@ -68,4 +68,16 @@ Até
                                       30
                                       dia(s) corrido(s)
 Documentação
+Documentação em comum para todos os casos
+Da pessoa titular:
+Identificação - RG, CIN, CNH ou CTPS da pessoa falecida e dependentes.
+Documentos para comprovar a dependência.
+Da pessoa com procuração ou representação legal, se houver:
+Identificação - RG, CIN, CNH ou CTPS
+Cadastro de Pessoa Física (CPF)
+Procuração no modelo do INSS ou pública
+Termo de representação legal - tutela, curatela ou termo de guarda
+Tempo de duração da etapa
+Atendimento imediato
+Receber resposta
 ```

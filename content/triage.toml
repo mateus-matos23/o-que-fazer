@@ -8,7 +8,7 @@ help = "Escolha o assunto mais próximo. Se errar, é só voltar."
 options = [
   {label = "Documentos pessoais (CPF, identidade, carteira de motorista)", icon = "document", next = "documentos"},
   {label = "Trabalho ou emprego", icon = "work", next = "trabalho"},
-  {label = "Família (nascimento de filho, falecimento)", icon = "family", uncovered = true},
+  {label = "Família (falecimento, nascimento de filho)", icon = "family", next = "familia"},
   {label = "Veículo (compra ou venda)", icon = "vehicle", next = "veiculo"},
   {label = "Outro assunto", icon = "other", uncovered = true},
 ]
@@ -37,5 +37,14 @@ slug = "veiculo"
 text = "O que aconteceu com o veículo?"
 options = [
   {label = "Comprei ou vendi um veículo usado, ou recebi por herança, doação ou leilão", icon = "vehicle", situation = "transferencia-de-veiculo"},
+  {label = "Outra coisa", icon = "other", uncovered = true},
+]
+
+[[triage]]
+slug = "familia"
+text = "O que aconteceu na sua família?"
+options = [
+  {label = "Alguém da família faleceu", icon = "family", situation = "falecimento-na-familia"},
+  {label = "Nasceu um filho", icon = "family", uncovered = true},
   {label = "Outra coisa", icon = "other", uncovered = true},
 ]

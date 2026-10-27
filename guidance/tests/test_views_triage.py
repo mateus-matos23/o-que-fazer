@@ -30,7 +30,7 @@ def test_root_shows_start_node(loaded: dict[str, int], client: Client) -> None:
     assert _links(html) == [
         "/comecar/documentos/",
         "/comecar/trabalho/",
-        "/fora-da-cobertura/",
+        "/comecar/familia/",
         "/comecar/veiculo/",
         "/fora-da-cobertura/",
     ]
@@ -72,6 +72,14 @@ def test_inner_node_links_to_situations(loaded: dict[str, int], client: Client) 
 
 def test_trabalho_node(loaded: dict[str, int], client: Client) -> None:
     assert _links(_html(client, "/comecar/trabalho/"))[0] == "/s/desligamento-do-trabalho/"
+
+
+def test_familia_node_links_to_falecimento(loaded: dict[str, int], client: Client) -> None:
+    assert _links(_html(client, "/comecar/familia/")) == [
+        "/s/falecimento-na-familia/",
+        "/fora-da-cobertura/",
+        "/fora-da-cobertura/",
+    ]
 
 
 def test_unknown_node_is_404(loaded: dict[str, int], client: Client) -> None:
