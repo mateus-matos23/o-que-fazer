@@ -126,7 +126,6 @@ _TABLES = {
                     {
                         "next": str,
                         "situation": str,
-                        "uncovered": bool,
                         "icon": frozenset(TriageChoice.Icon.values),
                     },
                 )
@@ -236,7 +235,6 @@ class TriageOptionRecord:
     label: str
     next_node: str | None
     situation: str | None
-    uncovered: bool
     icon: str = ""
 
 
@@ -318,7 +316,6 @@ def _parse(file: str, doc: dict[str, Any], content: Content) -> None:
                 o["label"],
                 o.get("next"),
                 o.get("situation"),
-                o.get("uncovered", False),
                 o.get("icon", ""),
             )
             for o in r["options"]
@@ -589,9 +586,8 @@ def _triage_problems(content: Content, situations: set[str]) -> list[str]:
             where = f"{n.file}: {n.slug}: options[{i}]"
             if not o.label.strip():
                 problems.append(f"{where}: label vazio")
-            destinations = [o.next_node is not None, o.situation is not None, o.uncovered]
-            if sum(destinations) != 1:
-                problems.append(f"{where}: informe exatamente um entre next, situation e uncovered")
+            if (o.next_node is None) == (o.situation is None):
+                problems.append(f"{where}: informe exatamente um entre next e situation")
             if o.next_node is not None:
                 if o.next_node in nodes:
                     edges.add((n.slug, o.next_node))

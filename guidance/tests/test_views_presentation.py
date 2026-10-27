@@ -202,9 +202,7 @@ def test_print_hint_is_plain_text_without_script() -> None:
 LIBRAS_SCRIPT = '<script type="module" src="/static/guidance/libras.js">'
 
 
-@pytest.mark.parametrize(
-    "url", ["/", "/situacoes/", URL, URL + "plano/", "/onde-resolvo/?q=cpf", "/fora-da-cobertura/"]
-)
+@pytest.mark.parametrize("url", ["/", URL, URL + "plano/", "/onde-resolvo/?q=cpf"])
 def test_libras_button_is_hidden_until_script_and_loads_nothing_external(
     loaded: dict[str, int], client: Client, url: str
 ) -> None:

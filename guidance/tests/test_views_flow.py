@@ -42,7 +42,7 @@ def _plan(client: Client) -> str:
 
 
 def test_lists_situations(loaded: dict[str, int], client: Client) -> None:
-    assert "Meu CPF está irregular" in client.get("/situacoes/").content.decode()
+    assert "Meu CPF está com problema" in client.get("/").content.decode()
 
 
 def test_unknown_situation_is_404(loaded: dict[str, int], client: Client) -> None:

@@ -559,19 +559,26 @@ help = "Dica."
 options = [
   {label = "Um", next = "sub"},
   {label = "Dois", situation = "sit"},
-  {label = "Três", uncovered = true},
-  {label = "Quatro", uncovered = false, situation = "sit"},
+  {label = "Três", situation = "sit"},
 ]
 
 [[triage]]
 slug = "sub"
 text = "Detalhe?"
-options = [{label = "Fora", uncovered = true}, {label = "Volta", next = "inicio2"}]
+options = [{label = "Fora", situation = "sit"}, {label = "Volta", next = "inicio2"}]
 
 [[triage]]
 slug = "inicio2"
 text = "Outro"
-options = [{label = "Fim", uncovered = true}]
+options = [{label = "Fim", situation = "sit"}]
+"""
+
+
+OTHER_SITUATION = """
+[[situations]]
+slug = "outra"
+title = "Outra"
+candidates = ["proc-b"]
 """
 
 
@@ -590,19 +597,19 @@ TRIAGE_ERRORS = {
         "journey.toml: inicio: slug duplicado em triage",
     ),
     "no destination": (
-        _triage('{label = "Três", uncovered = true}', '{label = "Três"}'),
-        "inicio: options[2]: informe exatamente um entre next, situation e uncovered",
+        _triage('{label = "Três", situation = "sit"}', '{label = "Três"}'),
+        "inicio: options[2]: informe exatamente um entre next e situation",
     ),
     "two destinations": (
         _triage(
-            '{label = "Três", uncovered = true}',
+            '{label = "Três", situation = "sit"}',
             '{label = "Três", next = "sub", situation = "sit"}',
         ),
-        "inicio: options[2]: informe exatamente um entre next, situation e uncovered",
+        "inicio: options[2]: informe exatamente um entre next e situation",
     ),
-    "uncovered false does not count": (
-        _triage('{label = "Três", uncovered = true}', '{label = "Três", uncovered = false}'),
-        "inicio: options[2]: informe exatamente um entre next, situation e uncovered",
+    "uncovered key is rejected": (
+        _triage('{label = "Três", situation = "sit"}', '{label = "Três", uncovered = true}'),
+        "options[2].uncovered: chave desconhecida",
     ),
     "unknown next": (
         _triage('next = "sub"', 'next = "nada"'),
@@ -617,7 +624,7 @@ TRIAGE_ERRORS = {
         "inicio: ciclo no funil de triagem envolvendo: inicio, sub",
     ),
     "self cycle": (
-        _triage('{label = "Fim", uncovered = true}', '{label = "Fim", next = "inicio2"}'),
+        _triage('{label = "Fim", situation = "sit"}', '{label = "Fim", next = "inicio2"}'),
         "inicio2: ciclo no funil de triagem envolvendo: inicio2",
     ),
     "isolated cycle is also unreachable": (
@@ -628,27 +635,25 @@ TRIAGE_ERRORS = {
     ),
     "empty text": (_triage('text = "Detalhe?"', 'text = "  "'), "sub: text vazio"),
     "empty label": (
-        _triage('{label = "Fora", uncovered = true}', '{label = "", uncovered = true}'),
+        _triage('{label = "Fora", situation = "sit"}', '{label = "", situation = "sit"}'),
         "sub: options[0]: label vazio",
     ),
     "unreachable node": (
-        _triage('{label = "Um", next = "sub"},', '{label = "Um", uncovered = true},'),
+        _triage('{label = "Um", next = "sub"},', '{label = "Um", situation = "sit"},'),
         "sub: nó inalcançável a partir de inicio",
     ),
     "situation not reachable": (
-        _triage(
-            '{label = "Dois", situation = "sit"},', '{label = "Dois", uncovered = true},'
-        ).replace('{label = "Quatro", uncovered = false, situation = "sit"},', ""),
-        "journey.toml: sit: situação não alcançável pelo funil de triagem",
+        _triage() + OTHER_SITUATION,
+        "journey.toml: outra: situação não alcançável pelo funil de triagem",
     ),
     "unknown icon": (
         _triage(
-            '{label = "Fora", uncovered = true}', '{label = "Fora", uncovered = true, icon = "x"}'
+            '{label = "Fora", situation = "sit"}', '{label = "Fora", situation = "sit", icon = "x"}'
         ),
         "options[0].icon: valor 'x' fora de",
     ),
     "node without options": (
-        _triage('options = [{label = "Fim", uncovered = true}]', "options = []"),
+        _triage('options = [{label = "Fim", situation = "sit"}]', "options = []"),
         "inicio2: nó sem opções",
     ),
 }
@@ -666,9 +671,9 @@ def test_triage_error_writes_nothing(content: Path, text: str, expected: str) ->
 def test_triage_stores_nodes_and_choices_in_order(content: Path) -> None:
     (content / "journey.toml").write_text(
         JOURNEY
-        + TRIAGE.replace('{label = "Volta", next = "inicio2"}', '{label = "Volta", next = "fim"}')
-        .replace('slug = "inicio2"', 'slug = "fim"')
-        .replace('  {label = "Quatro", uncovered = false, situation = "sit"},\n', "")
+        + TRIAGE.replace(
+            '{label = "Volta", next = "inicio2"}', '{label = "Volta", next = "fim"}'
+        ).replace('slug = "inicio2"', 'slug = "fim"')
     )
     counts = load_content(content)
     assert (counts["TriageNode"], counts["TriageChoice"]) == (3, 6)
@@ -678,17 +683,17 @@ def test_triage_stores_nodes_and_choices_in_order(content: Path) -> None:
     assert [c.order for c in (first, second, third)] == [1, 2, 3]
     assert first.next_node == TriageNode.objects.get(slug="sub")
     assert second.situation is not None and second.situation.slug == "sit"
-    assert (third.next_node, third.situation) == (None, None)
+    assert third.next_node is None and third.situation == second.situation
     assert load_content(content) == counts  # recarga substitui tudo
 
 
 def test_triage_icon_is_stored_and_optional(content: Path) -> None:
     (content / "journey.toml").write_text(
-        _triage('{label = "Um", next = "sub"}', '{label = "Um", next = "sub", icon = "work"}')
+        _triage('{label = "Um", next = "sub"}', '{label = "Um", next = "sub", icon = "family"}')
     )
     load_content(content)
     first, second, *_ = TriageNode.objects.get(slug="inicio").choices.all()
-    assert (first.icon, second.icon) == ("work", "")
+    assert (first.icon, second.icon) == ("family", "")
 
 
 def test_content_without_triage_is_valid(content: Path) -> None:
@@ -698,7 +703,7 @@ def test_content_without_triage_is_valid(content: Path) -> None:
 def test_triage_duplicate_slug_across_files(content: Path) -> None:
     (content / "journey.toml").write_text(_triage().replace('"inicio2"', '"sub2"', 2))
     (content / "other.toml").write_text(
-        '[[triage]]\nslug = "sub"\ntext = "T"\noptions = [{label = "x", uncovered = true}]\n'
+        '[[triage]]\nslug = "sub"\ntext = "T"\noptions = [{label = "x", situation = "sit"}]\n'
     )
     with pytest.raises(ContentError) as info:
         load_content(content)

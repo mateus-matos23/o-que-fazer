@@ -199,16 +199,11 @@ class TriageNode(models.Model):
 class TriageChoice(models.Model):
     class Icon(models.TextChoices):
         # Cada valor tem um SVG em guidance/templates/guidance/icons/<valor>.svg.
-        DOCUMENT = "document", "Documento"
-        WORK = "work", "Trabalho"
         FAMILY = "family", "Família"
         VEHICLE = "vehicle", "Veículo"
-        OTHER = "other", "Outro assunto"
         LOST = "lost", "Perda"
         PROBLEM = "problem", "Problema"
-        FIRST_TIME = "first-time", "Primeira vez"
         LEAVING = "leaving", "Saída"
-        FIRST_JOB = "first-job", "Primeiro emprego"
         RETIREMENT = "retirement", "Aposentadoria"
 
     node = models.ForeignKey(TriageNode, on_delete=models.CASCADE, related_name="choices")
@@ -227,10 +222,10 @@ class TriageChoice(models.Model):
         ordering = ["order"]
         constraints = [
             models.UniqueConstraint(fields=["node", "order"], name="unique_choice_order_per_node"),
-            # Ambos nulos = ramo fora da cobertura.
+            # Toda opção leva a um nó ou a uma situação, nunca a ambos nem a nenhum.
             models.CheckConstraint(
-                condition=Q(next_node__isnull=True) | Q(situation__isnull=True),
-                name="triage_choice_at_most_one_destination",
+                condition=Q(next_node__isnull=True) ^ Q(situation__isnull=True),
+                name="triage_choice_exactly_one_destination",
             ),
         ]
 

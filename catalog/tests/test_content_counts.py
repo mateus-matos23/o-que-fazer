@@ -22,18 +22,11 @@ def test_global_counts(loaded: dict[str, int]) -> None:
         "Rule": 21,
         "Condition": 28,
         "Dependency": 4,
-        "TriageNode": 6,
-        "TriageChoice": 20,
+        "TriageNode": 1,
+        "TriageChoice": 6,
     }
 
 
 def test_real_content_passes_validation_with_triage(loaded: dict[str, int]) -> None:
     content, _ = validate(ROOT / "content")
-    assert {n.slug for n in content.triage} == {
-        "inicio",
-        "documentos",
-        "trabalho",
-        "veiculo",
-        "familia",
-        "aposentadoria",
-    }
+    assert [n.slug for n in content.triage] == ["inicio"]

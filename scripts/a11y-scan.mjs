@@ -128,18 +128,13 @@ try {
 
   await goto(cdp, "/");
   await scan(cdp, "início");
-  for (const path of (await links(cdp, /^\/comecar\//)).slice(0, 2)) { await goto(cdp, path); await scan(cdp, "triagem"); }
-  await goto(cdp, "/fora-da-cobertura/");
-  await scan(cdp, "fora da cobertura");
+  const situations = await links(cdp, /^\/s\/[^/]+\/$/);
+  if (!situations.length) throw new Error("Nenhuma situação no início: o conteúdo foi carregado?");
   await goto(cdp, "/onde-resolvo/?q=cpf");
   await scan(cdp, "busca");
   const [procedure] = await links(cdp, /^\/onde-resolvo\/[^/]+\/$/);
   if (procedure) { await goto(cdp, procedure); await scan(cdp, "procedimento"); }
 
-  await goto(cdp, "/situacoes/");
-  await scan(cdp, "situações");
-  const situations = await links(cdp, /^\/s\/[^/]+\/$/);
-  if (!situations.length) throw new Error("Nenhuma situação em /situacoes/: o conteúdo foi carregado?");
   // Estado de erro: enviar a primeira pergunta sem resposta; submit() pula o "required" do navegador.
   await goto(cdp, situations[0]);
   await submit(cdp, `document.querySelector("form.answer-form").submit()`);

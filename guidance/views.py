@@ -84,12 +84,6 @@ def _answer_and_record_effect(
     write_effect(request.session, catalog.situation_slug, effect)
 
 
-@require_GET
-def situation_list(request: HttpRequest) -> HttpResponse:
-    situations = Situation.objects.order_by("title")
-    return render(request, "guidance/situation_list.html", {"situations": situations})
-
-
 def _triage_node(slug: str) -> TriageNode | None:
     return (
         TriageNode.objects.filter(slug=slug)
@@ -104,7 +98,8 @@ def _triage_node(slug: str) -> TriageNode | None:
 def home(request: HttpRequest) -> HttpResponse:
     node = _triage_node(START_NODE)
     if node is None:  # conteúdo sem funil: a lista de situações é a entrada
-        return situation_list(request)
+        situations = Situation.objects.order_by("title")
+        return render(request, "guidance/situation_list.html", {"situations": situations})
     return render(request, "guidance/triage.html", {"node": node, "is_start": True})
 
 
@@ -116,12 +111,6 @@ def triage(request: HttpRequest, slug: str) -> HttpResponse:
     if node is None:
         raise Http404("Pergunta não encontrada")
     return render(request, "guidance/triage.html", {"node": node, "is_start": False})
-
-
-@require_GET
-def uncovered(request: HttpRequest) -> HttpResponse:
-    situations = Situation.objects.order_by("title")
-    return render(request, "guidance/uncovered.html", {"situations": situations})
 
 
 @require_http_methods(["GET", "POST"])

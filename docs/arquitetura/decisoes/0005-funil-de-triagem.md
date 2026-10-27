@@ -14,6 +14,7 @@ A Fase 7 (conversa guiada) quer que o cidadão chegue à situação respondendo 
 3. **Ramo sem jornada leva ao limite de cobertura.** A página `/fora-da-cobertura/` diz que a situação ainda não é orientada, lista as situações existentes e oferece "Onde resolvo?".
 4. **Toda situação é alcançável pelo funil.** A carga falha se uma situação não tem entrada pelo funil, se um nó é inalcançável, se há ciclo, se falta o nó `inicio` ou se uma opção não tem exatamente um destino. Sem nenhum nó `triage` no conteúdo, as validações do funil não se aplicam e a raiz mostra a lista de situações.
 5. **Lista de situações mantida** em `/situacoes/`, como link secundário.
+   - Revisto em 27/10/2026: por decisão do autor, o funil só mostra opções que levam a um plano real. O nó `inicio` lista direto as situações com jornada, e não há mais destino "fora da cobertura": os itens 3 e 5 deixam de valer, e `/situacoes/` e `/fora-da-cobertura/` saem (a raiz ainda mostra a lista de situações se o conteúdo não tiver nó `inicio`). Cada opção tem exatamente um destino (nó ou situação), garantido pela carga e por uma constraint no banco (`triage_choice_exactly_one_destination`). Os nós internos (documentos, trabalho, família, veículo, aposentadoria) foram removidos do conteúdo.
 
 ## Por que o funil não tem fonte
 
