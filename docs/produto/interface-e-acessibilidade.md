@@ -70,7 +70,7 @@ Consolidado (27/10/2026): identidade neutra, que não imita o gov.br ([ADR 0004]
 - Alvos principais de 56 px, nenhum abaixo de 48 px.
 - Coluna única de 36 rem, com mobile primeiro.
 - O indicador de etapas tem 3 segmentos (Perguntas, Atendimento, Plano) e não aparece no plano.
-- O botão de Libras continua flutuante à direita, agora na vertical (44 px de largura).
+- O botão de Libras continua flutuante à direita, agora na vertical (44 px de largura). Em telas estreitas, a página ganha margem direita do tamanho do botão, que assim não cobre o conteúdo.
 
 Não há sistema de componentes.
 

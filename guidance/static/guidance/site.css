@@ -402,6 +402,10 @@ dd { margin: 0; }
   border-radius: var(--radius-button) 0 0 var(--radius-button);
   font-size: 1rem;
 }
+/* Abaixo de 44rem a coluna encosta no botão: a margem direita impede que ele cubra o conteúdo. */
+@media (max-width: 44rem) {
+  body:has(#libras:not([hidden])) .page { padding-right: calc(44px + 0.75rem); }
+}
 .libras-panel {
   max-width: min(26rem, calc(100vw - 2rem));
   padding: 1.25rem;
