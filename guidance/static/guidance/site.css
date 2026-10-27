@@ -191,6 +191,7 @@ button.secondary:hover, .button.secondary:hover { background: var(--action-soft)
 /* Busca */
 .search-form { display: grid; gap: 0.75rem; margin-bottom: 1rem; }
 .search-form label { display: block; font-weight: 700; }
+.search-form .search-hint { color: var(--muted); margin: -0.5rem 0 0; }
 .search-form input {
   display: block;
   width: 100%;

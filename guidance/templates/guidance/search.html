@@ -10,7 +10,9 @@
   </div>
   {% endif %}
   <label for="id_q">{{ form.q.label }}</label>
-  <input type="search" name="q" id="id_q" value="{{ form.q.value|default:'' }}" minlength="2" maxlength="100" required{% if form.errors %} aria-describedby="search-errors" aria-invalid="true"{% endif %}>
+  {# os exemplos são buscados de verdade em test_search_hint_examples_find_services #}
+  <p id="search-hint" class="search-hint">Digite parte do nome do serviço. Exemplos: CPF, seguro-desemprego, FGTS, pensão por morte, CNH, aposentadoria.</p>
+  <input type="search" name="q" id="id_q" value="{{ form.q.value|default:'' }}" minlength="2" maxlength="100" required aria-describedby="search-hint{% if form.errors %} search-errors" aria-invalid="true{% endif %}">
   <button type="submit">Buscar</button>
 </form>
 

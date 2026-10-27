@@ -28,6 +28,21 @@ def test_search_without_term_shows_only_the_form(loaded: dict[str, int], client:
     assert "Resultados" not in html and "Erro:" not in html
 
 
+def test_search_hint_describes_the_field(loaded: dict[str, int], client: Client) -> None:
+    html = _html(client, SEARCH)
+    assert '<p id="search-hint" class="search-hint">Digite parte do nome do serviço.' in html
+    assert 'aria-describedby="search-hint"' in html
+    errors = _html(client, SEARCH, q="c")
+    assert 'aria-describedby="search-hint search-errors" aria-invalid="true"' in errors
+
+
+def test_search_hint_examples_find_services(loaded: dict[str, int], client: Client) -> None:
+    hint = re.search(r"Exemplos: ([^<]+)\.</p>", _html(client, SEARCH))
+    assert hint is not None
+    for example in hint.group(1).split(", "):
+        assert _result_slugs(_html(client, SEARCH, q=example)), example
+
+
 def test_search_matches_title_case_insensitively_ordered_by_title(
     loaded: dict[str, int], client: Client
 ) -> None:
