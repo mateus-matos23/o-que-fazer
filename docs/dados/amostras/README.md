@@ -76,3 +76,24 @@ Mesmo método da coleta de 10/10, com duas diferenças: o extrato de texto desca
 - **Ident-MA** (`agendamento.ssp.ma.gov.br`): a página é só um formulário de agendamento (nome, nome da mãe, CPF, cidade, serviço, data). Não traz requisitos, documentos nem taxa da 2ª via da CIN. Não serve como fonte de requisitos.
 - **TSE / TRE-MA** (2ª via do título e transferência de domicílio eleitoral): o autor não localizou as páginas.
 - **Registro de nascimento em cartório** (TJMA): o autor não localizou uma página de orientação ao cidadão.
+
+## Coleta de 27/10/2026
+
+Mesmo método da coleta de 24/10/2026, para decidir os assuntos Família, Veículo e um quinto assunto ([jornadas candidatas](../evidencias/jornadas-candidatas.md)).
+
+| arquivo | fonte | tipo | HTTP | data da coleta | "Última Modificação" declarada | sha256 (só HTML) |
+| --- | --- | --- | --- | --- | --- | --- |
+| `html-govbr-pensao-morte-urbana.md` | https://www.gov.br/pt-br/servicos/solicitar-pensao-por-morte-urbana | HTML (trecho) | 200 | 2026-10-27T09:52:12-03:00 | Última Modificação: 19/08/2026 | `6480888081e0a18a2671e2b5b8cd7f869e9095d14e3aa0080ca16725f0062b9d` |
+| `html-govbr-pensao-morte-rural.md` | https://www.gov.br/pt-br/servicos/solicitar-pensao-por-morte-rural | HTML (trecho) | 200 | 2026-10-27T09:52:54-03:00 | Última Modificação: 19/08/2026 | `70a7c618a16f733dbc9078ea6334058b404acf7585ad67519b7a3094a38e177a` |
+| `html-govbr-certidao-inexistencia-dependentes.md` | https://www.gov.br/pt-br/servicos/solicitar-certidao-de-inexistencia-de-dependentes-habilitados-a-pensao-por-morte | HTML (trecho) | 200 | 2026-10-27T09:53:01-03:00 | Última Modificação: 19/08/2026 | `70335145365359b1acbb43b48452d88182a98faad5ef77594e281351da00b55d` |
+| `html-govbr-aposentadoria-idade-urbano.md` | https://www.gov.br/pt-br/servicos/solicitar-aposentadoria-por-idade-trabalhador-urbano | HTML (trecho) | 200 | 2026-10-27T09:58:05-03:00 | Última Modificação: 12/08/2026 | `b52009a6a9a0691561ef7ea6b2a3df5fc944b411b00f2721fb990c9bcec28e98` |
+| `html-govbr-aposentadoria-tempo-contribuicao.md` | https://www.gov.br/pt-br/servicos/solicitar-aposentadoria-por-tempo-de-contribuicao | HTML (trecho) | 200 | 2026-10-27T09:57:36-03:00 | Última Modificação: 12/08/2026 | `78df3737f8c077e5dd1d33ecac8cc14ce798fa2356cd14ad2f8ac6dc5185ed64` |
+| `html-govbr-extrato-cnis.md` | https://www.gov.br/pt-br/servicos/emitir-extrato-de-contribuicao-cnis | HTML (trecho) | 200 | 2026-10-27T09:58:06-03:00 | Última Modificação: 13/08/2026 | `0fbebf6e4fe0c1d65a8f18ad671646e26f43ff986dfc92f46a298348d920a996` |
+| `html-govbr-simular-aposentadoria.md` | https://www.gov.br/pt-br/servicos/simular-aposentadoria | HTML (trecho) | 200 | 2026-10-27T09:58:08-03:00 | Última Modificação: 20/08/2026 | `a11f965366aa468d40ca555c0d9411caf3ba844441f67eefafdcba5b604b859e` |
+
+### Falhas em 27/10/2026
+
+- **DETRAN-MA, ids 19272, 19281, 19279 e 19481**: HTTP 200, mas ainda com o aviso de defeso eleitoral (`Capa_de_site-aviso_de_suspensao.png`) no lugar do conteúdo. A transferência digital (id 23692) continua com o texto completo.
+- **Planalto** (`planalto.gov.br/ccivil_03/leis/l9534.htm` e `l6015compilada.htm`): conexão encerrada pelo servidor (`curl: (56)`), também com `--tlsv1.2`. Sem amostra das leis do registro de nascimento.
+- **gov.br, slugs inexistentes (404)**: `registrar-nascimento`, `obter-certidao-de-obito`, `sacar-o-fgts-em-caso-de-falecimento-do-trabalhador`, `solicitar-o-bolsa-familia`, `solicitar-aposentadoria-por-idade-trabalhador-rural`. Os slugs foram tentados por padrão de nome, não tirados de links; 404 não prova que o serviço não exista com outro endereço.
+- **FGTS, `saque-falecimento.aspx`**: HTTP 200, mas o texto do serviço não vem no HTML (só o menu).
