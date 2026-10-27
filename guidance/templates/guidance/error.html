@@ -3,5 +3,5 @@
 {% block content %}
 <h1>Não foi possível continuar</h1>
 <div class="notice"><p>{{ message }}</p></div>
-<p><a class="button" href="{% url 'guidance:home' %}">Voltar ao início</a></p>
+<div class="actions"><a class="button" href="{% url 'guidance:home' %}">Voltar ao início</a></div>
 {% endblock %}

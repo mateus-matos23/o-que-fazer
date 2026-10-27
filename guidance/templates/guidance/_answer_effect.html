@@ -1,7 +1,7 @@
 {% if effect %}
 <div class="answer-effect">
   {% if effect.entered %}
-  <p>Por causa dessa resposta, entrou no seu plano:</p>
+  <p class="entered">Por causa dessa resposta, entrou no seu plano:</p>
   <ul>{% for title in effect.entered %}<li>{{ title }}</li>{% endfor %}</ul>
   {% endif %}
   {% if effect.left %}

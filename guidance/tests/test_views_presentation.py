@@ -275,17 +275,17 @@ def _journey_steps(current: str, preference: object = None) -> list[tuple[str, s
 @pytest.mark.parametrize(
     ("current", "preference", "expected"),
     [
-        ("questions", None, ["done", "current", "next", "next"]),
-        ("preference", None, ["done", "done", "current", "next"]),
-        ("plan", object(), ["done", "done", "done", "current"]),
-        ("plan", None, ["done", "done", "next", "current"]),  # plano sem preferência escolhida
+        ("questions", None, ["current", "next", "next"]),
+        ("preference", None, ["done", "current", "next"]),
+        ("plan", object(), ["done", "done", "current"]),
+        ("plan", None, ["done", "next", "current"]),  # plano sem preferência escolhida
     ],
 )
 def test_journey_steps_mark_done_and_current(
     current: str, preference: object, expected: list[str]
 ) -> None:
     steps = _journey_steps(current, preference)
-    assert [label for _, label in steps] == ["Assunto", "Perguntas", "Atendimento", "Plano"]
+    assert [label for _, label in steps] == ["Perguntas", "Atendimento", "Plano"]
     assert [state for state, _ in steps] == expected
 
 

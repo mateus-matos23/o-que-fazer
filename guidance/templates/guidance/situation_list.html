@@ -10,5 +10,8 @@
   <li>Nenhuma situação disponível.</li>
   {% endfor %}
 </ul>
-<p class="search-link">Já sabe qual serviço procura? <a href="{% url 'guidance:search' %}">Onde resolvo?</a></p>
+<section class="search-cta" aria-labelledby="search-cta-title">
+  <h2 id="search-cta-title">Já sabe qual serviço procura?</h2>
+  <a class="button secondary" href="{% url 'guidance:search' %}">Buscar pelo nome do serviço</a>
+</section>
 {% endblock %}

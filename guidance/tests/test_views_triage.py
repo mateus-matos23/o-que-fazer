@@ -41,7 +41,9 @@ def test_root_lists_the_six_situations(loaded: dict[str, int], client: Client) -
     for slug, label in SITUATIONS.items():
         assert f'href="/s/{slug}/"' in html and f"<span>{label}</span>" in html
     assert "/fora-da-cobertura/" not in html and "Ver todas as situações" not in html
-    assert 'href="/onde-resolvo/"' in html
+    assert (
+        '<a class="button secondary" href="/onde-resolvo/">Buscar pelo nome do serviço</a>' in html
+    )
     assert "Voltar ao início" not in html
 
 

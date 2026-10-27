@@ -2,7 +2,7 @@
 {% block title %}{% if form.errors %}Erro: {% endif %}Onde resolvo? - O que Fazer?{% endblock %}
 {% block content %}
 <h1>Onde resolvo?</h1>
-<p>Já sabe qual serviço procura? Busque pelo nome para ver o órgão, os canais, os requisitos e a fonte oficial.</p>
+<p class="lead">Digite o nome do serviço para ver o órgão, os canais, o que levar e a fonte oficial.</p>
 <form method="get" class="search-form" role="search">
   {% if form.errors %}
   <div id="search-errors" class="errors" tabindex="-1" autofocus>
