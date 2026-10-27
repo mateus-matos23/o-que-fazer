@@ -35,7 +35,7 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 9 | Redesenho visual "azulejo": paleta, triagem ilustrada, etapas da conversa e plano como linha do tempo | Consolidado (26/10/2026) |
 | 10 | Aderência às práticas das skills do projeto: logging, HTTPS, retenção de sessões, cache do catálogo e refactors | Consolidado (26/10/2026) |
 | 11 | Critério de JS e dependências, varredura com axe-core, texto de 16 px e alvos de 44 px, e VLibras a pedido | Consolidado (26/10/2026) |
-| 12 | Novas jornadas: transferência de veículo, falecimento na família e aposentadoria | Consolidado (27/10/2026), com pendências de carga e navegador (ver Fase 12) |
+| 12 | Novas jornadas: transferência de veículo, falecimento na família e aposentadoria | Consolidado (27/10/2026) |
 
 ## Decisões tomadas em 24/10/2026 (aprovadas pelo autor)
 
@@ -587,7 +587,8 @@ Limites conhecidos desta fase:
 - A amostra do DETRAN-MA (id 23692) foi recoletada em 27/10/2026, com hash novo (ver [amostras](../dados/amostras/README.md#coleta-de-27102026)).
 - Nenhum `DEADLINE` foi criado a partir de tempos de espera ou de etapa: as páginas do INSS trazem esses tempos, mas não o prazo de resposta do pedido.
 - Novo ícone da triagem `retirement` (migração `0007_alter_triagechoice_icon`), para o assunto aposentadoria. O banco precisa da migração e da carga de conteúdo para exibi-lo, como nas demais mudanças de ícone da [Fase 9b](#fase-9--redesenho-visual).
-- **Pendente:** carga real no `oqf_dev` com as três jornadas e verificação no navegador delas. Nenhuma das duas foi feita até esta atualização.
+- **Carga real e navegador (27/10/2026).** No `oqf_dev`: migração 0007, `load_sources`, `fetch_sources` das 9 fontes novas (todas OK) e `load_content`, que confere cada trecho na página baixada; todos os trechos foram encontrados nas páginas ao vivo. No Chromium headless, em 320 px e 1280 px, um roteiro por CDP percorreu a triagem, os planos e a edição de respostas das três jornadas: 34 verificações sem falha, sem rolagem horizontal e sem erro de console além do `favicon.ico` ausente (404). A varredura com axe-core não rodou, porque o `node_modules` não estava instalado. Leitor de tela, teclado e foco não foram verificados.
+- O botão flutuante do VLibras cobre parte do texto à direita em 320 px (por exemplo, "Trabalho ou emprego" no início). Vem da Fase 11, não destas jornadas.
 - **Pendente:** confirmação da mudança de escopo com o orientador.
 
 ## Limitações conhecidas

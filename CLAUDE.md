@@ -6,7 +6,7 @@ O sistema é **orientativo**: não executa serviços, não autentica nos portais
 
 ## Fase atual
 
-Fases 0 a 7 concluídas (núcleo, três jornadas, interface com meta WCAG 2.2 AA, busca "Onde resolvo?" e conversa guiada: funil de triagem, efeito da resposta, preferência de atendimento e plano com "Comece por aqui"). Fase 12 (novas jornadas) concluída: seis jornadas no total, com CPF irregular, perda de documentos, desligamento do trabalho, transferência de veículo, falecimento na família e aposentadoria; carga em `oqf_dev` e verificação no navegador das novas jornadas seguem pendentes. RF02 (texto livre) segue pendente. Antes de implementar algo, confira a documentação em `docs/` e as decisões em aberto em `docs/pendencias.md`.
+Fases 0 a 7 concluídas (núcleo, três jornadas, interface com meta WCAG 2.2 AA, busca "Onde resolvo?" e conversa guiada: funil de triagem, efeito da resposta, preferência de atendimento e plano com "Comece por aqui"). Fase 12 (novas jornadas) concluída: seis jornadas no total, com CPF irregular, perda de documentos, desligamento do trabalho, transferência de veículo, falecimento na família e aposentadoria. RF02 (texto livre) segue pendente. Antes de implementar algo, confira a documentação em `docs/` e as decisões em aberto em `docs/pendencias.md`.
 
 ## Comandos
 
