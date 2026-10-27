@@ -43,10 +43,11 @@ def _html(client: Client, url: str) -> str:
 def test_plan_shows_step_details(loaded: dict[str, int], client: Client) -> None:
     _answer(client, "suspenso")
     html = _html(client, PLAN)
-    assert "orientativo" in html and "não executa serviços" in html
-    assert 'href="#etapa-regularizar-cpf-suspenso"' in html
+    assert "Orientação a partir das suas respostas. Quem confirma é o órgão." in html
+    assert 'id="etapa-regularizar-cpf-suspenso"' in html
     assert "<h2>" in html and "Por que esta etapa" in html
-    assert 'class="step-layer"' not in html  # um só passo: sem número nos cards
+    assert 'class="layer-number"' not in html  # um só passo: sem número nos cards
+    assert "<strong>Onde:</strong> Receita Federal" in html
     assert "Formulário online para regularizar CPF suspenso." in html
     assert "Online:" in html and "Presencial:" in html  # tipo legível
     assert (
@@ -61,7 +62,7 @@ def test_plan_shows_step_details(loaded: dict[str, int], client: Client) -> None
     assert "(site oficial)" in html
     assert "Coletado em 09/10/2026 21:00" in html  # RN12
     assert "Atualizado pelo órgão em" in html
-    assert "Revisar respostas" in html and "Recomeçar" in html
+    assert "Rever respostas" in html and "Recomeçar" in html
 
 
 def test_empty_plan_message() -> None:
@@ -198,18 +199,10 @@ def test_recommended_is_marked_as_suggestion() -> None:
             "undetermined": [],
         },
     )
-    assert "Faça depois de:" in html and "a (sugestão)" in html
+    assert "<strong>Depois de:</strong> a (sugestão)" in html
 
 
-def _block(html: str, heading_id: str) -> str:
-    match = re.search(
-        rf'<section class="[^"]*" aria-labelledby="{heading_id}">(.*?)</section>', html, re.S
-    )
-    assert match, heading_id
-    return match.group(1)
-
-
-def test_start_here_lists_first_layer_of_real_journey(
+def test_real_journey_starts_with_every_first_layer_step(
     loaded: dict[str, int], client: Client
 ) -> None:
     perda = "/s/perda-de-documentos/"
@@ -218,30 +211,23 @@ def test_start_here_lists_first_layer_of_real_journey(
     )
     assert response.status_code == 303
     client.post(perda, {"question": "declarou-imposto-de-renda", "answer": "sim"})
-    start = _block(_html(client, perda + "plano/"), "comece-por-aqui")
-    assert "Pode começar por qualquer uma destas:" in start
-    assert '<a href="#etapa-registrar-ocorrencia-extravio">' in start
-    assert '<a href="#etapa-segunda-via-cin">' in start
-    assert '<a href="#etapa-segunda-via-cpf">' in start
-    assert "#etapa-segunda-via-cnh" not in start  # depende do B.O. (camada 2)
+    html = _html(client, perda + "plano/")
+    assert '<p class="plan-summary">2 passos. Comece pelo 1.</p>' in html
+    first, second = html.split('<span class="layer-number">')[1:]
+    assert "Comece aqui" in first and "Pode fazer em qualquer ordem" in first
+    for slug in ("registrar-ocorrencia-extravio", "segunda-via-cin", "segunda-via-cpf"):
+        assert f'id="etapa-{slug}"' in first
+    assert 'id="etapa-segunda-via-cnh"' in second  # depende do B.O. (camada 2)
+    assert "RG atual, caso possua." in html  # requisitos seguem no detalhe de cada etapa
 
 
-def test_start_here_single_step_in_real_journey(loaded: dict[str, int], client: Client) -> None:
-    _answer(client, "suspenso")
-    start = _block(_html(client, PLAN), "comece-por-aqui")
-    assert '<p><a href="#etapa-regularizar-cpf-suspenso">' in start
-    assert "qualquer uma destas" not in start
-
-
-def test_prepare_has_one_group_per_step_with_requirements(
+def test_step_button_goes_to_the_official_online_channel(
     loaded: dict[str, int], client: Client
 ) -> None:
-    perda = "/s/perda-de-documentos/"
-    client.post(perda, {"question": "documentos-perdidos", "answer": ["cpf", "cin", "cnh"]})
-    client.post(perda, {"question": "declarou-imposto-de-renda", "answer": "sim"})
-    prepare = _block(_html(client, perda + "plano/"), "o-que-separar-antes")
-    assert prepare.count("<h3>") == 4  # um grupo por etapa, na ordem do plano
-    assert prepare.index("Solicitar a Carteira de Identidade") < prepare.index(
-        "Solicitar a segunda via da CNH"
+    _answer(client, "suspenso")
+    card = _html(client, PLAN).split('<article id="etapa-regularizar-cpf-suspenso"')[1]
+    button = card.split("<details>")[0]
+    assert (
+        '<a class="button" href="https://servicos.receita.fazenda.gov.br/Servicos/CPF/'
+        'regularizar/Default.asp" rel="noopener">Ir para o site oficial' in button
     )
-    assert "RG atual, caso possua." in prepare

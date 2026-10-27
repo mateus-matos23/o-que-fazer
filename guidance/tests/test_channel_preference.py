@@ -147,8 +147,8 @@ def test_change_link_leads_to_page_with_current_option(
     _answer(client)
     client.post(PREFERENCE, {"preference": "presencial"})
     plan = client.get(PLAN).text
-    assert "Canais ordenados pela sua preferência: Pessoalmente." in plan
-    assert f'<a href="{PREFERENCE}">Mudar</a>' in plan
+    assert "Atendimento preferido: Pessoalmente." in plan
+    assert f'<a href="{PREFERENCE}">Mudar<span class="visually-hidden">' in plan
     assert _checked(client.get(PREFERENCE).text) == ["presencial"]
 
 
@@ -159,7 +159,7 @@ def test_plan_without_preference_or_tanto_faz_shows_only_the_link(
     for _ in range(2):
         plan = client.get(PLAN).text
         assert "Escolher como prefere ser atendido" in plan
-        assert "Canais ordenados pela sua preferência" not in plan
+        assert "Atendimento preferido" not in plan
         client.post(PREFERENCE, {"preference": "tanto-faz"})
 
 

@@ -221,7 +221,7 @@ MAYBE = "Pode valer para você:"
 def test_plan_marks_undetermined_items_with_visible_text() -> None:
     html = _render(_plan_catalog(), {"q": UNKNOWN})
     assert f'<span class="maybe">{MAYBE}</span> quando-q' in html
-    assert html.count(MAYBE) == 3  # requisito em "separar antes" e na etapa; canal na etapa
+    assert html.count(MAYBE) == 2  # requisito e canal, no detalhe da etapa
 
 
 def test_plan_hides_not_applicable_items_everywhere() -> None:
@@ -232,12 +232,6 @@ def test_plan_hides_not_applicable_items_everywhere() -> None:
     assert "Doc comum" in html
     assert "Doc escondido" not in html and "Canal oculto" not in html
     assert MAYBE not in html
-
-
-def test_prepare_section_skips_step_whose_items_are_all_hidden() -> None:
-    proc = _proc("p", (_req("Doc escondido", WHEN_Q),))
-    html = _render(f.catalog(QUESTIONS, (proc,)), NO)
-    assert "O que separar antes" not in html
 
 
 def test_all_hidden_shows_notice_instead_of_not_informed() -> None:

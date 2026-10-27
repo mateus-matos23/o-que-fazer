@@ -6,17 +6,26 @@ from django.contrib.staticfiles import finders
 from django.template.loader import render_to_string
 from django.test import Client
 
-from guidance.engine.model import Catalog, Facts, ProcedureDef, RequirementDef
+from guidance.engine.channels import PREFERENCES
+from guidance.engine.model import (
+    Catalog,
+    ChannelDef,
+    ChannelKind,
+    Facts,
+    ProcedureDef,
+    RequirementDef,
+    Tri,
+)
 from guidance.engine.plan import build_plan
 from guidance.forms import AnswerForm
-from guidance.presentation import plan_context
+from guidance.presentation import channel_lines, plan_context, primary_channel
 from guidance.tests import factories as f
 
 pytestmark = pytest.mark.django_db
 
 URL = "/s/cpf-irregular/"
 QUESTION = "cpf-situacao-cadastral"
-NOTE = "Podem ser feitas em qualquer ordem"
+NOTE = "Pode fazer em qualquer ordem"
 
 
 def _html(client: Client, url: str) -> str:
@@ -100,12 +109,30 @@ def test_help_text_and_errors_are_both_described() -> None:
     assert '<fieldset aria-describedby="question-help form-errors">' in html
 
 
-def test_route_groups_steps_by_layer_and_notes_only_parallel_groups() -> None:
-    route = _plan_html().split('<ol class="route">')[1].split("</ol>")[0]
-    first, second = route.split('<span class="route-number">')[1:]
-    assert "</span>1</span>" in first and 'href="#etapa-a"' in first and NOTE not in first
-    assert "</span>2</span>" in second and NOTE in second
-    assert 'href="#etapa-b"' in second and 'href="#etapa-c"' in second
+def _layers(html: str) -> list[str]:
+    return html.split('<ol class="layers">')[1].split("</ol>")[0].split("<li>\n")[1:]
+
+
+def test_layers_number_steps_and_note_only_parallel_groups() -> None:
+    html = _plan_html()
+    assert '<p class="plan-summary">2 passos. Comece pelo 1.</p>' in html
+    first, second = _layers(html)
+    assert "</span>1</span>" in first and "Comece aqui" in first and NOTE not in first
+    assert 'id="etapa-a"' in first
+    assert "</span>2</span>" in second and "Comece aqui" not in second and NOTE in second
+    assert 'id="etapa-b"' in second and 'id="etapa-c"' in second
+
+
+def test_single_step_has_no_layer_head() -> None:
+    html = _render_plan(f.catalog((), (_procedure("a"),)))
+    assert '<p class="plan-summary">1 passo.</p>' in html
+    assert "layer-head" not in html and "Comece aqui" not in html
+
+
+def test_single_parallel_layer_notes_order_without_number() -> None:
+    html = _render_plan(f.catalog((), (_procedure("a"), _procedure("b"))))
+    assert '<p class="plan-summary">1 passo.</p>' in html
+    assert NOTE in html and "layer-number" not in html and "Comece aqui" not in html
 
 
 def _procedure(slug: str, *requirements: str) -> ProcedureDef:
@@ -116,54 +143,13 @@ def _procedure(slug: str, *requirements: str) -> ProcedureDef:
     )
 
 
-def _section(html: str, heading_id: str) -> str:
-    match = re.search(
-        rf'<section class="[^"]*" aria-labelledby="{heading_id}">(.*?)</section>', html, re.S
-    )
-    assert match, heading_id
-    return match.group(1)
-
-
-def test_start_here_with_single_first_step_links_it() -> None:
-    catalog = f.catalog((), (_procedure("a"), _procedure("b")), dependencies=(f.dep("a", "b"),))
-    html = _render_plan(catalog)
-    start = _section(html, "comece-por-aqui")
-    assert '<h2 id="comece-por-aqui">Comece por aqui</h2>' in start
-    assert '<a href="#etapa-a">a</a>' in start
-    assert "qualquer uma destas" not in html
-
-
-def test_start_here_lists_every_first_layer_step() -> None:
-    catalog = f.catalog(
-        (), (_procedure("a"), _procedure("b"), _procedure("c")), dependencies=(f.dep("a", "c"),)
-    )
-    start = _section(_render_plan(catalog), "comece-por-aqui")
-    assert "Pode começar por qualquer uma destas:" in start
-    assert '<a href="#etapa-a">a</a>' in start and '<a href="#etapa-b">b</a>' in start
-    assert "#etapa-c" not in start
-
-
-def test_start_here_absent_without_steps() -> None:
-    catalog = f.catalog((), (f.procedure("p"),), candidates=())
-    html = _render_plan(catalog)
-    assert "Nenhuma providência" in html
-    assert "Comece por aqui" not in html and "start-here" not in html
-
-
-def test_prepare_groups_requirements_by_step_in_order() -> None:
-    catalog = f.catalog(
-        (),
-        (_procedure("a", "Documento A1", "Documento A2"), _procedure("b", "Documento B")),
-        dependencies=(f.dep("a", "b"),),
-    )
-    prepare = _section(_render_plan(catalog), "o-que-separar-antes")
-    assert (
-        prepare.index("<h3>a</h3>") < prepare.index("Documento A1") < prepare.index("Documento A2")
-    )
-    assert (
-        prepare.index("Documento A2") < prepare.index("<h3>b</h3>") < prepare.index("Documento B")
-    )
-    assert "Documento A1" in prepare and "Documento B" in prepare
+def test_each_step_keeps_its_details_collapsed() -> None:
+    html = _plan_html()
+    for card in html.split('<article id="etapa-')[1:]:
+        details = card.split("<details>")[1].split("</details>")[0]
+        assert details.lstrip().startswith("<summary>Ver detalhes")
+        assert '<dl class="facts">' in details and "<dt>Fonte</dt>" in details
+    assert html.count("<details>") == 3 and "<details open" not in html
 
 
 def test_identical_requirement_is_not_merged_across_steps() -> None:
@@ -172,31 +158,67 @@ def test_identical_requirement_is_not_merged_across_steps() -> None:
         (_procedure("a", "RG original"), _procedure("b", "RG original")),
         dependencies=(f.dep("a", "b"),),
     )
-    html = _render_plan(catalog)
-    prepare = _section(html, "o-que-separar-antes")
-    assert prepare.count("<li>RG original</li>") == 2
-    assert prepare.count("<h3>") == 2
-    assert html.count("<li>RG original</li>") == 4  # também segue na etapa (RF12)
+    assert _render_plan(catalog).count("<li>RG original</li>") == 2  # um por etapa (RF12)
 
 
-def test_step_without_requirement_stays_out_of_prepare() -> None:
-    catalog = f.catalog(
-        (), (_procedure("a", "Documento"), _procedure("b")), dependencies=(f.dep("a", "b"),)
-    )
-    prepare = _section(_render_plan(catalog), "o-que-separar-antes")
-    assert "<h3>a</h3>" in prepare and "<h3>b</h3>" not in prepare
-
-
-def test_prepare_absent_without_requirements() -> None:
-    catalog = f.catalog((), (_procedure("a"), _procedure("b")), dependencies=(f.dep("a", "b"),))
-    html = _render_plan(catalog)
-    assert "O que separar antes" not in html and "prepare" not in html
-
-
-def test_print_hint_is_plain_text_without_script() -> None:
+def test_plan_drops_repeated_sections_and_needs_no_script() -> None:
     html = _plan_html()
-    assert "Para guardar este plano, use a opção de imprimir do navegador." in html
+    for removed in (
+        "Comece por aqui",
+        "O que separar antes",
+        "Resumo",
+        "imprimir",
+        "journey-steps",
+    ):
+        assert removed not in html, removed
     assert re.findall(r"<script[^>]*>", html) == [LIBRAS_SCRIPT] and "onclick" not in html
+
+
+def test_empty_plan_has_no_summary_or_layers() -> None:
+    html = _render_plan(f.catalog((), (f.procedure("p"),), candidates=()))
+    assert "Nenhuma providência" in html
+    assert "plan-summary" not in html and 'class="layers"' not in html
+
+
+def _channel(name: str, kind: ChannelKind = "ONLINE", url: str = "https://x.gov.br") -> ChannelDef:
+    return ChannelDef(kind, name, url, f.CITATION)
+
+
+@pytest.mark.parametrize(
+    ("pairs", "preference", "expected"),
+    [
+        (((_channel("site"), Tri.APPLICABLE),), None, "site"),
+        # a preferência reordena os canais e o botão segue a nova ordem
+        (
+            ((_channel("site"), Tri.APPLICABLE), (_channel("balcão", "IN_PERSON"), Tri.APPLICABLE)),
+            "presencial",
+            "balcão",
+        ),
+        # canal sem endereço não vira botão
+        (
+            ((_channel("fone", "PHONE", ""), Tri.APPLICABLE), (_channel("site"), Tri.APPLICABLE)),
+            None,
+            "site",
+        ),
+        # canal que só "pode valer" (regra indeterminada) também não
+        (
+            (
+                (replace(_channel("talvez"), rule=f.rule("r")), Tri.UNDETERMINED),
+                (_channel("site"), Tri.APPLICABLE),
+            ),
+            None,
+            "site",
+        ),
+        (((_channel("fone", "PHONE", ""), Tri.APPLICABLE),), None, None),
+        ((), None, None),
+    ],
+)
+def test_primary_channel_is_first_preferred_channel_with_url(
+    pairs: tuple[tuple[ChannelDef, Tri], ...], preference: str | None, expected: str | None
+) -> None:
+    lines = channel_lines(pairs, PREFERENCES[preference] if preference else None)
+    chosen = primary_channel(lines)
+    assert (chosen.channel.description if chosen else None) == expected
 
 
 LIBRAS_SCRIPT = '<script type="module" src="/static/guidance/libras.js">'
@@ -259,10 +281,8 @@ def _stylesheet() -> str:
         return handle.read()
 
 
-def _journey_steps(current: str, preference: object = None) -> list[tuple[str, str]]:
-    html = render_to_string(
-        "guidance/_journey_steps.html", {"current": current, "preference": preference}
-    )
+def _journey_steps(current: str) -> list[tuple[str, str]]:
+    html = render_to_string("guidance/_journey_steps.html", {"current": current})
     return [
         (
             "current" if "aria-current" in attrs else "done" if "(concluída)" in rest else "next",
@@ -273,18 +293,14 @@ def _journey_steps(current: str, preference: object = None) -> list[tuple[str, s
 
 
 @pytest.mark.parametrize(
-    ("current", "preference", "expected"),
+    ("current", "expected"),
     [
-        ("questions", None, ["current", "next", "next"]),
-        ("preference", None, ["done", "current", "next"]),
-        ("plan", object(), ["done", "done", "current"]),
-        ("plan", None, ["done", "next", "current"]),  # plano sem preferência escolhida
+        ("questions", ["current", "next", "next"]),
+        ("preference", ["done", "current", "next"]),
     ],
 )
-def test_journey_steps_mark_done_and_current(
-    current: str, preference: object, expected: list[str]
-) -> None:
-    steps = _journey_steps(current, preference)
+def test_journey_steps_mark_done_and_current(current: str, expected: list[str]) -> None:
+    steps = _journey_steps(current)
     assert [label for _, label in steps] == ["Perguntas", "Atendimento", "Plano"]
     assert [state for state, _ in steps] == expected
 

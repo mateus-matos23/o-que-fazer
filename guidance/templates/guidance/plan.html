@@ -2,106 +2,68 @@
 {% block title %}Seu plano - {{ catalog.situation_title }} - O que Fazer?{% endblock %}
 {% block content %}
 <p class="context-link"><a href="{% url 'guidance:question' catalog.situation_slug %}">{{ catalog.situation_title }}</a></p>
-{% include "guidance/_journey_steps.html" with current="plan" %}
-{% include "guidance/_answer_effect.html" %}
 <h1>Seu plano</h1>
-<div class="plan-intro">
-<p class="disclaimer">Este sistema é apenas orientativo. Ele não executa serviços nem confirma direitos; confira sempre na fonte oficial.</p>
-<p class="muted print-hint">Para guardar este plano, use a opção de imprimir do navegador.</p>
-
-<p class="channel-preference">
-  {% if preference and preference.kinds %}Canais ordenados pela sua preferência: {{ preference.label }}.
-  <a href="{% url 'guidance:channel_preference' catalog.situation_slug %}">Mudar</a>
-  {% else %}<a href="{% url 'guidance:channel_preference' catalog.situation_slug %}">Escolher como prefere ser atendido</a>{% endif %}
-</p>
+{% regroup steps by step.layer as layers %}
+{% if steps %}<p class="plan-summary">{{ layers|length }} passo{{ layers|length|pluralize }}.{% if layers|length > 1 %} Comece pelo 1.{% endif %}</p>{% endif %}
+{% include "guidance/_answer_effect.html" %}
+<div class="plan-meta">
+  <p class="disclaimer">Orientação a partir das suas respostas. Quem confirma é o órgão.</p>
+  <p class="channel-preference">
+    {% if preference and preference.kinds %}Atendimento preferido: {{ preference.label }}.
+    <a href="{% url 'guidance:channel_preference' catalog.situation_slug %}">Mudar<span class="visually-hidden"> a preferência de atendimento</span></a>
+    {% else %}<a href="{% url 'guidance:channel_preference' catalog.situation_slug %}">Escolher como prefere ser atendido</a>{% endif %}
+  </p>
 </div>
 
-{% if start_steps %}
-<section class="start-here" aria-labelledby="comece-por-aqui">
-  <h2 id="comece-por-aqui">Comece por aqui</h2>
-  {% if start_steps|length == 1 %}
-  <p><a href="#etapa-{{ start_steps.0.step.procedure.slug }}">{{ start_steps.0.step.procedure.title }}</a></p>
-  {% else %}
-  <p>Pode começar por qualquer uma destas:</p>
-  <ul>
-    {% for item in start_steps %}<li><a href="#etapa-{{ item.step.procedure.slug }}">{{ item.step.procedure.title }}</a></li>{% endfor %}
-  </ul>
-  {% endif %}
-</section>
-{% endif %}
-
-{% if uncovered %}
-<section id="limite-de-cobertura" class="notice">
-  <h2>Limite de cobertura</h2>
-  <p>Não encontramos orientação oficial para esta resposta nesta versão. As etapas abaixo não cobrem esse caso.</p>
-  <ul>
-    {% for line in uncovered %}<li>{{ line.question_text }} Você respondeu: {{ line.option_label }}.</li>{% endfor %}
-  </ul>
-</section>
-{% endif %}
-
 {% if steps %}
-<nav aria-label="Resumo do plano">
-  <h2>Resumo</h2>
-  {% regroup steps by step.layer as layers %}
-  <ol class="route">
-    {% for group in layers %}
-    <li>
-      <span class="route-number"><span class="visually-hidden">Passo </span>{{ group.grouper }}</span>
-      <ul class="route-items">
-        {% for item in group.list %}
-        <li><a href="#etapa-{{ item.step.procedure.slug }}">{{ item.step.procedure.title }}</a></li>
-        {% endfor %}
-      </ul>
-      {% if group.list|length > 1 %}<p class="route-note">Podem ser feitas em qualquer ordem</p>{% endif %}
-    </li>
-    {% endfor %}
-  </ol>
-</nav>
-
-{% if requirement_steps %}
-<section class="prepare" aria-labelledby="o-que-separar-antes">
-  <h2 id="o-que-separar-antes">O que separar antes</h2>
-  {% for item in requirement_steps %}
-  <h3>{{ item.step.procedure.title }}</h3>
-  <ul>
-    {% for requirement in item.requirements %}<li>{% include "guidance/_maybe.html" with maybe=requirement.maybe %}{{ requirement.description }}</li>{% endfor %}
-  </ul>
+<ol class="layers">
+  {% for group in layers %}
+  <li>
+    {% if layers|length > 1 or group.list|length > 1 %}
+    <div class="layer-head">
+      {% if layers|length > 1 %}<span class="layer-number"><span class="visually-hidden">Passo </span>{{ group.grouper }}</span>{% endif %}{# com um só passo, o número sozinho parece erro #}
+      <p class="layer-label{% if group.grouper == 1 %} start{% endif %}">{% if group.grouper == 1 and layers|length > 1 %}Comece aqui{% endif %}{% if group.list|length > 1 %}<span class="layer-note">Pode fazer em qualquer ordem</span>{% endif %}</p>
+    </div>
+    {% endif %}
+    <div class="layer-steps">
+      {% for item in group.list %}
+      {% with step=item.step procedure=item.step.procedure %}
+      <article id="etapa-{{ procedure.slug }}" class="step" data-slug="{{ procedure.slug }}">
+        <h2>{{ procedure.title }}</h2>
+        <p>{{ procedure.description }}</p>
+        <p class="step-where"><strong>Onde:</strong> {{ procedure.agency_name }}</p>
+        {% if item.after %}
+        <p class="step-after"><strong>Depois de:</strong> {% for line in item.after %}{{ line.title }}{% if line.suggestion %} (sugestão){% endif %}{% if not forloop.last %}; {% endif %}{% endfor %}</p>
+        {% endif %}
+        {% if step.clarifies %}
+        <div class="step-clarify">
+          <p>Você respondeu "Não sei" para: {{ step.clarifies.text }} Descubra a resposta e volte para continuar.</p>
+          <a class="edit-answer" href="{% url 'guidance:edit_answer' catalog.situation_slug step.clarifies.slug %}">Alterar essa resposta</a>
+        </div>
+        {% endif %}
+        {% if item.primary_channel %}
+        <a class="button" href="{{ item.primary_channel.channel.url }}" rel="noopener">Ir para o site oficial<span class="visually-hidden">: {{ procedure.title }}</span></a>
+        {% endif %}
+        <details>
+          <summary>Ver detalhes<span class="visually-hidden">: {{ procedure.title }}</span></summary>
+          {% if step.reasons %}
+          <h3>Por que esta etapa</h3>
+          <ul>
+            {% for rule in step.reasons %}<li>{{ rule.explanation }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+          {% if item.required_for %}
+          <p>Necessária antes de: {{ item.required_for|join:", " }}</p>
+          {% endif %}
+          {% include "guidance/_procedure_facts.html" with requirements=item.requirements channels=item.channels costs=item.costs deadlines=item.deadlines channel_notice=item.channel_notice %}
+        </details>
+      </article>
+      {% endwith %}
+      {% endfor %}
+    </div>
+  </li>
   {% endfor %}
-</section>
-{% endif %}
-
-{% for item in steps %}
-{% with step=item.step procedure=item.step.procedure %}
-<article id="etapa-{{ procedure.slug }}" class="step" data-slug="{{ procedure.slug }}">
-  {% if layers|length > 1 %}<p class="step-layer">Passo {{ step.layer }}</p>{% endif %}{# com um só passo, o número repetido parece erro #}
-  <h2>{{ procedure.title }}</h2>
-  <p>{{ procedure.description }}</p>
-
-  {% if step.reasons %}
-  <h3>Por que esta etapa</h3>
-  <ul>
-    {% for rule in step.reasons %}<li>{{ rule.explanation }}</li>{% endfor %}
-  </ul>
-  {% endif %}
-  {% if step.clarifies %}
-  <p>Você respondeu "Não sei" para: {{ step.clarifies.text }} Descubra a resposta e volte para continuar.
-    <a class="edit-answer" href="{% url 'guidance:edit_answer' catalog.situation_slug step.clarifies.slug %}">Alterar essa resposta</a></p>
-  {% endif %}
-  {% if item.required_for %}
-  <p>Necessária antes de: {{ item.required_for|join:", " }}</p>
-  {% endif %}
-  {% if item.after %}
-  <p>Faça depois de:</p>
-  <ul>
-    {% for line in item.after %}<li>{{ line.title }}{% if line.suggestion %} (sugestão){% endif %}</li>{% endfor %}
-  </ul>
-  {% endif %}
-
-  {% include "guidance/_procedure_facts.html" with requirements=item.requirements channels=item.channels costs=item.costs deadlines=item.deadlines channel_notice=item.channel_notice %}
-</article>
-{% endwith %}
-{% endfor %}
+</ol>
 {% elif not undetermined %}
 <p>Nenhuma providência encontrada para as respostas dadas.</p>
 {% endif %}
@@ -115,8 +77,18 @@
 </section>
 {% endif %}
 
+{% if uncovered %}
+<section id="limite-de-cobertura" class="notice">
+  <h2>Limite de cobertura</h2>
+  <p>Não encontramos orientação oficial para esta resposta nesta versão. As etapas acima não cobrem esse caso.</p>
+  <ul>
+    {% for line in uncovered %}<li>{{ line.question_text }} Você respondeu: {{ line.option_label }}.</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
 <div class="actions">
-  <a class="button secondary" href="{% url 'guidance:review' catalog.situation_slug %}">Revisar respostas</a>
+  <a class="button secondary" href="{% url 'guidance:review' catalog.situation_slug %}">Rever respostas</a>
   <form method="post" action="{% url 'guidance:restart' catalog.situation_slug %}">
     {% csrf_token %}
     <button type="submit" class="secondary">Recomeçar</button>

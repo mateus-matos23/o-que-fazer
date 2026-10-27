@@ -1,6 +1,6 @@
-{# Etapas da conversa; o total de perguntas é adaptativo, por isso não há "3 de 7". #}
+{# Etapas da conversa; o total de perguntas é adaptativo, por isso não há "3 de 7". O plano não mostra o indicador. #}
 <ol class="journey-steps" aria-label="Etapas da orientação">
   {% if current == "questions" %}<li class="current" aria-current="step">Perguntas</li>{% else %}<li class="done">Perguntas<span class="visually-hidden"> (concluída)</span></li>{% endif %}
-  {% if current == "preference" %}<li class="current" aria-current="step">Atendimento</li>{% elif current == "plan" and preference %}<li class="done">Atendimento<span class="visually-hidden"> (concluída)</span></li>{% else %}<li>Atendimento</li>{% endif %}
-  {% if current == "plan" %}<li class="current" aria-current="step">Plano</li>{% else %}<li>Plano</li>{% endif %}
+  {% if current == "preference" %}<li class="current" aria-current="step">Atendimento</li>{% else %}<li>Atendimento</li>{% endif %}
+  <li>Plano</li>
 </ol>

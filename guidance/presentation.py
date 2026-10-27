@@ -66,6 +66,7 @@ class StepView:
     costs: tuple[str, ...]
     deadlines: tuple[str, ...]
     channel_notice: str = ""
+    primary_channel: ChannelLine | None = None  # botão "Ir para o site oficial"
 
 
 def step_view(
@@ -78,18 +79,25 @@ def step_view(
         return DependencyLine(title(dependency.before), dependency.kind == "RECOMMENDED")
 
     procedure = step.procedure
+    channels = channel_lines(step.channels, preference)
     return StepView(
         step=step,
         required_for=tuple(title(slug) for slug in step.required_for),
         after=tuple(line(d) for d in step.after),
         requirements=requirement_lines(step.requirements),
-        channels=channel_lines(step.channels, preference),
+        channels=channels,
         costs=detail_texts(procedure, "COST"),
         deadlines=detail_texts(procedure, "DEADLINE"),
         channel_notice=preference.missing_notice
         if preference and lacks_preferred([c for c, _ in step.channels], preference)
         else "",
+        primary_channel=primary_channel(channels),
     )
+
+
+def primary_channel(lines: tuple[ChannelLine, ...]) -> ChannelLine | None:
+    """Primeiro canal com endereço na ordem de preferência; o que só "pode valer" não vira botão."""
+    return next((line for line in lines if line.channel.url and not line.maybe), None)
 
 
 def _maybe(item: RequirementDef | ChannelDef, tri: Tri) -> str:
@@ -136,8 +144,6 @@ def plan_context(
     steps = [step_view(catalog, step, preference) for step in result.steps]
     return {
         "steps": steps,
-        "start_steps": [s for s in steps if s.step.layer == 1],
-        "requirement_steps": [s for s in steps if s.requirements],
         "uncovered": uncovered_lines(catalog, result.uncovered),
         "undetermined": [catalog.procedures[s].title for s in result.undetermined],
     }
