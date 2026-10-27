@@ -2,7 +2,7 @@
 
 import pytest
 
-from catalog.models import AnswerOption, Procedure, Question, Rule, Situation
+from catalog.models import AnswerOption, Procedure, ProcedureDetail, Question, Rule, Situation
 
 pytestmark = pytest.mark.django_db
 
@@ -59,3 +59,17 @@ def test_ctps_and_caged_have_no_rules(loaded: dict[str, int]) -> None:
 
 def test_no_clarification_step(loaded: dict[str, int]) -> None:
     assert not Procedure.objects.filter(clarifies__situations__slug=SITUATION).exists()
+
+
+def test_cost_and_deadline_cite_the_official_pages(loaded: dict[str, int]) -> None:
+    details = {
+        (d.procedure.slug, d.kind): d.text
+        for d in ProcedureDetail.objects.filter(procedure__situations__slug=SITUATION)
+    }
+    assert details[("seguro-desemprego", "COST")] == "Gratuito para o cidadão."
+    assert details[("seguro-desemprego", "DEADLINE")].startswith("Entre 31 e 60 dias corridos")
+    assert "não é o prazo para pedir" in details[("seguro-desemprego", "DEADLINE")]
+    assert details[("seguro-desemprego-domestico", "COST")] == "Gratuito para o cidadão."
+    assert details[("extrato-vinculos-caged", "COST")] == "Gratuito para o cidadão."
+    assert details[("conferir-vinculos-ctps", "DEADLINE")] == "Atendimento imediato."
+    assert ("saque-fgts-dispensa", "COST") not in details  # a página não declara custo (RN11)

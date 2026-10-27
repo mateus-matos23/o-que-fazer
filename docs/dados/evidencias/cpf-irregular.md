@@ -65,7 +65,7 @@ seu navegador esteja habilitado para a gravação de "_cookies_"."
 - Requisitos: ser inscrito no CPF. Quem tem CIN deve alterar dados de identificação civil no Órgão de Identificação Civil; contato, endereço, cadastro externo e situação cadastral vão diretamente à Receita.
 - Documentos: documento oficial com foto; certidão de nascimento ou casamento (ou equivalente para estrangeiros) se o documento não trouxer naturalidade, filiação e data de nascimento; foto segurando o documento quando enviado por e-mail; outros documentos a critério do atendente. Regras específicas: menores de 16 e de 16–17 anos, pessoas com deficiência de 18 anos ou mais, pessoas falecidas (certidão de óbito e comprovação de legitimidade).
 - Custo: gratuito, exceto em unidades conveniadas (R$ 7,00).
-- Prazo: cada etapa até 15 minutos; atendimento por e-mail em média 48 horas; "Atendimento imediato" para o total.
+- Prazo: cada etapa até 15 minutos; atendimento por e-mail em média 48 horas; "Atendimento imediato" para o total. Entra como detalhe `DEADLINE` da regularização do CPF suspenso, com o trecho de "Quanto tempo leva?" (versão de fonte de 27/10/2026, no "Trecho de custo e prazo" da amostra).
 - Formato do formulário de regularização: campos pedidos incluem CPF, nome completo, data de nascimento, sexo, naturalidade e UF, título de eleitor, nome da mãe, CPF e nome de um responsável, um documento de identidade, endereço completo e telefone.
 - Data de atualização declarada: 24/09/2026 (página gov.br de atualização; "Última Modificação: 24/09/2026"). A ficha da API não traz data de atualização.
 

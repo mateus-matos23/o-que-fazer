@@ -2,7 +2,7 @@
 
 import pytest
 
-from catalog.models import AnswerOption, Procedure, Question, Rule, Situation
+from catalog.models import AnswerOption, Procedure, ProcedureDetail, Question, Rule, Situation
 
 pytestmark = pytest.mark.django_db
 
@@ -36,3 +36,11 @@ def test_clarification_points_to_unknown_question(loaded: dict[str, int]) -> Non
     clarifier = Procedure.objects.get(slug="consultar-situacao-cpf")
     assert clarifier.clarifies == Question.objects.get(slug="cpf-situacao-cadastral")
     assert clarifier.clarifies.allows_unknown
+
+
+def test_suspended_cpf_deadline_cites_how_long_it_takes(loaded: dict[str, int]) -> None:
+    deadline = ProcedureDetail.objects.get(
+        procedure__slug="regularizar-cpf-suspenso", kind="DEADLINE"
+    )
+    assert deadline.text == "Atendimento imediato; pelo e-mail, em média 48 horas."
+    assert deadline.excerpt.startswith("Quanto tempo leva? Atendimento imediato")

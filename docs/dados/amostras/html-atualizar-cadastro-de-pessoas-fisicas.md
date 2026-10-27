@@ -49,3 +49,16 @@ Tarifa
 R$ 7,00
 Tempo de duração da etapa
 ```
+
+## Trecho de custo e prazo
+
+- Coleta: 2026-10-27T09:26:39-03:00 (versão de fonte gravada por `fetch_sources`)
+- SHA-256 do HTML completo baixado: `1784adf2805285405ac1e6dcddd67ac65e1e1f2b983c12936de84c986c9128ec`
+- Trecho: linhas 258 a 261 do extrato de texto (450 linhas não vazias), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+
+```text
+Quanto tempo leva?
+Atendimento imediato
+Informações adicionais ao tempo estimado
+O atendimento por e-mail leva, em média, 48 horas.
+```

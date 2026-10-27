@@ -49,3 +49,21 @@ O trabalhador terá direito ao valor da sua parcela a cada trinta dias se forem 
 O recebimento será feito na seguinte ordem, por meio de:
 a) depósito em conta e banco informados pelo próprio trabalhador;
 ```
+
+## Trecho de custo e prazo
+
+- Coleta: 2026-10-27T09:26:44-03:00 (versão de fonte gravada por `fetch_sources`)
+- SHA-256 do HTML completo baixado: `011a5297588f7b74b9f8ad3c595296117fd0492bf190884915ba9635e65ebb49`
+- Trecho: linhas 206 a 214 do extrato de texto (353 linhas não vazias), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+
+```text
+Quanto tempo leva?
+Entre
+31
+e
+60
+dia(s) corrido(s)
+é o tempo estimado para a prestação deste serviço.
+Informações adicionais ao tempo estimado
+Este serviço é gratuito para o cidadão.
+```

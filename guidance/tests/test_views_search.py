@@ -84,8 +84,16 @@ def test_procedure_detail_shows_facts_without_applicability(
     assert "govbr-caged (site oficial)" in html
     assert "Coletado em 09/10/2026 21:00" in html  # 00h UTC no fuso de Fortaleza
     assert "Em média 30 dias corridos." in html
-    assert "Não informado pela fonte oficial. Confirme o custo no canal" in html  # RN11
+    assert "Gratuito para o cidadão." in html
     assert "não confirma se ele se aplica" in html and "Por que esta etapa" not in html
+
+
+def test_procedure_detail_without_cost_or_deadline_says_not_informed(
+    loaded: dict[str, int], client: Client
+) -> None:
+    html = _html(client, SEARCH + "registrar-ocorrencia-extravio/")
+    assert "Não informado pela fonte oficial. Confirme o custo no canal" in html  # RN11
+    assert "Não informado pela fonte oficial. Confirme o prazo no canal" in html
 
 
 def test_procedure_detail_unknown_slug_is_404(loaded: dict[str, int], client: Client) -> None:

@@ -56,10 +56,8 @@ def test_plan_shows_step_details(loaded: dict[str, int], client: Client) -> None
     )
     assert re.search(r"<dt>Custo</dt>\s*<dd>Gratuito, exceto em unidades conveniadas", html)
     assert re.search(
-        r'<dt>Prazo</dt>\s*<dd><span class="not-informed">Não informado pela fonte oficial. '
-        r"Confirme o prazo no canal de atendimento.</span></dd>",
-        html,
-    )  # RN11
+        r"<dt>Prazo</dt>\s*<dd>Atendimento imediato; pelo e-mail, em média 48 horas.</dd>", html
+    )
     assert "(site oficial)" in html
     assert "Coletado em 09/10/2026 21:00" in html  # RN12
     assert "Atualizado pelo órgão em" in html

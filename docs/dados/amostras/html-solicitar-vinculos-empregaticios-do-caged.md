@@ -49,3 +49,19 @@ Enviar declarações ao solicitante
 Analisar conformidade da documentação apresentada
 Em caso de conformidade da documentação apresentada, a declaração solicitada será disponibilizada no menu “Meus Pedidos” disponível na página de acompanhamento em: https://atendimento.trabalho.gov.br/
 ```
+
+## Trecho de custo e prazo
+
+- Coleta: 2026-10-27T09:26:39-03:00 (versão de fonte gravada por `fetch_sources`)
+- SHA-256 do HTML completo baixado: `7f0de5ff8ccb60388f6d0da22d3a1080d6ed4518e1cbd62a82448877b4de67f5`
+- Trecho: linhas 173 a 179 do extrato de texto (308 linhas não vazias), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+
+```text
+Quanto tempo leva?
+Em média
+30
+dia(s) corrido(s)
+é o tempo estimado para a prestação deste serviço.
+Informações adicionais ao tempo estimado
+Este serviço é gratuito para o cidadão.
+```

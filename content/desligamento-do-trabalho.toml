@@ -3,6 +3,9 @@
 # onde tem o campo (prazo estimado). Nas amostras HTML vale só o bloco de texto, que é truncado.
 #
 # Decisões:
+# - Custo e prazo das páginas gov.br (seguro, doméstico, CAGED, CTPS): "Este serviço é gratuito" e
+#   "Quanto tempo leva?" vêm do "Trecho de custo e prazo" de cada amostra (fetch_sources, 27/10/2026).
+#   O tempo estimado do seguro 1045 (31 a 60 dias) não é o prazo para pedir, que segue não informado.
 # - A forma de término restringe os seguros e o saque do FGTS a "sem justa causa" (as fontes só citam
 #   essa hipótese). Pedido de demissão e justa causa ficam NOT_APPLICABLE: é intencional e aprovado.
 # - "Acordo", "culpa recíproca" e "fim de contrato" são opções fora de cobertura (out_of_coverage):
@@ -14,16 +17,12 @@
 # - Esclarecimento intermediário: nenhum trecho orienta a descobrir a forma de término nem o tipo de
 #   vínculo; não foi criado.
 # - Dependências: nenhum trecho estabelece precedência entre os procedimentos; nenhuma foi criada.
-# - Custo do seguro-desemprego, do doméstico, do CAGED e do FGTS: "gratuito" só existe como campo
-#   booleano da API (gratuito: "true"); o texto "Este serviço é gratuito" está fora das amostras.
-#   O custo da CTPS (página "obter a carteira") tem trecho e entra.
+# - Custo do FGTS: a página não declara custo.
 # - Conta gov.br obrigatória (seguro, doméstico, CAGED, CTPS): o trecho "Utilize a sua conta GOV.BR"
 #   está fora da amostra HTML.
 # - Prazo do doméstico "7 a 90 dias": entra (HTML). O número de terceiros (7 a 120) não é usado.
 # - Prazo para requerer o seguro 1045 e número máximo de solicitações: não informados na fonte.
-# - Prazo estimado do CAGED: só a API tem ("30 dias-corridos", média); a página tem o texto fora da amostra.
-#   Prazo estimado do seguro 1045 (31 a 60 dias corridos): fora. A API só o guarda como campos min/max
-#   separados, sem texto corrido; o jsonb reordena as chaves, então não há trecho literal estável.
+# - Prazo estimado do CAGED: vem da API ("30 dias-corridos", média).
 # - FGTS: documentos da agência, lotérica, telefones e o passo a passo do app estão fora da amostra
 #   (truncada). Regras do saque-aniversário além da multa rescisória não entram (a evidência não as
 #   confirma; blog e MP 1.290/2025 não são fonte oficial lida).
@@ -110,6 +109,10 @@ channels = [
   {kind = "IN_PERSON", description = "Atendimento presencial, com agendamento pela Plataforma FACILITA.", source = "govbr-seguro-desemprego", excerpt = "Acesse a Plataforma FACILITA para agendar seu atendimento presencial"},
   {kind = "PHONE", description = "Telefone 158.", source = "govbr-seguro-desemprego", excerpt = "Telefone 158"},
 ]
+details = [
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-seguro-desemprego", excerpt = "Este serviço é gratuito para o cidadão."},
+  {kind = "DEADLINE", text = "Entre 31 e 60 dias corridos (tempo estimado para a prestação do serviço; não é o prazo para pedir).", source = "govbr-seguro-desemprego", excerpt = "Entre 31 e 60 dia(s) corrido(s) é o tempo estimado para a prestação deste serviço."},
+]
 
 [[procedures]]
 slug = "seguro-desemprego-domestico"
@@ -136,6 +139,7 @@ channels = [
 ]
 details = [
   {kind = "DEADLINE", text = "Solicitar de 7 a 90 dias contados da data da demissão.", source = "govbr-seguro-desemprego-domestico", excerpt = "tenha solicitado o seguro-desemprego no prazo de 7 a 90 dias contados da data da demissão"},
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-seguro-desemprego-domestico", excerpt = "Este serviço é gratuito para o cidadão."},
 ]
 
 [[procedures]]
@@ -175,6 +179,7 @@ channels = [
 ]
 details = [
   {kind = "COST", text = "Obter a Carteira de Trabalho Digital é gratuito para o cidadão.", source = "govbr-obter-carteira-de-trabalho", excerpt = "Este serviço é gratuito para o cidadão."},
+  {kind = "DEADLINE", text = "Atendimento imediato.", source = "govbr-obter-carteira-de-trabalho", excerpt = "Quanto tempo leva? Atendimento imediato"},
 ]
 
 # Candidato sem regra: aplicável a qualquer forma de término (evidência).
@@ -197,6 +202,7 @@ channels = [
 ]
 details = [
   {kind = "DEADLINE", text = "Em média 30 dias corridos.", source = "api-servicos-7839", excerpt = "30 dias-corridos"},
+  {kind = "COST", text = "Gratuito para o cidadão.", source = "govbr-caged", excerpt = "Este serviço é gratuito para o cidadão."},
 ]
 
 [[rules]]

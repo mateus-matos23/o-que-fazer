@@ -3,6 +3,7 @@
 # Aqui a opção segue o rótulo da Receita (meu-cpf), que é a fonte dos trechos das regras.
 # Fora desta jornada, por não estar confirmado em fonte oficial: título de eleitor (obs. 5 da evidência).
 # Custo e prazo não documentados são omitidos (a interface mostra "não informado").
+# Prazo da regularização: "Quanto tempo leva?" da página de atualização (Trecho de custo e prazo da amostra).
 
 [[situations]]
 slug = "cpf-irregular"
@@ -65,6 +66,7 @@ channels = [
 ]
 details = [
   {kind = "COST", text = "Gratuito, exceto em unidades conveniadas (R$ 7,00).", source = "govbr-atualizar-cpf", excerpt = "A atualização do CPF é gratuita, exceto quando realizada em unidades conveniadas (neste caso será cobrado uma taxa de R$ 7,00)"},
+  {kind = "DEADLINE", text = "Atendimento imediato; pelo e-mail, em média 48 horas.", source = "govbr-atualizar-cpf", excerpt = "Quanto tempo leva? Atendimento imediato Informações adicionais ao tempo estimado O atendimento por e-mail leva, em média, 48 horas."},
 ]
 
 [[procedures]]

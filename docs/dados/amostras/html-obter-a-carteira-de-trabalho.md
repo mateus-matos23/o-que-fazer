@@ -49,3 +49,16 @@ Acessibilidade;
 Cortesia;
 Presunção da boa-fé do usuário;
 ```
+
+## Trecho de custo e prazo
+
+- Coleta: 2026-10-27T09:26:44-03:00 (versão de fonte gravada por `fetch_sources`)
+- SHA-256 do HTML completo baixado: `581f52fe3e79038ee28a5587f8245f53b40c3f8160ad8b2e0cc7e5c136759136`
+- Trecho: linhas 156 a 159 do extrato de texto (307 linhas não vazias), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+
+```text
+Quanto tempo leva?
+Atendimento imediato
+Informações adicionais ao tempo estimado
+Este serviço é gratuito para o cidadão.
+```

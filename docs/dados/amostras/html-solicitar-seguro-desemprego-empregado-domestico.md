@@ -49,3 +49,16 @@ O recebimento será feito na seguinte ordem, por meio de:
 a) depósito em conta e banco informados pelo próprio trabalhador.
 b) depósito em conta poupança de titularidade do trabalhador identificada na CAIXA.
 ```
+
+## Trecho de custo e prazo
+
+- Coleta: 2026-10-27T09:26:45-03:00 (versão de fonte gravada por `fetch_sources`)
+- SHA-256 do HTML completo baixado: `f1b1cbfa0fc73beef23ab06813af1d733b381355a2358d33cbd337fffb4c0a8e`
+- Trecho: linhas 228 a 231 do extrato de texto (372 linhas não vazias), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+
+```text
+Quanto tempo leva?
+Não estimado ainda
+Informações adicionais ao tempo estimado
+Este serviço é gratuito para o cidadão.
+```
