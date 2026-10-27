@@ -10,20 +10,20 @@ pytestmark = pytest.mark.django_db
 
 def test_global_counts(loaded: dict[str, int]) -> None:
     # CPF irregular + desligamento do trabalho + perda de documentos + transferência de veículo
-    # + falecimento na família.
+    # + falecimento na família + aposentadoria.
     assert loaded == {
-        "Situation": 5,
-        "Question": 10,
-        "AnswerOption": 39,
-        "Procedure": 21,
+        "Situation": 6,
+        "Question": 12,
+        "AnswerOption": 43,
+        "Procedure": 25,
         "ProcedureDetail": 12,
-        "Requirement": 55,
-        "ServiceChannel": 48,
-        "Rule": 19,
-        "Condition": 25,
+        "Requirement": 75,
+        "ServiceChannel": 62,
+        "Rule": 21,
+        "Condition": 28,
         "Dependency": 4,
-        "TriageNode": 5,
-        "TriageChoice": 17,
+        "TriageNode": 6,
+        "TriageChoice": 20,
     }
 
 
@@ -35,4 +35,5 @@ def test_real_content_passes_validation_with_triage(loaded: dict[str, int]) -> N
         "trabalho",
         "veiculo",
         "familia",
+        "aposentadoria",
     }

@@ -5,7 +5,7 @@
 - Coleta: 2026-10-27T09:58:05-03:00
 - "Última Modificação" / "Atualizado em" / "Publicado em" declarada (texto do HTML): Última Modificação: 12/08/2026
 - SHA-256 do HTML completo baixado: `b52009a6a9a0691561ef7ea6b2a3df5fc944b411b00f2721fb990c9bcec28e98`
-- Trecho: linhas 145 a 204 do extrato de texto (426 linhas no total), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+- Trecho: linhas 145 a 208 do extrato de texto (426 linhas no total), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
 
 ```text
 O que é?
@@ -68,4 +68,8 @@ Cadastro de Pessoa Física (CPF)
 Da pessoa com procuração ou representação legal, se houver:
 Identificação - RG, CIN, CNH ou CTPS
 Cadastro de Pessoa Física (CPF)
+Procuração no modelo do INSS ou pública
+Termo de representação legal - tutela, curatela ou termo de guarda
+Tempo de duração da etapa
+Atendimento imediato
 ```

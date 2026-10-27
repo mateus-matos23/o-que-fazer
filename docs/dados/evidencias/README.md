@@ -2,7 +2,7 @@
 
 > Consolidação revisada do levantamento de fontes das três jornadas prioritárias (consultas de 10/10/2026).
 
-Arquivos por jornada: [perda de documentos](perda-de-documentos.md) · [CPF irregular](cpf-irregular.md) · [desligamento do trabalho](desligamento-do-trabalho.md) · [transferência de veículo](transferencia-de-veiculo.md) · [falecimento na família](falecimento-na-familia.md).
+Arquivos por jornada: [perda de documentos](perda-de-documentos.md) · [CPF irregular](cpf-irregular.md) · [desligamento do trabalho](desligamento-do-trabalho.md) · [transferência de veículo](transferencia-de-veiculo.md) · [falecimento na família](falecimento-na-familia.md) · [aposentadoria](aposentadoria.md).
 
 ## API de serviços do Gov.br
 

@@ -5,7 +5,7 @@
 - Coleta: 2026-10-27T09:58:06-03:00
 - "Última Modificação" / "Atualizado em" / "Publicado em" declarada (texto do HTML): Última Modificação: 13/08/2026
 - SHA-256 do HTML completo baixado: `0fbebf6e4fe0c1d65a8f18ad671646e26f43ff986dfc92f46a298348d920a996`
-- Trecho: linhas 135 a 184 do extrato de texto (378 linhas no total), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+- Trecho: linhas 135 a 197 do extrato de texto (378 linhas no total), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
 
 ```text
 O que é?
@@ -58,4 +58,17 @@ acordo
 com o INSS na sua região
 Tempo estimado de espera
 :
+Até
+                                      5
+                                      minuto(s)
+Documentação
+Documentação em comum para todos os casos
+Da pessoa titular:
+Identificação - RG, CIN, CNH ou CTPS
+Cadastro de Pessoa Física (CPF)
+Da pessoa com procuração ou representação legal, se houver:
+Identificação - RG, CIN, CNH ou CTPS
+Cadastro de Pessoa Física (CPF)
+Procuração no modelo do INSS ou pública
+Termo de representação legal - tutela, curatela ou termo de guarda
 ```

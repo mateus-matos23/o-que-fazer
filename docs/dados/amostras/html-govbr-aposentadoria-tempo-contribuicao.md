@@ -5,7 +5,7 @@
 - Coleta: 2026-10-27T09:57:36-03:00
 - "Última Modificação" / "Atualizado em" / "Publicado em" declarada (texto do HTML): Última Modificação: 12/08/2026
 - SHA-256 do HTML completo baixado: `78df3737f8c077e5dd1d33ecac8cc14ce798fa2356cd14ad2f8ac6dc5185ed64`
-- Trecho: linhas 127 a 186 do extrato de texto (389 linhas no total), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+- Trecho: linhas 127 a 192 do extrato de texto (389 linhas no total), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
 
 ```text
 O que é?
@@ -68,4 +68,10 @@ Documentação
 Documentação em comum para todos os casos
 Da pessoa titular:
 Identificação - RG, CIN, CNH ou CTPS
+Cadastro de Pessoa Física (CPF)
+Da pessoa com procuração ou representação legal, se houver:
+Identificação - RG, CIN, CNH ou CTPS
+Cadastro de Pessoa Física (CPF)
+Procuração no modelo do INSS ou pública
+Termo de representação legal - tutela, curatela ou termo de guarda
 ```

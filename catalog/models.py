@@ -209,6 +209,7 @@ class TriageChoice(models.Model):
         FIRST_TIME = "first-time", "Primeira vez"
         LEAVING = "leaving", "Saída"
         FIRST_JOB = "first-job", "Primeiro emprego"
+        RETIREMENT = "retirement", "Aposentadoria"
 
     node = models.ForeignKey(TriageNode, on_delete=models.CASCADE, related_name="choices")
     label = models.CharField(max_length=200)

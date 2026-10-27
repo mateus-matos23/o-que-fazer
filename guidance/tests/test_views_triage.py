@@ -32,6 +32,7 @@ def test_root_shows_start_node(loaded: dict[str, int], client: Client) -> None:
         "/comecar/trabalho/",
         "/comecar/familia/",
         "/comecar/veiculo/",
+        "/comecar/aposentadoria/",
         "/fora-da-cobertura/",
     ]
     assert 'href="/situacoes/"' in html and 'href="/onde-resolvo/"' in html
@@ -40,7 +41,7 @@ def test_root_shows_start_node(loaded: dict[str, int], client: Client) -> None:
 
 def test_choice_icon_is_decorative_and_optional(loaded: dict[str, int], client: Client) -> None:
     cards = _html(client, "/").split('<ul class="choice-cards">')[1].split("</ul>")[0]
-    assert cards.count('<span class="icon-tile"><svg class="icon" aria-hidden="true"') == 5
+    assert cards.count('<span class="icon-tile"><svg class="icon" aria-hidden="true"') == 6
     TriageChoice.objects.filter(node__slug="inicio").update(icon="")
     cards = _html(client, "/").split('<ul class="choice-cards">')[1].split("</ul>")[0]
     assert "icon-tile" not in cards and "<svg" not in cards
@@ -78,6 +79,13 @@ def test_familia_node_links_to_falecimento(loaded: dict[str, int], client: Clien
     assert _links(_html(client, "/comecar/familia/")) == [
         "/s/falecimento-na-familia/",
         "/fora-da-cobertura/",
+        "/fora-da-cobertura/",
+    ]
+
+
+def test_aposentadoria_node_links_to_situation(loaded: dict[str, int], client: Client) -> None:
+    assert _links(_html(client, "/comecar/aposentadoria/")) == [
+        "/s/aposentadoria/",
         "/fora-da-cobertura/",
     ]
 

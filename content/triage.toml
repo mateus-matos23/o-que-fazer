@@ -10,6 +10,7 @@ options = [
   {label = "Trabalho ou emprego", icon = "work", next = "trabalho"},
   {label = "Família (falecimento, nascimento de filho)", icon = "family", next = "familia"},
   {label = "Veículo (compra ou venda)", icon = "vehicle", next = "veiculo"},
+  {label = "Aposentadoria (INSS)", icon = "retirement", next = "aposentadoria"},
   {label = "Outro assunto", icon = "other", uncovered = true},
 ]
 
@@ -46,5 +47,13 @@ text = "O que aconteceu na sua família?"
 options = [
   {label = "Alguém da família faleceu", icon = "family", situation = "falecimento-na-familia"},
   {label = "Nasceu um filho", icon = "family", uncovered = true},
+  {label = "Outra coisa", icon = "other", uncovered = true},
+]
+
+[[triage]]
+slug = "aposentadoria"
+text = "O que você quer fazer sobre a aposentadoria?"
+options = [
+  {label = "Quero pedir minha aposentadoria", icon = "retirement", situation = "aposentadoria"},
   {label = "Outra coisa", icon = "other", uncovered = true},
 ]

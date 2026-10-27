@@ -293,3 +293,38 @@ url = "https://www.gov.br/pt-br/servicos/solicitar-certidao-de-inexistencia-de-d
 format = "HTML"
 jurisdiction = "FEDERAL"
 access_notes = "Página do serviço Solicitar certidão de inexistência de dependentes habilitados à pensão por morte; leitura sem login. Declara \"Última Modificação: 19/08/2026\"."
+
+# Jornada "aposentadoria" (27/10/2026).
+# Origem: docs/dados/evidencias/aposentadoria.md.
+
+[[sources]]
+slug = "govbr-aposentadoria-idade-urbano"
+agency = "inss"
+url = "https://www.gov.br/pt-br/servicos/solicitar-aposentadoria-por-idade-trabalhador-urbano"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do serviço Solicitar aposentadoria por idade (trabalhador urbano); leitura sem login. Declara \"Última Modificação: 12/08/2026\"."
+
+[[sources]]
+slug = "govbr-aposentadoria-tempo-contribuicao"
+agency = "inss"
+url = "https://www.gov.br/pt-br/servicos/solicitar-aposentadoria-por-tempo-de-contribuicao"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do serviço Solicitar aposentadoria por tempo de contribuição; leitura sem login. Declara \"Última Modificação: 12/08/2026\"."
+
+[[sources]]
+slug = "govbr-extrato-cnis"
+agency = "inss"
+url = "https://www.gov.br/pt-br/servicos/emitir-extrato-de-contribuicao-cnis"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do serviço Emitir extrato de contribuição (CNIS); leitura sem login. Declara \"Última Modificação: 13/08/2026\"."
+
+[[sources]]
+slug = "govbr-simular-aposentadoria"
+agency = "inss"
+url = "https://www.gov.br/pt-br/servicos/simular-aposentadoria"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do serviço Simular aposentadoria; leitura sem login. Declara \"Última Modificação: 20/08/2026\"."

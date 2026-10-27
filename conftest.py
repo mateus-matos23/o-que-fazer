@@ -54,6 +54,10 @@ SAMPLE_FILES = {
     "govbr-pensao-morte-urbana": "html-govbr-pensao-morte-urbana.md",
     "govbr-pensao-morte-rural": "html-govbr-pensao-morte-rural.md",
     "govbr-certidao-inexistencia-dependentes": "html-govbr-certidao-inexistencia-dependentes.md",
+    "govbr-aposentadoria-idade-urbano": "html-govbr-aposentadoria-idade-urbano.md",
+    "govbr-aposentadoria-tempo-contribuicao": "html-govbr-aposentadoria-tempo-contribuicao.md",
+    "govbr-extrato-cnis": "html-govbr-extrato-cnis.md",
+    "govbr-simular-aposentadoria": "html-govbr-simular-aposentadoria.md",
 }
 
 
