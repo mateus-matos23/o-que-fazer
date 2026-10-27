@@ -238,8 +238,8 @@ def test_all_hidden_shows_notice_instead_of_not_informed() -> None:
     proc = _proc("p", (_req("R", WHEN_Q),), (_chan("C", WHEN_Q),))
     html = _render(f.catalog(QUESTIONS, (proc,)), NO)
     assert html.count("Nenhum dos itens da fonte vale para o que você informou.") == 2
-    assert "Não informado" in html  # custo e prazo continuam sem fonte
-    assert html.count('<span class="not-informed">Não informado</span>') == 3  # custo, prazo, data
+    assert "Confirme o custo no canal" in html and "Confirme o prazo no canal" in html  # sem fonte
+    assert html.count('<span class="not-informed">Não informado</span>') == 1  # data do órgão
 
 
 def test_procedure_without_items_still_says_not_informed() -> None:

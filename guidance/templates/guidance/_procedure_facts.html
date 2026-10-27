@@ -27,10 +27,10 @@
     </dd>
 
     <dt>Custo</dt>
-    <dd>{% if costs %}{{ costs|join:"; " }}{% else %}<span class="not-informed">Não informado</span>{% endif %}</dd>
+    <dd>{% if costs %}{{ costs|join:"; " }}{% else %}<span class="not-informed">Não informado pela fonte oficial. Confirme o custo no canal de atendimento.</span>{% endif %}</dd>
 
     <dt>Prazo</dt>
-    <dd>{% if deadlines %}{{ deadlines|join:"; " }}{% else %}<span class="not-informed">Não informado</span>{% endif %}</dd>
+    <dd>{% if deadlines %}{{ deadlines|join:"; " }}{% else %}<span class="not-informed">Não informado pela fonte oficial. Confirme o prazo no canal de atendimento.</span>{% endif %}</dd>
 
     <dt>Fonte</dt>
     <dd>

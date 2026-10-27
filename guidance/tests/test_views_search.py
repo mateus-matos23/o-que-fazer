@@ -84,7 +84,7 @@ def test_procedure_detail_shows_facts_without_applicability(
     assert "govbr-caged (site oficial)" in html
     assert "Coletado em 09/10/2026 21:00" in html  # 00h UTC no fuso de Fortaleza
     assert "Em média 30 dias corridos." in html
-    assert '<span class="not-informed">Não informado</span>' in html  # custo sem fonte
+    assert "Não informado pela fonte oficial. Confirme o custo no canal" in html  # RN11
     assert "não confirma se ele se aplica" in html and "Por que esta etapa" not in html
 
 
