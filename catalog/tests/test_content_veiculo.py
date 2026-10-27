@@ -43,6 +43,10 @@ def test_restrictions_lookup_is_free(loaded: dict[str, int]) -> None:
     cost = ProcedureDetail.objects.get(procedure__slug="consultar-restricoes-veiculo", kind="COST")
     assert cost.text == "Gratuito para o cidadão."
     assert cost.excerpt == "Este serviço é gratuito para o cidadão."
+    # "Quanto tempo leva?" diz "Não estimado ainda"; duração de etapa não é prazo (RN11).
+    assert not ProcedureDetail.objects.filter(
+        procedure__slug="consultar-restricoes-veiculo", kind="DEADLINE"
+    ).exists()
 
 
 def test_detran_procedures_have_no_documented_cost(loaded: dict[str, int]) -> None:
