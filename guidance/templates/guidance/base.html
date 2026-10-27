@@ -9,7 +9,10 @@
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
   <header class="site-header">
-    <div class="page"><a class="brand" href="{% url 'guidance:home' %}">O que Fazer?</a></div>
+    <div class="page">
+      <a class="brand" href="{% url 'guidance:home' %}">O que Fazer?</a>
+      {% if not is_start %}<p class="context-link"><a href="{% url 'guidance:home' %}">Voltar ao início</a></p>{% endif %}
+    </div>
   </header>
   <main id="conteudo" class="page" tabindex="-1">
     {% block content %}{% endblock %}

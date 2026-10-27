@@ -234,6 +234,22 @@ def test_step_button_goes_to_the_official_online_channel(
     assert "Ver a página oficial do serviço" not in button
 
 
+def test_every_screen_but_home_links_back_home(loaded: dict[str, int], client: Client) -> None:
+    home_link = '<p class="context-link"><a href="/">Voltar ao início</a></p>'
+    assert home_link not in _html(client, "/")
+    assert home_link in _html(client, URL)  # pergunta
+    _answer(client, "suspenso")
+    for url in (
+        PLAN,
+        URL + "respostas/",
+        URL + f"respostas/{QUESTION}/",
+        URL + "atendimento/",
+        "/onde-resolvo/",
+        "/onde-resolvo/extrato-vinculos-caged/",
+    ):
+        assert home_link in _html(client, url), url
+
+
 def test_external_links_open_in_a_new_tab(loaded: dict[str, int], client: Client) -> None:
     _answer(client, "suspenso")
     for url in (PLAN, "/onde-resolvo/extrato-vinculos-caged/"):

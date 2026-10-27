@@ -99,7 +99,9 @@ def home(request: HttpRequest) -> HttpResponse:
     node = _triage_node(START_NODE)
     if node is None:  # conteúdo sem funil: a lista de situações é a entrada
         situations = Situation.objects.order_by("title")
-        return render(request, "guidance/situation_list.html", {"situations": situations})
+        return render(
+            request, "guidance/situation_list.html", {"situations": situations, "is_start": True}
+        )
     return render(request, "guidance/triage.html", {"node": node, "is_start": True})
 
 

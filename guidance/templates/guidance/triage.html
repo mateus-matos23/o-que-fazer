@@ -8,9 +8,5 @@
   <li><a href="{% if choice.next_node %}{% url 'guidance:triage' choice.next_node.slug %}{% else %}{% url 'guidance:question' choice.situation.slug %}{% endif %}">{% if choice.icon %}<span class="icon-tile">{% include "guidance/icons/"|add:choice.icon|add:".svg" %}</span>{% endif %}<span>{{ choice.label }}</span></a></li>
   {% endfor %}
 </ul>
-{% if is_start %}
-{% include "guidance/_search_cta.html" %}
-{% else %}
-<p class="context-link"><a href="{% url 'guidance:home' %}">Voltar ao início</a></p>
-{% endif %}
+{% if is_start %}{% include "guidance/_search_cta.html" %}{% endif %}
 {% endblock %}
