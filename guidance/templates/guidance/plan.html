@@ -74,7 +74,7 @@
 {% for item in steps %}
 {% with step=item.step procedure=item.step.procedure %}
 <article id="etapa-{{ procedure.slug }}" class="step" data-slug="{{ procedure.slug }}">
-  <p class="step-layer">Passo {{ step.layer }}</p>
+  {% if layers|length > 1 %}<p class="step-layer">Passo {{ step.layer }}</p>{% endif %}{# com um só passo, o número repetido parece erro #}
   <h2>{{ procedure.title }}</h2>
   <p>{{ procedure.description }}</p>
 

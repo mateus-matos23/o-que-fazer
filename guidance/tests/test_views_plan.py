@@ -46,7 +46,7 @@ def test_plan_shows_step_details(loaded: dict[str, int], client: Client) -> None
     assert "orientativo" in html and "não executa serviços" in html
     assert 'href="#etapa-regularizar-cpf-suspenso"' in html
     assert "<h2>" in html and "Por que esta etapa" in html
-    assert "Passo 1" in html
+    assert 'class="step-layer"' not in html  # um só passo: sem número nos cards
     assert "Formulário online para regularizar CPF suspenso." in html
     assert "Online:" in html and "Presencial:" in html  # tipo legível
     assert (

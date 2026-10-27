@@ -81,3 +81,6 @@ def test_http_flow_to_digital_plan(loaded: dict[str, int], client: Client) -> No
     html = client.get(f"/s/{SLUG}/plano/").content.decode()
     assert all(f'data-slug="{slug}"' in html for slug in (RESTRICTIONS, INSPECTION, DIGITAL))
     assert f'data-slug="{COUNTER}"' not in html
+    # Dois passos (vistoria antes da digital): os cards mostram o número do passo.
+    assert html.count('<p class="step-layer">Passo 1</p>') == 2
+    assert html.count('<p class="step-layer">Passo 2</p>') == 1
