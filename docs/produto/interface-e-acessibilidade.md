@@ -46,13 +46,33 @@ Consolidado (Fase 7, 25/10/2026): regras de redação para perguntas e opções,
 
 Cada etapa deve apresentar título, explicação curta, motivo de aplicabilidade, órgão, canais, requisitos, dependências e fonte. Custos e prazos aparecem quando disponíveis. A ordem deve tornar visíveis os pré-requisitos e as etapas independentes.
 
-Consolidado (Fase 7, 25/10/2026): o plano começa por "Comece por aqui", que indica por onde começar. Em seguida vem "O que separar antes", agrupado por etapa e sem mesclar requisitos parecidos de procedimentos diferentes. O plano também tem versão para impressão.
+Histórico (Fase 7, 25/10/2026): o plano tinha as seções "Comece por aqui", "Resumo" e "O que separar antes" e uma dica de impressão. Essas seções saíram em 27/10/2026.
+
+Consolidado (27/10/2026): o plano é uma lista única de etapas, agrupada por camada.
+
+- Topo: resumo "N etapas. Comece pelo passo 1." (a segunda frase só aparece com mais de uma camada), aviso orientativo de uma linha e linha com a preferência de atendimento e o link "Mudar".
+- A camada 1 traz "Comece aqui". Uma camada com várias etapas diz "Pode fazer em qualquer ordem". Plano de uma só camada não mostra número.
+- Cada cartão mostra título, descrição, "Onde: órgão", "Depois de" com "(sugestão)" quando a ordem é só recomendada (RN08) e o esclarecimento de "Não sei".
+- O botão principal é "Ir para o site oficial": o primeiro canal, na ordem de preferência, que tenha URL e não seja "pode valer". Sem canal com URL, o cartão tem o botão de contorno "Ver a página oficial do serviço", que leva à fonte citada.
+- Motivos, requisitos, todos os canais, custo, prazo e fonte com datas ficam em "Ver detalhes" (`<details>`).
+- Impressão: o CSS abre os `<details>` com `::details-content`, que só funciona no Chromium 131 ou superior (`shortcut:` registrado no CSS).
 
 ### Direção visual discutida
 
 Interface clara, pouco carregada, com espaço em branco, tipografia legível, cards grandes, ícones simples e destaque para a ação principal. A aparência deve transmitir confiança, neutralidade e acolhimento, com atenção prioritária ao smartphone.
 
-Proposto (24/10/2026): paleta própria em verde-petróleo sobre fundo claro, que não imita o gov.br, e a fonte Atkinson Hyperlegible Next, servida localmente. Os tokens e os contrastes estão no topo de `guidance/static/guidance/site.css` ([ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.md)). Não há sistema de componentes; uma identidade visual final não foi confirmada.
+Histórico: a paleta de 24/10/2026 (verde-petróleo) e a de 26/10/2026 (inspirada nas fachadas e azulejos de São Luís) foram substituídas.
+
+Consolidado (27/10/2026): identidade neutra, que não imita o gov.br ([ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.md)). Os valores e os contrastes estão no topo de `guidance/static/guidance/site.css`.
+
+- A cor só aparece com papel: azul para ação, verde para prioridade ("Comece aqui", "entrou no plano"), âmbar para alerta e vermelho para erro.
+- Fonte Atkinson Hyperlegible Next, servida localmente, com texto base de 18 px.
+- Alvos principais de 56 px, nenhum abaixo de 48 px.
+- Coluna única de 36 rem, com mobile primeiro.
+- O indicador de etapas tem 3 segmentos (Perguntas, Atendimento, Plano) e não aparece no plano.
+- O botão de Libras continua flutuante à direita, agora na vertical (44 px de largura).
+
+Não há sistema de componentes.
 
 ### Acessibilidade
 

@@ -117,7 +117,7 @@ O que ficou fora:
 - Certidão de óbito: fornecida pelo cartório, sem fonte coletada.
 - Saque de FGTS e PIS por falecimento: a página do FGTS não tem texto no HTML, e o slug gov.br correspondente retornou 404.
 - Pensão de servidor público e acordo internacional: não coletados.
-- Nascimento de filho: opção fora da cobertura dentro de Família, sem fonte baixável para o registro de nascimento.
+- Nascimento de filho: segue fora da cobertura, sem fonte baixável para o registro de nascimento. Revisto em 27/10/2026: o ramo "Família" com essa opção saiu do funil, que só lista situações com jornada.
 
 ### Jornada demonstrativa: aposentadoria
 

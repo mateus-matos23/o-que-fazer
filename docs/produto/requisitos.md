@@ -34,7 +34,7 @@ Os requisitos abaixo organizam o conteúdo discutido. Eles precisam ser detalhad
 | RF18 | Permitir busca direta por serviço no modo “Onde resolvo?”. | Visão do produto. |
 | RF19 | Explicar por que uma etapa aparece e por que depende de outra. | Núcleo explicável. |
 | RF20 | Tratar informação divergente, desatualizada ou não disponível. | Qualidade da orientação. |
-| RF21 | Conduzir o cidadão até a situação por um funil de perguntas amplas (triagem), informando o limite de cobertura nos ramos sem jornada. | Consolidado (Fase 7, fatia 2). |
+| RF21 | Conduzir o cidadão até a situação por um funil de perguntas amplas (triagem), informando o limite de cobertura nos ramos sem jornada. Revisto em 27/10/2026: o funil só lista situações com jornada; o limite de cobertura continua nas respostas `out_of_coverage` e no aviso do plano. | Consolidado (Fase 7, fatia 2). |
 | RF22 | Mostrar, após cada resposta, o efeito dela no plano (providências que entraram, que saíram e quantas seguem em análise). | Consolidado (Fase 7, fatia 3). |
 | RF23 | Perguntar a preferência de atendimento (internet/aplicativo, telefone, pessoalmente, tanto faz) e ordenar os canais por ela, sem esconder nenhum. | Consolidado (Fase 7, fatia 4). |
 | RF24 | Redigir perguntas e opções em linguagem simples, com dica opcional por pergunta. | Consolidado (Fase 7, fatia 1). |

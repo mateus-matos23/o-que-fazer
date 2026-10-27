@@ -33,6 +33,7 @@ O público é o cidadão, em grande parte usando smartphone e conexões instáve
    - Paleta própria, que não imita a do gov.br, para o site não se passar por portal oficial.
    - O plano é apresentado como um roteiro em sequência, e as etapas da mesma camada aparecem como independentes.
    - Revisto em 26/10/2026 (Fase 9): a paleta passou a vir das fachadas e dos azulejos de São Luís (cal, cobalto, ocre e verde-petróleo). As restrições desta ADR não mudaram.
+   - Revisto em 27/10/2026: a identidade de São Luís (cal, cobalto, ocre, verde-petróleo e azulejo) foi substituída por uma identidade neutra, em que a cor só aparece com papel (ação, prioridade, alerta, erro). Os valores e contrastes estão no topo de `site.css`. As restrições seguem: sem JavaScript no fluxo principal, meta WCAG 2.2 AA e fonte servida localmente.
 
 ## Alternativas consideradas
 

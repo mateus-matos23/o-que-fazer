@@ -32,10 +32,11 @@ Motivo: o fundamental do produto são as fontes heterogêneas, a modelagem do co
 | 6 | UI/UX, acessibilidade, frontend e RF18 (RF02 segue pendente) | Consolidado |
 | 7 | Conversa guiada: funil de triagem, efeito da resposta, preferência de atendimento e plano com ponto de partida (RF21 a RF26) | Consolidado (25/10/2026) |
 | 8 | Hospedagem: Dockerfile, gunicorn, WhiteNoise e deploy no Render com Neon (ADR 0006) | Consolidado (26/10/2026, commits `de7d221`, `94f9ec7`) |
-| 9 | Redesenho visual "azulejo": paleta, triagem ilustrada, etapas da conversa e plano como linha do tempo | Consolidado (26/10/2026) |
+| 9 | Redesenho visual "azulejo": paleta, triagem ilustrada, etapas da conversa e plano como linha do tempo | Histórico (substituído pela Fase 13; Consolidado em 26/10/2026) |
 | 10 | Aderência às práticas das skills do projeto: logging, HTTPS, retenção de sessões, cache do catálogo e refactors | Consolidado (26/10/2026) |
 | 11 | Critério de JS e dependências, varredura com axe-core, texto de 16 px e alvos de 44 px, e VLibras a pedido | Consolidado (26/10/2026) |
 | 12 | Novas jornadas: transferência de veículo, falecimento na família e aposentadoria | Consolidado (27/10/2026) |
+| 13 | Redesenho neutro: funil direto às situações, visual neutro e plano em lista única | Consolidado (27/10/2026) |
 
 ## Decisões tomadas em 24/10/2026 (aprovadas pelo autor)
 
@@ -365,6 +366,7 @@ Proposta aprovada pelo autor em 25/10/2026. Estado: Consolidado; as fatias 0 a 9
 **Fatia 2 — funil de triagem.**
 
 - `TriageNode` e `TriageChoice` (migration 0004), tabela TOML `triage` e `content/triage.toml` com 3 nós e 12 opções. A raiz `/` mostra o nó `inicio`; `/comecar/<slug>/` mostra os demais; `/fora-da-cobertura/` é o limite de cobertura; a lista de situações passou a `/situacoes/`. Sem nó `inicio` no conteúdo, a raiz mostra a lista.
+- Histórico: a estrutura acima (3 nós, 12 opções, `/fora-da-cobertura/` e `/situacoes/`) foi substituída em 27/10/2026 ([Fase 13](#fase-13--redesenho-neutro)). Hoje há um único nó `inicio` com 6 opções, sem ramo fora da cobertura.
 - Validação na carga: nó `inicio` ausente, slug duplicado, opção sem exatamente um destino, `next` ou `situation` inexistente, ciclo, nó inalcançável, situação não alcançável pelo funil e nó sem opções.
 - Motivo: o público variado (RF21, RF24) não deve precisar reconhecer o nome da situação. O funil é encaminhamento (RN02), por isso não tem fonte. Decisão em [ADR 0005](../arquitetura/decisoes/0005-funil-de-triagem.md).
 - Gates: ruff, mypy e pytest verdes (311 passed).
@@ -450,6 +452,8 @@ Decisão e alternativas em [ADR 0006](../arquitetura/decisoes/0006-hospedagem-e-
 
 Motivo: o autor achou a interface simples demais e pouco convidativa para o cidadão. As restrições da [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.md) continuam: CSS próprio, sem build, sem JS obrigatório e meta WCAG 2.2 AA.
 
+Histórico: esta fase foi substituída pela [Fase 13](#fase-13--redesenho-neutro) (paleta neutra, sem azulejo). O texto abaixo registra o que foi feito em 26/10/2026.
+
 A direção visual vem das fachadas de São Luís: fundo cor de cal, azulejo azul-cobalto com ocre e verde-petróleo nas ações. Só a faixa de azulejo do cabeçalho é ornamento; o resto da interface fica sóbrio. Os cartões usam borda sólida com a base mais grossa, como o vidrado de um ladrilho, no lugar de sombra.
 
 - **9a — Paleta e base.** Novos tokens em `site.css`, com a tabela de contraste recalculada: o menor par de texto é 6,35:1 e o botão primário tem 7,33:1. O cabeçalho ganhou a faixa e a marca (`azulejo.svg`, desenho próprio e decorativo, com `alt=""`). Botões, opções, avisos e etapas receberam raio maior e borda com base mais grossa. A opção marcada usa fundo `--soft` e borda `--ink`.
@@ -510,7 +514,7 @@ Uma revisão externa sugeriu frameworks (govbr-ds, Bootstrap, Tailwind, HTMX com
 
   Motivo: a proibição rejeitava pelo mesmo argumento ferramentas sem ganho e ferramentas com ganho real de acessibilidade. Ficaram rejeitados govbr-ds, Bootstrap, Tailwind, HTMX com Alpine.js e widget-tweaks. O axe-core foi aceito no dev, e o VLibras ficou em estudo.
 - **11b — Varredura com axe-core.** Entrou a dependência de dev `axe-core` (Node; `package.json` só com ferramentas de dev), aprovada e instalada pelo autor. O `scripts/a11y-scan.mjs` abre o Chromium headless e fala CDP pelo WebSocket nativo do Node 24, sem outra dependência. O script visita:
-  - início, duas triagens, "fora da cobertura", busca e um procedimento;
+  - início, duas triagens, "fora da cobertura", busca e um procedimento (histórico: `/fora-da-cobertura/` e `/situacoes/` saíram em 27/10/2026; a varredura atual tem 27 páginas, ver Fase 13);
   - a lista de situações e a primeira pergunta enviada sem resposta, para ver o estado de erro;
   - uma jornada por situação, respondendo a primeira opção até o plano e depois a revisão.
 
@@ -571,7 +575,7 @@ Em 27/10/2026, o autor acrescentou três jornadas à versão do protótipo: tran
 
 - **12a — Pesquisa e gate (`c1f48f0`).** Coleta das amostras de 27/10/2026 e veredito sobre seis candidatas. O critério exige: pelo menos 2 procedimentos com trecho literal em fonte baixada pelo `fetch_sources`; pelo menos 1 pergunta que muda aplicabilidade, ordem ou canal (RN02); requisitos e canais com trecho; data declarada separada da data de coleta (RN12).
   - Entram: compra ou venda de veículo usado, falecimento na família e aposentadoria.
-  - Não entram: nascimento de filho (registro de nascimento sem fonte baixável; vira opção fora da cobertura dentro de Família) e benefícios sociais (só o Cadastro Único foi confirmado).
+  - Não entram: nascimento de filho (registro de nascimento sem fonte baixável; segue fora da cobertura; a opção em Família saiu do funil na Fase 13) e benefícios sociais (só o Cadastro Único foi confirmado).
   - Primeiro emprego fica dentro de Trabalho; mudança de endereço depende de fontes em defeso eleitoral e não teve nova coleta.
 - **12b — Transferência de veículo (`9a996b3`).** Duas perguntas: forma de transferência e casos de atendimento presencial. A vistoria em ECV é dependência obrigatória da transferência digital, e a consulta de restrições da Senatran é recomendada (RN08). “Não sei” só na segunda pergunta, mantendo as duas transferências indeterminadas.
   - Fora: taxa da transferência (“não informado”), documentos de cada caso de balcão (Portaria Detran 166/2020 não lida), resultado da vistoria reprovada e débitos como impedimento.
@@ -590,6 +594,30 @@ Limites conhecidos desta fase:
 - **Carga real e navegador (27/10/2026).** No `oqf_dev`: migração 0007, `load_sources`, `fetch_sources` das 9 fontes novas (todas OK) e `load_content`, que confere cada trecho na página baixada; todos os trechos foram encontrados nas páginas ao vivo. No Chromium headless, em 320 px e 1280 px, um roteiro por CDP percorreu a triagem, os planos e a edição de respostas das três jornadas: 34 verificações sem falha, sem rolagem horizontal e sem erro de console além do `favicon.ico` ausente (404). A varredura com axe-core não rodou, porque o `node_modules` não estava instalado. Leitor de tela, teclado e foco não foram verificados.
 - O botão flutuante do VLibras cobre parte do texto à direita em 320 px (por exemplo, "Trabalho ou emprego" no início). Vem da Fase 11, não destas jornadas.
 - **Pendente:** confirmação da mudança de escopo com o orientador.
+
+## Fase 13 — Redesenho neutro
+
+Em 27/10/2026, cinco commits da branch `feat/ui-redesign` (`5a1f733`, `93ce2b0`, `37db4af`, `94db19a`, `41df7b3`) substituíram o visual "azulejo" da Fase 9, simplificaram o funil e reorganizaram o plano. As restrições da [ADR 0004](../arquitetura/decisoes/0004-frontend-e-acessibilidade.md) seguem.
+
+- **13a — Funil só com situações que têm plano (`5a1f733`).** O funil é um único nó `inicio` ("O que aconteceu com você?") com 6 opções, cada uma levando direto a uma situação: perda de documentos, CPF irregular, desligamento do trabalho, transferência de veículo, falecimento na família e aposentadoria.
+  - Saíram o ramo "fora da cobertura", a página `/fora-da-cobertura/` e a página `/situacoes/`. O loader rejeita a chave `uncovered`.
+  - Constraint `triage_choice_exactly_one_destination` (exatamente um entre `next_node` e `situation`). A migration 0008 apaga antes as escolhas sem destino.
+  - Ícones de `TriageChoice.Icon`: `family`, `vehicle`, `lost`, `problem`, `leaving`, `retirement`.
+  - O mecanismo de nós internos (`/comecar/<slug>/`) continua, para uso futuro. As respostas `out_of_coverage` nas perguntas e o aviso "Limite de cobertura" no plano continuam.
+  - Ver a nota de 27/10/2026 na [ADR 0005](../arquitetura/decisoes/0005-funil-de-triagem.md).
+- **13b — Sistema visual neutro (`93ce2b0`).** Paleta neutra no lugar da de São Luís (creme, azulejo, ocre); `azulejo.svg` foi removido. A tabela de contraste está no topo de `site.css`.
+  - A cor só tem papel: azul para ação, verde para prioridade, âmbar para alerta e vermelho para erro.
+  - Fonte Atkinson Hyperlegible Next, texto base de 18 px, alvos principais de 56 px (nenhum abaixo de 48 px), coluna única de 36 rem e mobile primeiro.
+  - O indicador de etapas tem 3 segmentos (Perguntas, Atendimento, Plano) e não aparece no plano.
+  - O botão de Libras continua flutuante à direita, agora na vertical (44 px de largura).
+- **13c — Plano em lista única (`37db4af`, `94db19a`).** Etapas agrupadas por camada, com resumo "N etapas. Comece pelo passo 1.", aviso de uma linha e preferência de atendimento com "Mudar". Cada cartão tem botão principal para o site oficial (`StepView.primary_channel`) ou, sem canal com URL, o botão "Ver a página oficial do serviço" para a fonte citada. Detalhes em "Ver detalhes". Saíram as seções "Comece por aqui", "Resumo" e "O que separar antes" e a dica de impressão. Descrição completa em [interface e acessibilidade](../produto/interface-e-acessibilidade.md#estrutura-do-plano).
+  - `shortcut:` na impressão, o CSS abre os `<details>` com `::details-content`, que só funciona no Chromium 131 ou superior.
+- **Verificação (27/10/2026).**
+  - `npm run a11y`: 0 violações em 27 páginas, com as tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` e `wcag22aa`.
+  - Capturas via CDP headless em 360, 390, 1280 e 640 px, com escala 2 (equivalente a zoom de 200%), e em 320 px: nenhuma rolagem horizontal.
+  - Navegação só por teclado no início e no plano: foco visível e não encoberto; "Ver detalhes" abre com Enter.
+  - Gates: ruff, mypy e pytest verdes, com 516 testes.
+  - Não verificado: leitor de tela real e a impressão em navegadores que não sejam Chromium 131 ou superior.
 
 ## Limitações conhecidas
 
