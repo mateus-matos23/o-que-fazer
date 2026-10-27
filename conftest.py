@@ -49,6 +49,8 @@ SAMPLE_FILES = {
     "ssp-cin-ma": "html-ssp-cin-ma.md",
     "detran-2via-cnh": "html-detran-2via-cnh.md",
     "detran-taxas": "html-detran-taxas.md",
+    "detran-transf-digital": "html-detran-transf-digital.md",
+    "govbr-restricoes-veiculo": "html-govbr-restricoes-veiculo.md",
 }
 
 

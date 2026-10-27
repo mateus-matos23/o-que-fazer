@@ -9,7 +9,7 @@ options = [
   {label = "Documentos pessoais (CPF, identidade, carteira de motorista)", icon = "document", next = "documentos"},
   {label = "Trabalho ou emprego", icon = "work", next = "trabalho"},
   {label = "Família (nascimento de filho, falecimento)", icon = "family", uncovered = true},
-  {label = "Veículo (compra ou venda)", icon = "vehicle", uncovered = true},
+  {label = "Veículo (compra ou venda)", icon = "vehicle", next = "veiculo"},
   {label = "Outro assunto", icon = "other", uncovered = true},
 ]
 
@@ -29,5 +29,13 @@ text = "O que aconteceu no trabalho?"
 options = [
   {label = "Saí do emprego (fui mandado embora, pedi para sair ou o contrato acabou)", icon = "leaving", situation = "desligamento-do-trabalho"},
   {label = "Estou procurando o primeiro emprego", icon = "first-job", uncovered = true},
+  {label = "Outra coisa", icon = "other", uncovered = true},
+]
+
+[[triage]]
+slug = "veiculo"
+text = "O que aconteceu com o veículo?"
+options = [
+  {label = "Comprei ou vendi um veículo usado, ou recebi por herança, doação ou leilão", icon = "vehicle", situation = "transferencia-de-veiculo"},
   {label = "Outra coisa", icon = "other", uncovered = true},
 ]

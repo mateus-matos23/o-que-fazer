@@ -2,10 +2,10 @@
 
 - URL: https://www.detran.ma.gov.br/inicio/paginas/Pagina.xhtml?id=23692
 - HTTP: 200
-- Coleta: 2026-10-24T23:51:11-03:00
+- Coleta: 2026-10-27T09:51:45-03:00 (recoleta; a de 2026-10-24T23:51:11-03:00 tinha o mesmo texto nas linhas 23 a 62, com SHA-256 `4b08e2995ce07e85f1870b48810a3642a1eef24fdc2acf13d6c44293d968c9ea`)
 - "Última Modificação" / "Atualizado em" / "Publicado em" declarada (texto do HTML): não informado
-- SHA-256 do HTML completo baixado: `4b08e2995ce07e85f1870b48810a3642a1eef24fdc2acf13d6c44293d968c9ea`
-- Trecho: linhas 23 a 62 do extrato de texto (118 linhas no total), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita.
+- SHA-256 do HTML completo baixado: `f7e3737d1a24e4138e1a9c3b296cff69d5d1f7283f6f38e40c140da05b4dccc8`
+- Trecho: linhas 23 a 64 do extrato de texto (122 linhas no total), sem `script`/`style`, tags removidas com `html.parser`, sem reescrita. As linhas 63 e 64 (mudança de UF e de característica) entraram na recoleta para completar a lista dos casos de balcão.
 
 ```text
 TRANSFERÊNCIA DE PROPRIEDADE DE VEÍCULO - DIGITAL
@@ -48,4 +48,6 @@ Veículos que necessitem do serviço de mudança de motor;
 Veículos que não possuam CRV (certificado de registro de veículo) no formato digital;
 Veículos que necessitem do serviço de regravação de chassi ou motor;
 Veículos onde o comprador ou o vendedor sejam Pessoa Jurídica, exceto concessionárias e revendedoras de veículos;
+Veículos que necessitem do serviço de mudança de UF;
+Veículos que necessitem do serviço de mudança de característica;
 ```

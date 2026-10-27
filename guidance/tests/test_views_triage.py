@@ -31,7 +31,7 @@ def test_root_shows_start_node(loaded: dict[str, int], client: Client) -> None:
         "/comecar/documentos/",
         "/comecar/trabalho/",
         "/fora-da-cobertura/",
-        "/fora-da-cobertura/",
+        "/comecar/veiculo/",
         "/fora-da-cobertura/",
     ]
     assert 'href="/situacoes/"' in html and 'href="/onde-resolvo/"' in html

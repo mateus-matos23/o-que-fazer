@@ -1,0 +1,190 @@
+# Jornada "transferência de veículo". Fonte da verdade: docs/dados/evidencias/transferencia-de-veiculo.md.
+# Fonte principal: página da transferência digital do DETRAN-MA (id 23692), sem data declarada (RN12:
+# "não informado"). A página do balcão (id 19272) segue em defeso eleitoral em 27/10/2026; o balcão
+# é citado pela própria página digital, que lista os casos que vão para o atendimento presencial.
+#
+# Decisões:
+# - Duas perguntas: como o veículo muda de dono (SINGLE) e se ele está num dos casos de balcão
+#   (MULTIPLE, vazio = nenhum). A transferência digital exige compra e venda E nenhum caso de balcão;
+#   o balcão vale para herança, doação ou leilão OU para qualquer caso marcado (OU de regras).
+# - "Não sei" só nos casos de balcão: quem não sabe se o CRV é digital fica com as duas transferências
+#   indeterminadas, nunca com uma delas descartada (RN03).
+# - Vistoria em ECV antes da transferência digital: dependência MANDATORY ("Após aprovação, o usuário
+#   seguirá para a plataforma online"). A vistoria só aparece com a transferência digital: a página
+#   não a descreve para o balcão.
+# - Consulta de restrições (Senatran) antes da transferência: RECOMMENDED. A página do DETRAN-MA pede
+#   que "não conste restrições", mas não exige a consulta; a ordem é sugestão (RN08).
+#
+# Fora por falta de trecho literal ou de fonte (a afirmação não entra; custo/prazo vira "não informado"):
+# - Taxa da transferência: a tabela de taxas lida não traz o item. Prazo: não consta.
+# - Documentos de cada caso de balcão: a página diz "documentação específica para cada caso" e remete à
+#   Portaria Detran 166/2020, que não foi lida.
+# - Vistoria reprovada por mudança de característica ou regravação de chassi/motor leva ao balcão: o
+#   resultado da vistoria não é perguntado (só se sabe depois dela); fica na descrição da vistoria.
+# - Débitos (IPVA, multas) como impedimento: hipótese sem trecho nas amostras.
+
+[[situations]]
+slug = "transferencia-de-veiculo"
+title = "Comprei ou vendi um veículo usado"
+candidates = [
+  "consultar-restricoes-veiculo",
+  "vistoria-veicular-ecv",
+  "transferencia-digital-veiculo",
+  "transferencia-balcao-veiculo",
+]
+
+[[questions]]
+slug = "forma-de-transferencia"
+text = "Como o veículo está mudando de dono?"
+help = "Escolha a forma da transferência. Herança, doação e leilão têm atendimento próprio no DETRAN-MA."
+kind = "SINGLE"
+allows_unknown = false
+situations = ["transferencia-de-veiculo"]
+options = [
+  {slug = "compra-e-venda", label = "Compra e venda (entre pessoas ou com concessionária ou revenda)"},
+  {slug = "heranca", label = "Herança"},
+  {slug = "doacao", label = "Doação"},
+  {slug = "leilao", label = "Leilão"},
+]
+
+[[questions]]
+slug = "casos-de-balcao-veiculo"
+text = "Algum destes casos vale para a transferência?"
+help = "Marque todos os que valem. Se nenhum vale, deixe tudo desmarcado. Se não souber, marque \"Não sei\"."
+kind = "MULTIPLE"
+allows_unknown = true
+order = 1
+situations = ["transferencia-de-veiculo"]
+options = [
+  {slug = "pessoa-juridica", label = "O comprador ou o vendedor é uma empresa (que não seja concessionária ou revenda)"},
+  {slug = "crv-nao-digital", label = "O veículo não tem o documento de registro (CRV) em formato digital"},
+  {slug = "mudanca-de-estado", label = "O veículo vem de outro estado ou vai para outro estado"},
+  {slug = "categoria-especial", label = "O veículo é de aluguel, de autoescola ou oficial"},
+  {slug = "condicao-especial", label = "Veículo de colecionador, para pessoa com deficiência, com curatela, para menor de idade, ou comprado por estrangeiro ou por seguradora"},
+  {slug = "alteracao-no-veiculo", label = "O veículo precisa mudar de motor ou de característica, ou regravar o chassi ou o motor"},
+]
+
+[[procedures]]
+slug = "consultar-restricoes-veiculo"
+title = "Consultar restrições e indicadores do veículo"
+description = "Veja se o veículo tem restrição judicial, administrativa, financeira ou de circulação antes de transferir. O sistema não consulta os dados do veículo."
+agency = "senatran"
+jurisdiction = "FEDERAL"
+source = "govbr-restricoes-veiculo"
+excerpt = "Essas informações são úteis para verificar a situação do veículo quanto à circulação, transferência de propriedade, pendências legais e outros aspectos."
+requirements = [
+  {description = "Estar cadastrado no Portal de Serviços da Senatran.", source = "govbr-restricoes-veiculo", excerpt = "Estejam cadastradas no Portal de Serviços SENATRAN"},
+  {description = "No portal: informar Renavam, placa e CPF ou CNPJ do proprietário.", source = "govbr-restricoes-veiculo", excerpt = "Informe o Código Renavam e Placa do veículo, e CPF/CNPJ do proprietário"},
+  {description = "No aplicativo: ter o veículo cadastrado na Carteira Digital de Trânsito.", source = "govbr-restricoes-veiculo", excerpt = "Deverá ter seu(s) veículo(s) cadastrado(s)"},
+  {description = "Cada usuário tem acesso a 5 consultas de veículos.", source = "govbr-restricoes-veiculo", excerpt = "Cada usuário tem acesso a 5 consultas de veículos."},
+]
+channels = [
+  {kind = "APP", description = "Aplicativo Carteira Digital de Trânsito (CDT), em \"Restrições e indicadores\".", source = "govbr-restricoes-veiculo", excerpt = "Consultar informações pelo aplicativo da Carteira Digital de Trânsito (CDT)"},
+  {kind = "ONLINE", description = "Portal de Serviços da Senatran, com conta gov.br, em \"Consultar Veículo\".", source = "govbr-restricoes-veiculo", excerpt = "Consultar informações pelo Portal de Serviços"},
+]
+details = [
+  {kind = "DEADLINE", text = "Atendimento imediato.", source = "govbr-restricoes-veiculo", excerpt = "Atendimento imediato"},
+]
+
+[[procedures]]
+slug = "vistoria-veicular-ecv"
+title = "Agendar a vistoria do veículo numa ECV do Maranhão"
+description = "A transferência digital começa pela vistoria numa empresa credenciada de vistoria (ECV). Se a vistoria reprovar o veículo por mudança de característica não regularizada ou por regravação de chassi ou motor, a transferência passa a ser no balcão do DETRAN-MA."
+agency = "detran-ma"
+jurisdiction = "MARANHAO"
+source = "detran-transf-digital"
+excerpt = "agendamento da vistoria veicular"
+channels = [
+  {kind = "IN_PERSON", description = "Empresa credenciada de vistoria (ECV) no Maranhão.", source = "detran-transf-digital", excerpt = "em ECV do Maranhão;"},
+]
+
+[[procedures]]
+slug = "transferencia-digital-veiculo"
+title = "Transferir o veículo pela plataforma digital"
+description = "Depois da vistoria aprovada, o vendedor inclui a autorização eletrônica de transferência (ATPVe) indicando o comprador, os dois assinam pela plataforma e o novo documento do veículo (CRLVe) sai no nome do comprador."
+agency = "detran-ma"
+jurisdiction = "MARANHAO"
+source = "detran-transf-digital"
+excerpt = "Após aprovação, o usuário seguirá para a plataforma online para inclusão do ATPVe (Autorização de Transferência de Propriedade Veicular eletrônico) com a indicação do comprador;"
+requirements = [
+  {description = "Vistoria aprovada e nenhuma restrição no veículo. Nesse caso, não é preciso apresentar documentos ao DETRAN-MA.", source = "detran-transf-digital", excerpt = "não há necessidade de apresentação de qualquer documentação para o DETRAN caso haja vistoria aprovada e não conste restrições no veículo"},
+  {description = "Comprador e vendedor reconhecem as assinaturas na própria plataforma, com validação facial e geolocalização.", source = "detran-transf-digital", excerpt = "Ambos deverão reconhecer as assinaturas pela própria plataforma que dispõe de validador facial e geolocalização;"},
+  {description = "Pagamento das taxas de serviço e das placas, quando for o caso.", source = "detran-transf-digital", excerpt = "pagamento das taxas de serviço e confecção da(s) placa(s) quando for o caso"},
+]
+channels = [
+  {kind = "ONLINE", description = "Plataforma de transferência digital, por computador, tablet ou celular.", url = "https://www.emplacamentoma.com.br", source = "detran-transf-digital", excerpt = "A abertura do processo de transferência será feita por computador, tablet ou smartphone, através do site:"},
+]
+
+[[procedures]]
+slug = "transferencia-balcao-veiculo"
+title = "Transferir o veículo no balcão do DETRAN-MA"
+description = "Alguns casos não podem usar a transferência digital e são atendidos presencialmente, em qualquer unidade do DETRAN-MA."
+agency = "detran-ma"
+jurisdiction = "MARANHAO"
+source = "detran-transf-digital"
+excerpt = "deverá ser feito processo de transferência por meio de balcão de atendimento em qualquer unidade Detran do Maranhão"
+requirements = [
+  {description = "Documentação específica do seu caso, documento de identificação válido (pessoa física, empresa e representantes legais) e comprovante de endereço.", source = "detran-transf-digital", excerpt = "munido da documentação específica para cada caso, bem como documentação válida de identificação pessoal pessoa física, jurídica e seus representantes legais, e comprovante de endereço"},
+]
+channels = [
+  {kind = "IN_PERSON", description = "Balcão de atendimento de qualquer unidade do DETRAN-MA.", source = "detran-transf-digital", excerpt = "balcão de atendimento em qualquer unidade Detran do Maranhão"},
+]
+
+[[rules]]
+slug = "regra-transferencia-digital"
+procedure = "transferencia-digital-veiculo"
+explanation = "A transferência digital é para compra e venda fora dos casos que o DETRAN-MA manda para o balcão."
+source = "detran-transf-digital"
+excerpt = "Caso o seu veículo pertença a alguma das categorias, tipos ou condições abaixo, deverá ser feito processo de transferência por meio de balcão"
+conditions = [
+  {question = "forma-de-transferencia", operator = "ANY_OF", options = ["compra-e-venda"]},
+  {question = "casos-de-balcao-veiculo", operator = "NONE_OF", options = ["pessoa-juridica", "crv-nao-digital", "mudanca-de-estado", "categoria-especial", "condicao-especial", "alteracao-no-veiculo"]},
+]
+
+[[rules]]
+slug = "regra-vistoria-digital"
+procedure = "vistoria-veicular-ecv"
+explanation = "A transferência digital começa pela vistoria."
+source = "detran-transf-digital"
+excerpt = "O Procedimento inicia com"
+conditions = [
+  {question = "forma-de-transferencia", operator = "ANY_OF", options = ["compra-e-venda"]},
+  {question = "casos-de-balcao-veiculo", operator = "NONE_OF", options = ["pessoa-juridica", "crv-nao-digital", "mudanca-de-estado", "categoria-especial", "condicao-especial", "alteracao-no-veiculo"]},
+]
+
+[[rules]]
+slug = "regra-balcao-forma"
+procedure = "transferencia-balcao-veiculo"
+explanation = "Veículo recebido por herança, doação ou leilão é transferido no balcão do DETRAN-MA."
+source = "detran-transf-digital"
+excerpt = "Veículo adquirido por herança;"
+conditions = [{question = "forma-de-transferencia", operator = "ANY_OF", options = ["heranca", "doacao", "leilao"]}]
+
+[[rules]]
+slug = "regra-balcao-caso"
+procedure = "transferencia-balcao-veiculo"
+explanation = "Os casos marcados estão na lista do DETRAN-MA de transferências feitas no balcão."
+source = "detran-transf-digital"
+excerpt = "CASOS BALCÃO DE ATENDIMENTO DETRAN:"
+conditions = [{question = "casos-de-balcao-veiculo", operator = "ANY_OF", options = ["pessoa-juridica", "crv-nao-digital", "mudanca-de-estado", "categoria-especial", "condicao-especial", "alteracao-no-veiculo"]}]
+
+[[dependencies]]
+before = "vistoria-veicular-ecv"
+after = "transferencia-digital-veiculo"
+kind = "MANDATORY"
+source = "detran-transf-digital"
+excerpt = "Após aprovação, o usuário seguirá para a plataforma online"
+
+[[dependencies]]
+before = "consultar-restricoes-veiculo"
+after = "transferencia-digital-veiculo"
+kind = "RECOMMENDED"
+source = "detran-transf-digital"
+excerpt = "não conste restrições no veículo"
+
+[[dependencies]]
+before = "consultar-restricoes-veiculo"
+after = "transferencia-balcao-veiculo"
+kind = "RECOMMENDED"
+source = "govbr-restricoes-veiculo"
+excerpt = "Essas informações são úteis para verificar a situação do veículo quanto à circulação, transferência de propriedade"

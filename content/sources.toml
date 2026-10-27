@@ -237,3 +237,27 @@ url = "https://www.detran.ma.gov.br/inicio/paginas/Taxas.xhtml"
 format = "HTML"
 jurisdiction = "MARANHAO"
 access_notes = "Tabela de taxas do DETRAN-MA; sem data declarada."
+
+# Jornada "transferência de veículo" (27/10/2026).
+# Origem: docs/dados/evidencias/transferencia-de-veiculo.md.
+
+[[agencies]]
+slug = "senatran"
+name = "Secretaria Nacional de Trânsito (Senatran)"
+jurisdiction = "FEDERAL"
+
+[[sources]]
+slug = "detran-transf-digital"
+agency = "detran-ma"
+url = "https://www.detran.ma.gov.br/inicio/paginas/Pagina.xhtml?id=23692"
+format = "HTML"
+jurisdiction = "MARANHAO"
+access_notes = "Página da transferência de propriedade de veículo (digital); leitura sem login; sem data declarada. Lista os casos de balcão; a página do balcão (id 19272) estava em defeso eleitoral em 27/10/2026."
+
+[[sources]]
+slug = "govbr-restricoes-veiculo"
+agency = "senatran"
+url = "https://www.gov.br/pt-br/servicos/consultar-informacoes-sobre-restricoes-e-indicadores-de-veiculos"
+format = "HTML"
+jurisdiction = "FEDERAL"
+access_notes = "Página do serviço Consultar restrições e indicadores de veículos; leitura sem login. Declara \"Última Modificação: 15/12/2025\"."
