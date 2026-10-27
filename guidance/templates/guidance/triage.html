@@ -1,7 +1,6 @@
 {% extends "guidance/base.html" %}
 {% block title %}{{ node.text }} - O que Fazer?{% endblock %}
 {% block content %}
-<div class="triage{% if is_start %} is-start{% endif %}">
 <h1>{{ node.text }}</h1>
 {% if node.help_text %}<p class="question-help">{{ node.help_text }}</p>{% endif %}
 <ul class="choice-cards">
@@ -9,12 +8,8 @@
   <li><a href="{% if choice.next_node %}{% url 'guidance:triage' choice.next_node.slug %}{% else %}{% url 'guidance:question' choice.situation.slug %}{% endif %}">{% if choice.icon %}<span class="icon-tile">{% include "guidance/icons/"|add:choice.icon|add:".svg" %}</span>{% endif %}<span>{{ choice.label }}</span></a></li>
   {% endfor %}
 </ul>
-</div>
 {% if is_start %}
-<section class="search-cta" aria-labelledby="search-cta-title">
-  <h2 id="search-cta-title">Já sabe qual serviço procura?</h2>
-  <a class="button secondary" href="{% url 'guidance:search' %}">Buscar pelo nome do serviço</a>
-</section>
+{% include "guidance/_search_cta.html" %}
 {% else %}
 <p class="context-link"><a href="{% url 'guidance:home' %}">Voltar ao início</a></p>
 {% endif %}
