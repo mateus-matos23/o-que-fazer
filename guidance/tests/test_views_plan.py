@@ -54,7 +54,6 @@ def test_plan_shows_step_details(loaded: dict[str, int], client: Client) -> None
         'href="https://servicos.receita.fazenda.gov.br/Servicos/CPF/regularizar/Default.asp"'
         in html
     )
-    assert 'rel="noopener"' in html
     assert re.search(r"<dt>Custo</dt>\s*<dd>Gratuito, exceto em unidades conveniadas", html)
     assert re.search(
         r'<dt>Prazo</dt>\s*<dd><span class="not-informed">Não informado</span></dd>', html
@@ -229,6 +228,16 @@ def test_step_button_goes_to_the_official_online_channel(
     button = card.split("<details>")[0]
     assert (
         '<a class="button" href="https://servicos.receita.fazenda.gov.br/Servicos/CPF/'
-        'regularizar/Default.asp" rel="noopener">Ir para o site oficial' in button
+        'regularizar/Default.asp" target="_blank" rel="noopener noreferrer">'
+        "Ir para o site oficial" in button
     )
     assert "Ver a página oficial do serviço" not in button
+
+
+def test_external_links_open_in_a_new_tab(loaded: dict[str, int], client: Client) -> None:
+    _answer(client, "suspenso")
+    for url in (PLAN, "/onde-resolvo/extrato-vinculos-caged/"):
+        links = re.findall(r'<a [^>]*href="https?://[^>]*>', _html(client, url))
+        assert links
+        for link in links:
+            assert 'target="_blank" rel="noopener noreferrer"' in link, link

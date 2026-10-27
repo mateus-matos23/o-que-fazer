@@ -155,7 +155,8 @@ def test_each_step_keeps_its_details_collapsed() -> None:
 def test_step_without_channel_url_links_to_its_official_source() -> None:
     card = _plan_html().split('<article id="etapa-a"')[1].split("<details>")[0]
     assert (
-        '<a class="button secondary" href="https://exemplo.gov.br/fonte" rel="noopener">'
+        '<a class="button secondary" href="https://exemplo.gov.br/fonte" target="_blank" '
+        'rel="noopener noreferrer">'
         "Ver a página oficial do serviço" in card
     )
     assert "Ir para o site oficial" not in card

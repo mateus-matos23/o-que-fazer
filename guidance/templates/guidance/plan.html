@@ -42,9 +42,9 @@
         </div>
         {% endif %}
         {% if item.primary_channel %}
-        <a class="button" href="{{ item.primary_channel.channel.url }}" rel="noopener">Ir para o site oficial<span class="visually-hidden">: {{ procedure.title }}</span></a>
+        <a class="button" href="{{ item.primary_channel.channel.url }}" target="_blank" rel="noopener noreferrer">Ir para o site oficial<span class="visually-hidden">: {{ procedure.title }} (abre em nova guia)</span></a>
         {% else %}{# sem URL de canal na fonte, leva à própria fonte oficial citada #}
-        <a class="button secondary" href="{{ procedure.citation.source_url }}" rel="noopener">Ver a página oficial do serviço<span class="visually-hidden">: {{ procedure.title }}</span></a>
+        <a class="button secondary" href="{{ procedure.citation.source_url }}" target="_blank" rel="noopener noreferrer">Ver a página oficial do serviço<span class="visually-hidden">: {{ procedure.title }} (abre em nova guia)</span></a>
         {% endif %}
         <details>
           <summary>Ver detalhes<span class="visually-hidden">: {{ procedure.title }}</span></summary>

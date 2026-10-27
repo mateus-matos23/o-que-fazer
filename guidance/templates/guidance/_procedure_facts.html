@@ -18,7 +18,7 @@
       {% if channels %}
       <ul>
         {% for line in channels %}
-        <li>{% include "guidance/_maybe.html" with maybe=line.maybe %}{{ line.kind_label }}: {% if line.channel.url %}<a href="{{ line.channel.url }}" rel="noopener">{{ line.channel.description }} (site oficial)</a>{% else %}{{ line.channel.description }}{% endif %}</li>
+        <li>{% include "guidance/_maybe.html" with maybe=line.maybe %}{{ line.kind_label }}: {% if line.channel.url %}<a href="{{ line.channel.url }}" target="_blank" rel="noopener noreferrer">{{ line.channel.description }} (site oficial)<span class="visually-hidden"> (abre em nova guia)</span></a>{% else %}{{ line.channel.description }}{% endif %}</li>
         {% endfor %}
       </ul>
       {% elif procedure.channels %}<span class="not-informed">Nenhum dos itens da fonte vale para o que você informou.</span>
@@ -34,7 +34,7 @@
 
     <dt>Fonte</dt>
     <dd>
-      <a href="{{ procedure.citation.source_url }}" rel="noopener">{{ procedure.citation.source_slug }} (site oficial)</a><br>
+      <a href="{{ procedure.citation.source_url }}" target="_blank" rel="noopener noreferrer">{{ procedure.citation.source_slug }} (site oficial)<span class="visually-hidden"> (abre em nova guia)</span></a><br>
       Coletado em {{ procedure.citation.fetched_at|date:"d/m/Y H:i" }}.<br>
       Atualizado pelo órgão em {% if procedure.citation.declared_updated_at %}{{ procedure.citation.declared_updated_at|date:"d/m/Y" }}{% else %}<span class="not-informed">Não informado</span>{% endif %}.
     </dd>
